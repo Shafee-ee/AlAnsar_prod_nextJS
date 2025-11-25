@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "QnA" ALTER COLUMN "question_en" DROP NOT NULL,
+ALTER COLUMN "answer_en" DROP NOT NULL,
+ALTER COLUMN "keywords_en" SET DEFAULT ARRAY[]::TEXT[];

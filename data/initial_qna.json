@@ -1,0 +1,25 @@
+[
+    {
+        "question_kn": "ನಮಸ್ಕಾರ",
+        "answer_kn": "ನಾನು ನಿಮ್ಮ ಸಹಾಯಕ ಚಾಟ್‌ಬಾಟ್. ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?",
+        "keywords_kn": "ನಮಸ್ಕಾರ,ಹೇಗಿದ್ದೀರಾ",
+        "question_en": "Hello",
+        "answer_en": "I am your assistant chatbot. How may I help you?",
+        "keywords_en": [
+            "hello",
+            "hi",
+            "greetings"
+        ]
+    },
+    {
+        "question_kn": "ಈ ವಾರದ ಅಪ್ಡೇಟ್ ಏನು?",
+        "answer_kn": "ಕ್ಷಮಿಸಿ, ಈ ಕುರಿತು ನನ್ನ ಬಳಿ ಮಾಹಿತಿ ಇಲ್ಲ.",
+        "keywords_kn": "ಅಪ್ಡೇಟ್, ಈ ವಾರ",
+        "question_en": "What is the update this week?",
+        "answer_en": "Sorry, I don't have information on this topic.",
+        "keywords_en": [
+            "update",
+            "weekly update"
+        ]
+    }
+]

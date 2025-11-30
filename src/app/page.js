@@ -2,19 +2,39 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Loader } from 'lucide-react';
+import { useRouter } from 'next/navigation'; // Import useRouter for redirection
 
+import { useAuth } from '@/components/AuthProvider'; // Import the Auth hook
 import ChatbotSection from '@/components/ChatbotSection';
 import { ArticleCarousel, CATEGORIES_DATA } from '@/components/ArticleComponents';
 
 export default function Home() {
+  const { user, isAdmin, loading } = useAuth(); // Use the Auth hook
+  const router = useRouter();
+
   const [articles, setArticles] = useState([]);
   const [isArticlesLoading, setIsArticlesLoading] = useState(true);
 
+  // --- ADMIN REDIRECTION LOGIC ---
   useEffect(() => {
+    if (!loading) {
+      if (isAdmin) {
+        // Redirect admin users to the dashboard
+        console.log("Admin user detected, redirecting to /dashboard.");
+        router.replace('/dashboard');
+        // We return null below, but the redirect happens here first.
+      }
+    }
+  }, [loading, isAdmin, router]);
+
+  // --- ARTICLE FETCHING LOGIC (Remains the same) ---
+  useEffect(() => {
+    // Only run this effect if the user is not an admin, or after the auth check is complete
+    if (loading || isAdmin) return;
+
     const fetchArticles = async () => {
       setIsArticlesLoading(true);
       try {
-
         const response = await fetch('/api/articles', { cache: 'no-store' });
 
         if (!response.ok) {
@@ -29,7 +49,6 @@ export default function Home() {
           return;
         }
 
-
         const articlesWithLocalPaths = fetchedArticles.map(article => ({
           ...article,
           image: article.image ? `${article.image}` : null,
@@ -39,14 +58,13 @@ export default function Home() {
 
       } catch (error) {
         console.error("Failed to fetch articles from API or parse response.", error);
-        // 🚨 NO MOCK DATA FALLBACK: Set to empty array on failure
         setArticles([]);
       } finally {
         setIsArticlesLoading(false);
       }
     };
     fetchArticles();
-  }, []);
+  }, [isAdmin, loading]); // Added isAdmin and loading to dependency array
 
   // FILTERING LOGIC 
   const featuredArticles = useMemo(() => {
@@ -58,7 +76,20 @@ export default function Home() {
     return articles.slice(0, 10);
   }, [articles]);
 
+  // --- LOADING/REDIRECT SCREEN ---
+  if (loading || isAdmin) {
+    // Show a full-screen loader while checking auth state or if admin is about to redirect
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center text-gray-700 text-lg">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4 text-red-600" />
+          Checking credentials...
+        </div>
+      </div>
+    );
+  }
 
+  // --- STANDARD USER UI ---
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col font-sans p-4 md:p-8">
       <div className="w-full max-w-7xl mx-auto py-8">

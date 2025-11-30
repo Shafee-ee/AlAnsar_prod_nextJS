@@ -1,0 +1,32 @@
+[
+    {
+        "question_en": "What is the meaning of Islam?",
+        "answer_en": "Islam means submission to the will of Allah and living a life of obedience and peace.",
+        "lang": "en"
+    },
+    {
+        "question_en": "Who is the Prophet Muhammad?",
+        "answer_en": "Prophet Muhammad (peace be upon him) is the final messenger of Allah, sent to guide humanity.",
+        "lang": "en"
+    },
+    {
+        "question_en": "What is the Quran?",
+        "answer_en": "The Quran is the holy book of Islam, revealed by Allah as guidance for mankind.",
+        "lang": "en"
+    },
+    {
+        "question_kn": "ಇಸ್ಲಾಂ ಎಂದರೆ 무엇?",
+        "answer_kn": "ಇಸ್ಲಾಂ ಎಂದರೆ ಅಲ್ಲಾಹನ ಇಚ್ಛೆಗೆ ಶರಣಾಗು ವುದು ಮತ್ತು ಶಾಂತಿಯುತ ಜೀವನವನ್ನು ನಡೆಸುವುದು.",
+        "lang": "kn"
+    },
+    {
+        "question_kn": "ಪ್ರವಾದಿ ಮುಹಮ್ಮದ್ ಯಾರು?",
+        "answer_kn": "ಪ್ರವಾದಿ ಮುಹಮ್ಮದ್ (ಸ.ಅ) ಅವರು ಅಲ್ಲಾಹನು ಮಾನವರಿಗೆ ಮಾರ್ಗದರ್ಶನ ನೀಡಲು ಕಳುಹಿಸಿದ ಕೊನೆಯ ದೂತರು.",
+        "lang": "kn"
+    },
+    {
+        "question_kn": "ಕುರ್'ಆನ್ ಎಂದರೆ ಏನು?",
+        "answer_kn": "ಕುರ್'ಆನ್ ಇಸ್ಲಾಂ ಧರ್ಮದ ಪವಿತ್ರ ಗ್ರಂಥವಾಗಿದ್ದು, ಅದು ಅಲ್ಲಾಹನಿಂದ ಮಾನವರಿಗೆ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ಇಳಿಸಲಾಯಿತು.",
+        "lang": "kn"
+    }
+]

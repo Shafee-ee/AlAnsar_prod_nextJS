@@ -1,17 +1,9 @@
-// jsconfig.json
 {
   "compilerOptions": {
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      // 💡 This is needed for '@/models/Article' to resolve correctly
-      "@/models/*": [
-        "models/*"
-      ],
-      "@/components/*": [
-        "src/components/*"
-      ],
-      "@/libs/*": [
-        "libs/*"
+      "@/*": [
+        "*"
       ]
     }
   }

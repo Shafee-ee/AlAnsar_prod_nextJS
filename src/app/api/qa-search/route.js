@@ -1,72 +1,46 @@
 import { NextResponse } from 'next/server';
-import prisma from '../../../../libs/prisma';
-export async function POST(request) {
-    const queryStartTime = Date.now();
-    let searchQuery = '';
+// FIX: This line now correctly imports from your file: '@/libs/firebase'
+import { searchQna } from '@/libs/firebase';
 
+// Handles POST requests to search the Qna database
+export async function POST(request) {
     try {
         const { query } = await request.json();
 
         if (!query || typeof query !== 'string' || query.trim() === '') {
-            return NextResponse.json({ error: 'A valid search query is required.' }, { status: 400 });
-        }
-
-        searchQuery = query.trim();
-
-        const results = await prisma.qna.findMany({
-            where: {
-                OR: [
-                    {
-                        question_en: {
-                            contains: searchQuery,
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        keywords_en: {
-                            contains: searchQuery,
-                            mode: 'insensitive'
-                        }
-                    },
-                    {
-                        question_kn: {
-                            contains: searchQuery,
-                            mode: 'insensitive'
-                        }
-                    },
-                ],
-            },
-            take: 5,
-        });
-
-        const queryDuration = Date.now() - queryStartTime;
-        console.log(`[QA Search] Query: "${searchQuery}" | Duration: ${queryDuration}ms | Results: ${results.length}`);
-
-
-        if (results.length > 0) {
-            const bestResult = results[0];
-
             return NextResponse.json({
-                success: true,
-                answer: bestResult.answer_en,
-                sourceQuestion_kn: bestResult.question_kn,
-                keywords: bestResult.keywords_en,
-            });
+                success: false,
+                answer: "ಪ್ರಶ್ನೆ ಇಲ್ಲ (No query provided)."
+            }, { status: 400 });
         }
 
+        // Execute the search using the Firebase utility
+        const bestMatch = await searchQna(query);
+
+        // This logic is designed to work with the data structure in libs/firebase.js
+        if (!bestMatch) {
+            return NextResponse.json({
+                success: false,
+                answer: "ಕ್ಷಮಿಸಿ, ಈ ಪ್ರಶ್ನೆಗೆ ಸಂಬಂಧಿಸಿದ ಮಾಹಿತಿಯನ್ನು ನನ್ನ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಕಂಡುಹಿಡಿಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆ ರೀತಿಯಲ್ಲಿ ಪ್ರಯತ್ನಿಸಿ."
+            }, { status: 200 });
+        }
+
+        // Return the successful response
         return NextResponse.json({
-            success: false,
-            answer: "ಕ್ಷಮಿಸಿ, ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಸಂಬಂಧಿಸಿದ ಮಾಹಿತಿಯನ್ನು ನನ್ನ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ಕಂಡುಹಿಡಿಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆ ರೀತಿಯಲ್ಲಿ ಪ್ರಯತ್ನಿಸಿ."
-        });
+            success: true,
+            // Assuming the Firestore document has these fields
+            answer: bestMatch.answer_en,
+            sourceQuestion_kn: bestMatch.question_kn,
+            // Handle keywords array/string conversion
+            keywords: Array.isArray(bestMatch.keywords_en) ? bestMatch.keywords_en :
+                (typeof bestMatch.keywords_en === 'string' ? bestMatch.keywords_en.split(',').map(k => k.trim()) : [])
+        }, { status: 200 });
 
     } catch (error) {
-        const errorDetails = error.message.split('\n').filter(line => line.trim() !== '').slice(0, 3).join(' | ');
-        console.error(`[QA Search] CRITICAL SERVER ERROR for query: "${searchQuery}"`, error);
-
+        console.error('Fatal Error in QA Search API (Firebase):', error);
         return NextResponse.json({
-            error: 'Internal Server Error during search process.',
-            answer: "ಒಳಾಂಗಣ ಸರ್ವರ್ ದೋಷ. (Internal Server Error)",
-            details: errorDetails
+            success: false,
+            answer: "ಸರ್ವರ್ ದೋಷದಿಂದಾಗಿ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ."
         }, { status: 500 });
     }
 }

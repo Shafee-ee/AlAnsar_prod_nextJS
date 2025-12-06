@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+
+@keyframes progressAnim {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-progress {
+  animation: progressAnim 1.4s infinite linear;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

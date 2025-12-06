@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
-    const { signIn } = useAuth();
+    // <-- FIX: use `login` exported by your AuthProvider
+    const { login } = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -19,10 +20,14 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            await signIn(email, password);
+            if (typeof login !== "function") {
+                throw new Error("AuthProvider missing `login` function. Check AuthProvider exports.");
+            }
+
+            await login(email, password);
             router.push("/admin");  // Redirect to admin dashboard
         } catch (err) {
-            setError(err.message || "Login failed");
+            setError(err?.message || "Login failed");
         } finally {
             setLoading(false);
         }

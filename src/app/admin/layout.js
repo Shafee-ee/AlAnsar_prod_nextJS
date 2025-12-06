@@ -5,17 +5,18 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function AdminLayout({ children }) {
-    const { loading, isAdmin } = useAuth();
+    const { loading, authReady, isAdmin, user } = useAuth();
     const router = useRouter();
 
-    // Protect ALL admin pages
     useEffect(() => {
-        if (!loading && !isAdmin) {
+        // Wait until authReady — means provider finished admin check
+        if (authReady && (!user || isAdmin === false)) {
             router.replace("/");
         }
-    }, [loading, isAdmin, router]);
+    }, [authReady, user, isAdmin, router]);
 
-    if (loading) {
+    // show checking UI until authReady is true (so no flash redirect)
+    if (loading || !authReady) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 Checking admin access…
@@ -24,6 +25,8 @@ export default function AdminLayout({ children }) {
     }
 
     if (!isAdmin) {
+        // In case authReady is true and user is not admin, nothing renders because the effect will redirect.
+        // Provide a fallback UI to avoid a blank page in case router.replace fails.
         return null;
     }
 
@@ -34,9 +37,15 @@ export default function AdminLayout({ children }) {
                 <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
 
                 <nav className="space-y-3">
-                    <a href="/admin" className="block text-gray-700 hover:text-black">Dashboard</a>
-                    <a href="/admin/qna" className="block text-gray-700 hover:text-black">Q&A Manager</a>
-                    <a href="/admin/articles" className="block text-gray-700 hover:text-black">Articles</a>
+                    <a href="/admin" className="block text-gray-700 hover:text-black">
+                        Dashboard
+                    </a>
+                    <a href="/admin/qna" className="block text-gray-700 hover:text-black">
+                        Q&A Manager
+                    </a>
+                    <a href="/admin/articles" className="block text-gray-700 hover:text-black">
+                        Articles
+                    </a>
                 </nav>
             </aside>
 

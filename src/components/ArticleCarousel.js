@@ -1,73 +1,82 @@
-import React, { useRef } from 'react';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
-import ArticleCard from './ArticleCard';
+// src/components/ArticleCarousel.js
+import React, { useRef } from "react";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import ArticleCard from "./ArticleCard";
 
+const ArticleCarousel = ({ title, articles, className = "" }) => {
+    const scrollRef = useRef(null);
 
-const ArticleCarousel = ({ title, articles, variant = 'carousel', className = '' }) => {
-    const scrollContainerRef = useRef(null);
+    if (!articles || articles.length === 0) return null;
 
-    if (!articles || articles.length === 0) {
-        return null;
-    }
     const scroll = (direction) => {
-        if (scrollContainerRef.current) {
-            const containerWidth = scrollContainerRef.current.offsetWidth;
-            const scrollAmount = direction === 'left' ? -containerWidth * 0.8 : containerWidth * 0.8;
+        if (!scrollRef.current) return;
 
-            scrollContainerRef.current.scrollBy({
-                left: scrollAmount,
-                behavior: 'smooth'
-            });
-        }
+        const width = scrollRef.current.offsetWidth;
+        const amount = direction === "left" ? -width * 0.8 : width * 0.8;
+
+        scrollRef.current.scrollBy({
+            left: amount,
+            behavior: "smooth",
+        });
     };
 
     return (
-        <section className={`py-8 md:py-12 relative group ${className}`}>
+        <section className={`py-10 relative group ${className}`}>
+            {/* Header */}
             <div className="flex justify-between items-center mb-6 px-4 md:px-0">
-                <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-blue-600 pl-3">
+                <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-[#0B4C8C] pl-3">
                     {title}
                 </h2>
-                <span className="text-blue-600 font-medium text-sm flex items-center pr-4">
+
+                <span className="text-[#0B4C8C] font-medium text-sm flex items-center pr-4">
                     Scroll to Explore <ChevronRight className="w-5 h-5 ml-1" />
                 </span>
             </div>
 
+            {/* Carousel Wrapper */}
             <div className="relative">
+
+                {/* Scrollable Cards */}
                 <div
-                    ref={scrollContainerRef}
-                    className="flex overflow-x-scroll pb-10 px-4 md:px-0 hide-scrollbar"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }} // For Firefox/IE
+                    ref={scrollRef}
+                    className="flex overflow-x-scroll pb-12 px-4 md:px-0 gap-6 hide-scrollbar"
                 >
                     {articles.map((article) => (
-                        <div
-                            key={article._id.toString()}
-                            className="flex-shrink-0 mr-6 last:mr-0"
-                        >
-                            <ArticleCard
-                                article={article}
-                                variant={variant}
-                            />
+                        <div key={article._id} className="flex-shrink-0">
+                            <ArticleCard article={article} />
                         </div>
                     ))}
                 </div>
 
-
+                {/* LEFT BUTTON */}
                 <button
-                    onClick={() => scroll('left')}
+                    onClick={() => scroll("left")}
                     aria-label="Scroll Left"
-                    className="absolute left-0 top-1/2 transform -translate-y-1/2 p-3 bg-white/90 rounded-full shadow-xl hover:bg-white text-gray-800 opacity-0 group-hover:opacity-100 transition duration-300 z-20 hidden md:flex items-center justify-center -ml-2"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-3 bg-[#0B4C8C] text-white rounded-full shadow-lg hover:bg-[#093866] transition duration-300 hidden md:flex items-center justify-center z-40"
                 >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="w-6 h-6 text-white" />
                 </button>
 
+                {/* RIGHT BUTTON */}
                 <button
-                    onClick={() => scroll('right')}
+                    onClick={() => scroll("right")}
                     aria-label="Scroll Right"
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 p-3 bg-white/90 rounded-full shadow-xl hover:bg-white text-gray-800 opacity-0 group-hover:opacity-100 transition duration-300 z-20 hidden md:flex items-center justify-center -mr-2"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-[#0B4C8C] text-white rounded-full shadow-lg hover:bg-[#093866] transition duration-300 hidden md:flex items-center justify-center z-40"
                 >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="w-6 h-6 text-white" />
                 </button>
             </div>
+
+            {/* Hide Scrollbar */}
+            <style jsx>{`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
         </section>
     );
 };

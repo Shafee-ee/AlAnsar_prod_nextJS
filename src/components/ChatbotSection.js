@@ -8,8 +8,7 @@ const langs = [
 ];
 
 const greetings = [
-    "hi", "hello", "hey",
-    "salaam", "salams",
+    "hi", "hello", "hey", "salaam", "salams",
     "assalamualaikum", "as-salamu alaikum", "asalamualaikum"
 ];
 
@@ -17,9 +16,7 @@ const LoaderSmall = () => (
     <Loader className="w-4 h-4 mr-2 animate-spin text-indigo-500" />
 );
 
-/* ---------------------------------------------------------
- * BOT CARD (FIXED Q/A + FIXED SHARE BUTTON)
- * --------------------------------------------------------- */
+/* BOT CARD */
 const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     if (!result?.bestMatch) {
         return (
@@ -36,7 +33,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     const { bestMatch, relatedQuestions } = result;
 
     return (
-        <div className="bg-white p-4 rounded-xl rounded-tl-none shadow-2xl border border-blue-200">
+        <div className="bg-white p-4 rounded-xl rounded-tl-none shadow-xl border border-blue-200">
 
             <div className="flex items-start text-blue-600 font-bold mb-3 border-b pb-2 border-blue-100">
                 <Zap className="w-5 h-5 mr-2" />
@@ -47,31 +44,26 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                 {bestMatch.answer}
             </div>
 
-            {/* SMALL CENTERED SHARE BUTTON */}
             <div className="flex justify-center mb-3">
                 <button
                     onClick={() => onShare(bestMatch.question, bestMatch.answer)}
-                    className="flex items-center gap-1 px-3 py-1 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow"
-                >
-                    <Share2 className="w-3 h-3" />
-                    Share
+                    className="flex items-center gap-1 px-3 py-1 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow">
+                    <Share2 className="w-3 h-3" /> Share
                 </button>
             </div>
 
             {relatedQuestions.length > 0 && (
                 <div className="pt-3 border-t border-gray-100">
                     <div className="flex items-center text-sm font-semibold text-gray-500 mb-2">
-                        <Search className="w-4 h-4 mr-2" />
-                        ಸಂಬಂಧಿತ ವಿಷಯಗಳು (Related)
+                        <Search className="w-4 h-4 mr-2" /> ಸಂಬಂಧಿತ ವಿಷಯಗಳು (Related)
                     </div>
 
                     <div className="space-y-2">
                         {relatedQuestions.map((r, i) => (
                             <button
                                 key={i}
-                                onClick={() => onRelatedClick(r.originalQuestion)}
-                                className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200 truncate shadow-sm"
-                            >
+                                onClick={() => onRelatedClick(r.question)}
+                                className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200 truncate shadow-sm">
                                 <MessageCircle className="w-3 h-3 inline mr-1" />
                                 {r.question}
                             </button>
@@ -83,9 +75,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     );
 };
 
-/* ---------------------------------------------------------
- * MAIN CHATBOT
- * --------------------------------------------------------- */
+/* MAIN CHATBOT */
 const ChatbotSection = () => {
     const [messages, setMessages] = useState([]);
     const [userInput, setUserInput] = useState('');
@@ -94,13 +84,14 @@ const ChatbotSection = () => {
 
     const chatRef = useRef(null);
 
+    /* Auto-scroll */
     useEffect(() => {
         if (chatRef.current) {
             chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
         }
     }, [messages]);
 
-    /* ------------------------------- Translation ------------------------------- */
+    /* Translation */
     async function translateText(text, targetLang) {
         try {
             const res = await fetch('/api/translate', {
@@ -110,78 +101,51 @@ const ChatbotSection = () => {
             });
             const j = await res.json();
             return j?.translated || text;
-        } catch {
-            return text;
-        }
+        } catch { return text; }
     }
 
-    /* ------------------------------- Share ------------------------------- */
-    async function shareQA(question, answer) {
-        const payload = `${question}\n\n${answer}`;
+    /* Share */
+    async function shareQA(q, a) {
+        const payload = `${q}\n\n${a}`;
         if (navigator.share) {
-            try {
-                await navigator.share({ title: question, text: payload });
-                return;
-            } catch { }
+            try { await navigator.share({ title: q, text: payload }); return; }
+            catch { }
         }
         await navigator.clipboard.writeText(payload);
-        alert("Copied to clipboard!");
+        alert("Copied!");
     }
 
-    /* ------------------------------- SEND MESSAGE ------------------------------- */
+    /* SEND MESSAGE */
     const handleSend = async (clickedText = null) => {
-        let query = "";
-
-        if (clickedText) {
-            query = typeof clickedText === "string"
-                ? clickedText.trim()
-                : clickedText.question.trim();
-        } else {
-            query = userInput.trim();
-        }
+        let query = clickedText ? clickedText : userInput.trim();
         if (!query || isLoading) return;
 
         setMessages(prev => [...prev, { type: 'user', text: query }]);
         if (!clickedText) setUserInput('');
-
         setIsLoading(true);
 
-        /* Greeting handling */
-        const isExactGreeting = (() => {
-            const cleaned = query.toLowerCase().trim();
-            return greetings.includes(cleaned)
-        })();
+        const isGreeting = greetings.includes(query.toLowerCase().trim());
 
-        if (isExactGreeting) {
+        if (isGreeting) {
             const englishReply =
                 "I am an Islamic Q&A bot. Ask me any Islamic question, and I will check the clouds for your answer.";
 
-            const reply =
-                selectedLang === "en"
-                    ? englishReply
-                    : await translateText(englishReply, selectedLang);
+            const reply = selectedLang === "en" ? englishReply : await translateText(englishReply, selectedLang);
 
-            setMessages(prev => [
-                ...prev,
-                {
-                    type: "bot",
-                    result: {
-                        bestMatch: { question: query, answer: reply },
-                        relatedQuestions: []
-                    },
-                    query
-                }
-            ]);
+            setMessages(prev => [...prev, {
+                type: "bot",
+                result: { bestMatch: { question: query, answer: reply }, relatedQuestions: [] },
+                query
+            }]);
+
             setIsLoading(false);
             return;
         }
 
         try {
-            /* Translate query to English before search */
-            let englishQuery = query;
-            if (selectedLang !== "en") {
-                englishQuery = await translateText(query, "en");
-            }
+            let englishQuery = selectedLang !== "en"
+                ? await translateText(query, "en")
+                : query;
 
             const res = await fetch('/api/qa-search', {
                 method: 'POST',
@@ -191,86 +155,64 @@ const ChatbotSection = () => {
 
             const data = await res.json();
 
-            /* If fail */
             if (!data.success) {
-                let fallback = data.answer;
-                if (selectedLang !== "en") {
-                    fallback = await translateText(fallback, selectedLang);
-                }
+                let fb = data.answer;
+                if (selectedLang !== "en") fb = await translateText(fb, selectedLang);
 
-                setMessages(prev => [
-                    ...prev,
-                    {
-                        type: "bot",
-                        result: { fallbackAnswer: fallback },
-                        query
-                    }
-                ]);
-
+                setMessages(prev => [...prev, {
+                    type: "bot",
+                    result: { fallbackAnswer: fb },
+                    query
+                }]);
                 setIsLoading(false);
                 return;
             }
 
-            /* FIXED — Correct mapping from backend */
             let finalQ = data.bestMatch.question;
             let finalA = data.bestMatch.answer;
 
-            /* Translate output back to selected language */
-            if (selectedLang !== 'en') {
+            if (selectedLang !== "en") {
                 const [tq, ta] = await Promise.all([
                     translateText(finalQ, selectedLang),
                     translateText(finalA, selectedLang)
                 ]);
-                finalQ = tq;
-                finalA = ta;
+                finalQ = tq; finalA = ta;
             }
 
-            /* Translate related questions + answers */
             let related = data.related || [];
-
-            if (related.length > 0) {
-                const translatedPairs = await Promise.all(
-                    related.map(async (r) => {
-                        const [tq, ta] = await Promise.all([
-                            translateText(r.question, selectedLang),
-                            translateText(r.answer, selectedLang)
-                        ]);
-                        return { question: tq, answer: ta };
-                    })
+            if (selectedLang !== "en") {
+                related = await Promise.all(
+                    related.map(async r => ({
+                        question: await translateText(r.question, selectedLang),
+                        answer: await translateText(r.answer, selectedLang)
+                    }))
                 );
-                related = translatedPairs;
             }
 
+            setMessages(prev => [...prev, {
+                type: 'bot',
+                result: {
+                    bestMatch: { question: finalQ, answer: finalA },
+                    relatedQuestions: related
+                },
+                query
+            }]);
 
-            /* Push bot message */
-            setMessages(prev => [
-                ...prev,
-                {
-                    type: 'bot',
-                    result: {
-                        bestMatch: { question: finalQ, answer: finalA },
-                        relatedQuestions: related
-                    },
-                    query
-                }
-            ]);
+        } catch {
+            let fb = "Server error. Try again later.";
+            if (selectedLang !== "en") fb = await translateText(fb, selectedLang);
 
-        } catch (e) {
-            let fallback = "Server error. Try again later.";
-            if (selectedLang !== 'en') {
-                fallback = await translateText(fallback, selectedLang);
-            }
-
-            setMessages(prev => [
-                ...prev,
-                { type: 'bot', result: { fallbackAnswer: fallback }, query }
-            ]);
+            setMessages(prev => [...prev, {
+                type: 'bot',
+                result: { fallbackAnswer: fb },
+                query
+            }]);
         }
 
         setIsLoading(false);
     };
 
-    /* ------------------------------- Bubble Component ------------------------------- */
+    /* BUBBLES */
     const MessageBubble = ({ message }) => {
         if (message.type === "user") {
             return (
@@ -296,18 +238,18 @@ const ChatbotSection = () => {
         );
     };
 
-    /* ------------------------------- UI ------------------------------- */
+    /* UI */
     return (
-        <section className="min-h-[70vh] flex flex-col items-center justify-center mb-16 px-4">
+        <section className="min-h-[70vh] flex flex-col items-center mb-1 px-1">
 
             <header className="text-center mb-4">
                 <h1 className="text-3xl font-extrabold text-gray-900">
-                    ಕೇಳಿ ಕೇಳಿ ಪ್ರಶ್ನೋತ್ತರ ಬಾಟ್ (Keli Nodi Q&A Bot)
+                    ಕೇಳಿ ಕೇಳಿ ಬಾಟ್
                 </h1>
                 <p className="text-gray-500 text-lg">ನಿಮ್ಮ ಮೂಲಭೂತ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ.</p>
             </header>
 
-            {/* Language Toggle */}
+            {/* LANG TOGGLE */}
             <div className="flex gap-2 mb-4">
                 {langs.map(l => (
                     <button
@@ -316,14 +258,14 @@ const ChatbotSection = () => {
                         className={`px-3 py-1 rounded-md font-semibold ${selectedLang === l.code
                             ? "bg-indigo-600 text-white"
                             : "bg-white border"
-                            }`}
-                    >
+                            }`}>
                         {l.label}
                     </button>
                 ))}
             </div>
 
-            <div className="bg-gray-100 shadow-2xl rounded-2xl w-full max-w-3xl flex flex-col h-[70vh] border">
+            {/* MAIN CHATBOX */}
+            <div className="bg-gray-100 shadow-xl rounded-xl w-full md:max-w-3xl flex flex-col h-[70vh] border mx-auto md:px-4 px-2">
 
                 {/* CHAT WINDOW */}
                 <div ref={chatRef} className="flex-grow p-4 overflow-y-auto">
@@ -342,17 +284,16 @@ const ChatbotSection = () => {
                     {isLoading && (
                         <div className="flex justify-start mb-4">
                             <div className="bg-white p-3 rounded-xl border shadow flex items-center">
-                                <LoaderSmall />
-                                Looking for best answer…
+                                <LoaderSmall /> Looking for best answer…
                             </div>
                         </div>
                     )}
-
                 </div>
 
-                {/* INPUT BOX */}
-                <div className="p-4 border-t bg-white rounded-b-2xl">
-                    <div className="flex">
+                {/* INPUT */}
+                <div className="p-2 border-t bg-white rounded-b-xl">
+                    <div className="flex w-full">
+
                         <input
                             disabled={isLoading}
                             value={userInput}
@@ -363,16 +304,16 @@ const ChatbotSection = () => {
                                     ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                                     : "Type your question here..."
                             }
-                            className="flex-grow p-3 border rounded-l-lg focus:ring-2"
+                            className="flex-grow p-3 border rounded-l-lg w-full min-w-0"
                         />
 
                         <button
                             disabled={isLoading || userInput.trim() === ""}
                             onClick={() => handleSend()}
-                            className="bg-indigo-600 text-white p-3 rounded-r-lg hover:bg-indigo-700"
-                        >
+                            className="bg-indigo-600 text-white p-3 rounded-r-lg hover:bg-indigo-700">
                             <Send className="w-5 h-5" />
                         </button>
+
                     </div>
                 </div>
 

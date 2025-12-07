@@ -100,7 +100,7 @@ const Footer = () => {
                         <h4 className={`text-lg font-semibold mb-4 ${accentCyan}`}>Quick Links</h4>
                         <ul className="space-y-2 text-sm">
                             {/* NEW: Upload Button/Link */}
-                            <li>
+                            {/* <li>
                                 <button
                                     onClick={handleBulkUpload}
                                     disabled={uploadStatus === 'loading'}
@@ -109,7 +109,7 @@ const Footer = () => {
                                     <Upload className="w-4 h-4 mr-1" />
                                     {uploadStatus === 'loading' ? 'Uploading...' : 'Bulk Upload Data'}
                                 </button>
-                            </li>
+                            </li> */}
                             {/* Existing Links */}
                             {[
                                 { name: 'Home (Q&A Assistant)', href: '/' },

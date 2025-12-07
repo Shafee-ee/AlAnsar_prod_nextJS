@@ -1,31 +1,15 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-// small wait helper
-const wait = ms => new Promise(res => setTimeout(res, ms));
+const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 
-// ---- FIXED: REMOVE overly strict language check ----
-function looksLikeSameLanguage(output, original) {
-    if (!output) return true;
-
-    // only reject if BOTH contain Kannada script
-    const kannadaRe = /[\u0C80-\u0CFF]/;
-
-    const origHas = kannadaRe.test(original);
-    const outHas = kannadaRe.test(output);
-
-    // If original Kannada but output still Kannada → fail
-    if (origHas && outHas) return true;
-
-    // Otherwise → allow it ALWAYS
-    return false;
-}
-
-// lightweight translator
-async function lightTranslate(text, target = "en") {
+/* ------------------------------------------------------------------
+   TRANSLATION (uses your working /api/translate endpoint)
+------------------------------------------------------------------ */
+async function translate(text, target = "en") {
     try {
         const r = await fetch(
-            (process.env.NEXT_PUBLIC_BASE_URL || "") + "/api/translate",
+            `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/translate`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -33,71 +17,18 @@ async function lightTranslate(text, target = "en") {
             }
         );
 
-        if (!r.ok) return null;
-
         const j = await r.json();
-        let out = j?.translated?.trim();
 
-        if (!out) return null;
-        return out;
-    } catch {
+        return j?.translated?.trim() || null;
+    } catch (err) {
+        console.error("translate() error:", err);
         return null;
     }
 }
 
-// strict fallback
-async function strictTranslate(text, target = "en") {
-    try {
-        const r = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [
-                        { parts: [{ text: `Translate ONLY to ${target}. ${text}` }] }
-                    ],
-                    generationConfig: { responseMimeType: "text/plain" }
-                })
-            }
-        );
-
-        if (!r.ok) return null;
-
-        const j = await r.json();
-        let out = j?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
-
-        out = out.replace(/^"(.*)"$/, "$1").trim();
-
-        return out || null;
-    } catch {
-        return null;
-    }
-}
-
-async function translateWithFallback(text) {
-    // attempt 1
-    let a = await lightTranslate(text, "en");
-    if (a && !looksLikeSameLanguage(a, text)) return a;
-
-    // attempt 2
-    await wait(200);
-    a = await lightTranslate(text, "en");
-    if (a && !looksLikeSameLanguage(a, text)) return a;
-
-    // strict fallback
-    let b = await strictTranslate(text, "en");
-    if (b && !looksLikeSameLanguage(b, text)) return b;
-
-    // strict retry
-    await wait(300);
-    b = await strictTranslate(text, "en");
-    if (b && !looksLikeSameLanguage(b, text)) return b;
-
-    return null;
-}
-
-// embedding
+/* ------------------------------------------------------------------
+   EMBEDDING
+------------------------------------------------------------------ */
 async function generateEmbedding(text) {
     try {
         const r = await fetch(
@@ -111,13 +42,18 @@ async function generateEmbedding(text) {
                 })
             }
         );
+
         const j = await r.json();
         return j?.embedding?.values || null;
-    } catch {
+    } catch (err) {
+        console.error("Embedding error:", err);
         return null;
     }
 }
 
+/* ------------------------------------------------------------------
+   SINGLE UPLOAD HANDLER
+------------------------------------------------------------------ */
 export async function POST(req) {
     try {
         const { question, answer, lang, keywords = [] } = await req.json();
@@ -133,24 +69,30 @@ export async function POST(req) {
         let ta = null;
         let embedText = "";
 
+        // English → no translation needed
         if (lang === "en") {
             embedText = q;
-        } else {
-            tq = await translateWithFallback(q);
-            ta = await translateWithFallback(a);
+        }
+
+        // Non-english → translate to English
+        else {
+            tq = await translate(q, "en");
+            ta = await translate(a, "en");
 
             if (!tq) {
-                console.error("Q translation failed:", q);
+                console.error("Question translation failed:", q);
                 return NextResponse.json({ success: false, reason: "translation-failed" });
             }
+
             if (!ta) {
-                console.error("A translation failed:", a);
+                console.error("Answer translation failed:", a);
                 return NextResponse.json({ success: false, reason: "translation-failed" });
             }
 
             embedText = tq;
         }
 
+        // Generate embedding
         let emb = await generateEmbedding(embedText);
 
         if (!emb) {
@@ -162,6 +104,7 @@ export async function POST(req) {
             return NextResponse.json({ success: false, reason: "embedding-failed" });
         }
 
+        // Save to Firestore
         await adminDB.collection("qna_items").add({
             originalQuestion: q,
             originalAnswer: a,
@@ -175,8 +118,8 @@ export async function POST(req) {
 
         return NextResponse.json({ success: true });
 
-    } catch (e) {
-        console.error("single upload error:", e);
+    } catch (err) {
+        console.error("single upload error:", err);
         return NextResponse.json({ success: false, reason: "server-error" });
     }
 }

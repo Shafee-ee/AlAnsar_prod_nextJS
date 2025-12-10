@@ -1,6 +1,21 @@
 import { NextResponse } from "next/server";
 
-const MODEL = "models/gemini-2.0-flash"; // your BEST AND MOST STABLE MODEL
+const MODEL = "models/gemini-2.0-flash";
+
+function cleanOutput(text) {
+    if (!text) return "";
+
+    // remove ``` blocks
+    text = text.replace(/```[\s\S]*?```/g, "");
+
+    // remove json-like structures
+    text = text.replace(/^{[\s\S]*?}$/g, "");
+
+    // remove markdown headings, asterisks, etc.
+    text = text.replace(/[*#>_`]/g, "");
+
+    return text.trim();
+}
 
 export async function POST(req) {
     try {
@@ -10,53 +25,56 @@ export async function POST(req) {
             return NextResponse.json({ translated: null });
         }
 
+        const trimmed = text.trim();
+        if (!trimmed) {
+            return NextResponse.json({ translated: "" });
+        }
+
+        const looksKannada = /[\u0C80-\u0CFF]/.test(trimmed);
+        const looksEnglish = /^[A-Za-z0-9 ,.'"!?-]+$/.test(trimmed);
+
+        // avoid useless translation calls
+        if (
+            (targetLang === "kn" && looksKannada) ||
+            (targetLang === "en" && looksEnglish)
+        ) {
+            return NextResponse.json({ translated: trimmed });
+        }
+
+        const prompt = `
+Translate the text into ${targetLang}.
+STRICT RULES:
+- ONLY return the translated sentence.
+- NO explanations.
+- NO JSON.
+- NO markdown.
+- DO NOT say "Here is the translation".
+- Preserve Islamic terms exactly: wudu, ghusl, salah, zakat, sunnah, takbir, qibla, mahr, talaq.
+TEXT TO TRANSLATE:
+${trimmed}
+`;
+
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/${MODEL}:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1/${MODEL}:generateContent?key=${process.env.GOOGLE_API_KEY}`,
             {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: `
-Translate the following text into "${targetLang}".
-Return **ONLY** the translated text.
-Do NOT add quotes, explanations, notes, comments, disclaimers, or formatting.
-
-Text:
-${text}
-                  `
-                                }
-                            ]
-                        }
-                    ],
-                    generationConfig: {
-                        responseMimeType: "text/plain",
-                        temperature: 0.2
-                    }
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: { temperature: 0.0 }
                 })
             }
         );
 
         const data = await response.json();
 
-        // Log failures
-        if (!data?.candidates) {
-            console.error("Translation error:", data);
-            return NextResponse.json({ translated: null });
-        }
+        let raw =
+            data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || trimmed;
 
-        let output =
-            data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || null;
+        const cleaned = cleanOutput(raw);
 
-        // Remove accidental quotes ("text")
-        if (output?.startsWith('"') && output?.endsWith('"')) {
-            output = output.slice(1, -1).trim();
-        }
+        return NextResponse.json({ translated: cleaned });
 
-        return NextResponse.json({ translated: output });
     } catch (err) {
         console.error("Fatal translate error:", err);
         return NextResponse.json({ translated: null });

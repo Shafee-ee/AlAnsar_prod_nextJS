@@ -14,7 +14,7 @@ export async function GET() {
             translatedQuestion: d.translatedQuestion || null,
             translatedAnswer: d.translatedAnswer || null,
             lang: d.lang || null,
-            keywords: d.keywords || []
+            keywords: d.keywords || [],
         };
     });
 

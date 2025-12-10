@@ -17,7 +17,7 @@ const LoaderSmall = () => (
 );
 
 /* BOT CARD */
-const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
+const BotResponseCard = ({ result, query, onRelatedClick, onShare, selectedLang }) => {
     if (!result?.bestMatch) {
         return (
             <div className="bg-red-50 text-red-700 p-4 rounded-xl rounded-tl-none shadow-lg border border-red-200">
@@ -34,7 +34,6 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
 
     return (
         <div className="bg-white p-4 rounded-xl rounded-tl-none shadow-xl border border-blue-200">
-
             <div className="flex items-start text-blue-600 font-bold mb-3 border-b pb-2 border-blue-100">
                 <Zap className="w-5 h-5 mr-2" />
                 <span className="text-lg">{bestMatch.question}</span>
@@ -62,7 +61,10 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                         {relatedQuestions.map((r, i) => (
                             <button
                                 key={i}
-                                onClick={() => onRelatedClick(r.question)}
+                                onClick={() => onRelatedClick(
+                                    selectedLang === "en"
+                                        ? r.question
+                                        : r.originalQuestion)}
                                 className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200 truncate shadow-sm">
                                 <MessageCircle className="w-3 h-3 inline mr-1" />
                                 {r.question}
@@ -70,7 +72,35 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                         ))}
                     </div>
                 </div>
-            )}
+            )
+            }
+        </div >
+    );
+};
+
+/* MESSAGE BUBBLE */
+const MessageBubble = ({ message, onRelatedClick, onShare, selectedLang }) => {
+    if (message.type === "user") {
+        return (
+            <div className="flex justify-end mb-4">
+                <div className="bg-blue-600 text-white p-3 rounded-xl rounded-br-none shadow max-w-md">
+                    {message.text}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex justify-start mb-6">
+            <div className="max-w-xl w-full">
+                <BotResponseCard
+                    result={message.result}
+                    query={message.query}
+                    onRelatedClick={onRelatedClick}
+                    onShare={onShare}
+                    selectedLang={selectedLang}
+                />
+            </div>
         </div>
     );
 };
@@ -84,14 +114,13 @@ const ChatbotSection = () => {
 
     const chatRef = useRef(null);
 
-    /* Auto-scroll */
     useEffect(() => {
         if (chatRef.current) {
             chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, behavior: 'smooth' });
         }
     }, [messages]);
 
-    /* Translation */
+    /* FE translation for display */
     async function translateText(text, targetLang) {
         try {
             const res = await fetch('/api/translate', {
@@ -101,10 +130,11 @@ const ChatbotSection = () => {
             });
             const j = await res.json();
             return j?.translated || text;
-        } catch { return text; }
+        } catch {
+            return text;
+        }
     }
 
-    /* Share */
     async function shareQA(q, a) {
         const payload = `${q}\n\n${a}`;
         if (navigator.share) {
@@ -115,7 +145,6 @@ const ChatbotSection = () => {
         alert("Copied!");
     }
 
-    /* SEND MESSAGE */
     const handleSend = async (clickedText = null) => {
         let query = clickedText ? clickedText : userInput.trim();
         if (!query || isLoading) return;
@@ -125,16 +154,21 @@ const ChatbotSection = () => {
         setIsLoading(true);
 
         const isGreeting = greetings.includes(query.toLowerCase().trim());
-
         if (isGreeting) {
             const englishReply =
                 "I am an Islamic Q&A bot. Ask me any Islamic question, and I will check the clouds for your answer.";
 
-            const reply = selectedLang === "en" ? englishReply : await translateText(englishReply, selectedLang);
+            const reply =
+                selectedLang === "en"
+                    ? englishReply
+                    : await translateText(englishReply, selectedLang);
 
             setMessages(prev => [...prev, {
                 type: "bot",
-                result: { bestMatch: { question: query, answer: reply }, relatedQuestions: [] },
+                result: {
+                    bestMatch: { question: query, answer: reply },
+                    relatedQuestions: []
+                },
                 query
             }]);
 
@@ -143,20 +177,19 @@ const ChatbotSection = () => {
         }
 
         try {
-            let englishQuery = selectedLang !== "en"
-                ? await translateText(query, "en")
-                : query;
-
-            const res = await fetch('/api/qa-search', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: englishQuery })
+            const res = await fetch("/api/qa-search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    query,
+                    selectedLang
+                })
             });
 
             const data = await res.json();
 
             if (!data.success) {
-                let fb = data.answer;
+                let fb = data.answer || "I do not know the answer to that.";
                 if (selectedLang !== "en") fb = await translateText(fb, selectedLang);
 
                 setMessages(prev => [...prev, {
@@ -164,33 +197,33 @@ const ChatbotSection = () => {
                     result: { fallbackAnswer: fb },
                     query
                 }]);
+
                 setIsLoading(false);
                 return;
             }
 
             let finalQ = data.bestMatch.question;
             let finalA = data.bestMatch.answer;
+            let related = data.related || [];
 
             if (selectedLang !== "en") {
                 const [tq, ta] = await Promise.all([
                     translateText(finalQ, selectedLang),
                     translateText(finalA, selectedLang)
                 ]);
-                finalQ = tq; finalA = ta;
-            }
+                finalQ = tq;
+                finalA = ta;
 
-            let related = data.related || [];
-            if (selectedLang !== "en") {
                 related = await Promise.all(
                     related.map(async r => ({
                         question: await translateText(r.question, selectedLang),
-                        answer: await translateText(r.answer, selectedLang)
+                        originalQuestion: r.originalQuestion
                     }))
                 );
             }
 
             setMessages(prev => [...prev, {
-                type: 'bot',
+                type: "bot",
                 result: {
                     bestMatch: { question: finalQ, answer: finalA },
                     relatedQuestions: related
@@ -198,12 +231,12 @@ const ChatbotSection = () => {
                 query
             }]);
 
-        } catch {
+        } catch (err) {
             let fb = "Server error. Try again later.";
             if (selectedLang !== "en") fb = await translateText(fb, selectedLang);
 
             setMessages(prev => [...prev, {
-                type: 'bot',
+                type: "bot",
                 result: { fallbackAnswer: fb },
                 query
             }]);
@@ -212,44 +245,13 @@ const ChatbotSection = () => {
         setIsLoading(false);
     };
 
-    /* BUBBLES */
-    const MessageBubble = ({ message }) => {
-        if (message.type === "user") {
-            return (
-                <div className="flex justify-end mb-4">
-                    <div className="bg-blue-600 text-white p-3 rounded-xl rounded-br-none shadow max-w-md">
-                        {message.text}
-                    </div>
-                </div>
-            );
-        }
-
-        return (
-            <div className="flex justify-start mb-6">
-                <div className="max-w-xl w-full">
-                    <BotResponseCard
-                        result={message.result}
-                        query={message.query}
-                        onRelatedClick={handleSend}
-                        onShare={shareQA}
-                    />
-                </div>
-            </div>
-        );
-    };
-
-    /* UI */
     return (
         <section className="min-h-[70vh] flex flex-col items-center mb-1 px-1">
-
             <header className="text-center mb-4">
-                <h1 className="text-3xl font-extrabold text-gray-900">
-                    ಕೇಳಿ ಕೇಳಿ ಬಾಟ್
-                </h1>
+                <h1 className="text-3xl font-extrabold text-gray-900">ಕೇಳಿ ಕೇಳಿ ಬಾಟ್</h1>
                 <p className="text-gray-500 text-lg">ನಿಮ್ಮ ಮೂಲಭೂತ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಕೇಳಿ.</p>
             </header>
 
-            {/* LANG TOGGLE */}
             <div className="flex gap-2 mb-4">
                 {langs.map(l => (
                     <button
@@ -264,10 +266,7 @@ const ChatbotSection = () => {
                 ))}
             </div>
 
-            {/* MAIN CHATBOX */}
             <div className="bg-gray-100 shadow-xl rounded-xl w-full md:max-w-3xl flex flex-col h-[70vh] border mx-auto md:px-4 px-2">
-
-                {/* CHAT WINDOW */}
                 <div ref={chatRef} className="flex-grow p-4 overflow-y-auto">
 
                     {messages.length === 0 && (
@@ -278,7 +277,13 @@ const ChatbotSection = () => {
                     )}
 
                     {messages.map((m, i) => (
-                        <MessageBubble key={i} message={m} />
+                        <MessageBubble
+                            key={i}
+                            message={m}
+                            onRelatedClick={(orig) => handleSend(orig)}
+                            onShare={shareQA}
+                            selectedLang={selectedLang}
+                        />
                     ))}
 
                     {isLoading && (
@@ -290,20 +295,16 @@ const ChatbotSection = () => {
                     )}
                 </div>
 
-                {/* INPUT */}
                 <div className="p-2 border-t bg-white rounded-b-xl">
                     <div className="flex w-full">
-
                         <input
                             disabled={isLoading}
                             value={userInput}
                             onChange={e => setUserInput(e.target.value)}
                             onKeyDown={e => e.key === "Enter" && handleSend()}
-                            placeholder={
-                                selectedLang === "kn"
-                                    ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
-                                    : "Type your question here..."
-                            }
+                            placeholder={selectedLang === "kn"
+                                ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                                : "Type your question here..."}
                             className="flex-grow p-3 border rounded-l-lg w-full min-w-0"
                         />
 
@@ -313,10 +314,8 @@ const ChatbotSection = () => {
                             className="bg-indigo-600 text-white p-3 rounded-r-lg hover:bg-indigo-700">
                             <Send className="w-5 h-5" />
                         </button>
-
                     </div>
                 </div>
-
             </div>
         </section>
     );

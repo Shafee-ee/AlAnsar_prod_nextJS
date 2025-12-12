@@ -2,16 +2,14 @@ import { NextResponse } from "next/server";
 
 const MODEL = "models/gemini-2.0-flash";
 
+// Much lighter cleaner: only removes markdown blocks, NOT JSON content.
 function cleanOutput(text) {
     if (!text) return "";
 
-    // remove ``` blocks
+    // strip ```code``` blocks
     text = text.replace(/```[\s\S]*?```/g, "");
 
-    // remove json-like structures
-    text = text.replace(/^{[\s\S]*?}$/g, "");
-
-    // remove markdown headings, asterisks, etc.
+    // remove markdown decorations
     text = text.replace(/[*#>_`]/g, "");
 
     return text.trim();
@@ -30,10 +28,11 @@ export async function POST(req) {
             return NextResponse.json({ translated: "" });
         }
 
+        // language checks
         const looksKannada = /[\u0C80-\u0CFF]/.test(trimmed);
         const looksEnglish = /^[A-Za-z0-9 ,.'"!?-]+$/.test(trimmed);
 
-        // avoid useless translation calls
+        // avoid unnecessary translation
         if (
             (targetLang === "kn" && looksKannada) ||
             (targetLang === "en" && looksEnglish)
@@ -46,13 +45,12 @@ Translate the text into ${targetLang}.
 STRICT RULES:
 - ONLY return the translated sentence.
 - NO explanations.
-- NO JSON.
 - NO markdown.
-- DO NOT say "Here is the translation".
 - Preserve Islamic terms exactly: wudu, ghusl, salah, zakat, sunnah, takbir, qibla, mahr, talaq.
-TEXT TO TRANSLATE:
+
+TEXT:
 ${trimmed}
-`;
+        `;
 
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1/${MODEL}:generateContent?key=${process.env.GOOGLE_API_KEY}`,
@@ -68,8 +66,7 @@ ${trimmed}
 
         const data = await response.json();
 
-        let raw =
-            data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || trimmed;
+        let raw = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || trimmed;
 
         const cleaned = cleanOutput(raw);
 

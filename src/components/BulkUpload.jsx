@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -6,8 +6,27 @@ import { toast } from "react-hot-toast";
 const MAX_RETRIES = 2;
 const PER_ITEM_DELAY = 700;
 
-function delay(ms) {
-    return new Promise(res => setTimeout(res, ms));
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+/* ---------------- CSV PARSER ---------------- */
+function parseCSV(text) {
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    const headers = lines.shift().split(",").map(h => h.trim());
+
+    return lines.map(line => {
+        const values = line.split(",").map(v => v.trim());
+        const obj = {};
+        headers.forEach((h, i) => {
+            if (h === "keywords") {
+                obj[h] = values[i]
+                    ? values[i].split(";").map(k => k.trim())
+                    : [];
+            } else {
+                obj[h] = values[i];
+            }
+        });
+        return obj;
+    });
 }
 
 export default function BulkUpload() {
@@ -18,13 +37,16 @@ export default function BulkUpload() {
     const [failed, setFailed] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(-1);
 
-    async function uploadItem(item, index) {
-        const question = item.question ?? item.question_kn ?? item.originalQuestion ?? "";
-        const answer = item.answer ?? item.answer_kn ?? item.originalAnswer ?? "";
-        const lang = item.lang ?? item.lang_kn ?? (item.id ? "kn" : "kn");
+    /* ---------------- UPLOAD SINGLE ITEM ---------------- */
+    async function uploadItem(item) {
+        const question = item.question ?? item.question_en ?? item.question_kn ?? "";
+        const answer = item.answer ?? item.answer_en ?? item.answer_kn ?? "";
         const keywords = Array.isArray(item.keywords) ? item.keywords : [];
+        const lang = item.lang ?? "kn";
 
-        if (!question || !answer) return { ok: false, error: "Missing question or answer" };
+        if (!question || !answer) {
+            return { ok: false, error: "Missing question or answer" };
+        }
 
         for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
@@ -36,25 +58,19 @@ export default function BulkUpload() {
 
                 const json = await res.json();
 
-                if (res.ok && json.success) {
-                    return { ok: true };
-                } else {
-                    if (attempt < MAX_RETRIES) {
-                        await delay(500 + attempt * 300);
-                        continue;
-                    }
-                    return { ok: false, error: json?.message || json?.error || "Server error" };
-                }
+                if (res.ok && json.success) return { ok: true };
+
+                if (attempt < MAX_RETRIES) await delay(500 + attempt * 300);
+                else return { ok: false, error: json.reason || "Upload failed" };
+
             } catch (err) {
-                if (attempt < MAX_RETRIES) {
-                    await delay(500 + attempt * 300);
-                    continue;
-                }
-                return { ok: false, error: err.message };
+                if (attempt < MAX_RETRIES) await delay(500 + attempt * 300);
+                else return { ok: false, error: err.message };
             }
         }
     }
 
+    /* ---------------- PROCESS FILE ---------------- */
     async function processItems(items) {
         setFailed([]);
         setTotal(items.length);
@@ -66,8 +82,9 @@ export default function BulkUpload() {
         for (let i = 0; i < items.length; i++) {
             setCurrentIndex(i);
 
-            const r = await uploadItem(items[i], i);
-            if (r.ok) setProgress(prev => prev + 1);
+            const r = await uploadItem(items[i]);
+
+            if (r.ok) setProgress(p => p + 1);
             else failedArr.push({ index: i, item: items[i], reason: r.error });
 
             await delay(PER_ITEM_DELAY);
@@ -77,153 +94,84 @@ export default function BulkUpload() {
         setLoading(false);
         setCurrentIndex(-1);
 
-        if (failedArr.length === 0) {
-            toast.success(`Uploaded ${items.length}/${items.length}`);
-        } else {
-            toast.success(`Uploaded ${items.length - failedArr.length}/${items.length}`);
-            toast.error(`${failedArr.length} failed`);
-        }
+        toast.success(`Uploaded ${items.length - failedArr.length}/${items.length}`);
+        if (failedArr.length) toast.error(`${failedArr.length} failed`);
     }
 
-    // 🔥 FIXED RETRY: clean, no undefined index, no crash
-    async function retryFailed() {
-        if (failed.length === 0) return;
-
-        const failedItems = failed.map(f => f.item);
-
-        setLoading(true);
-        setProgress(0);
-        setTotal(failedItems.length);
-
-        const newFailed = [];
-
-        for (let i = 0; i < failedItems.length; i++) {
-            setCurrentIndex(i);
-
-            const r = await uploadItem(failedItems[i], i);
-
-            if (r.ok) {
-                setProgress(prev => prev + 1);
-            } else {
-                newFailed.push({
-                    item: failedItems[i],
-                    reason: r.error
-                });
-            }
-
-            await delay(PER_ITEM_DELAY);
-        }
-
-        setFailed(newFailed);
-        setLoading(false);
-        setCurrentIndex(-1);
-
-        if (newFailed.length === 0) {
-            toast.success("All failed items uploaded successfully");
-        } else {
-            toast.error(`${newFailed.length} still failed`);
-        }
-    }
-
-
+    /* ---------------- FILE HANDLER ---------------- */
     async function handleBulkUpload(e) {
         e.preventDefault();
 
-        if (!file) {
-            toast.error("Please select a JSON file");
-            return;
+        if (!file) return toast.error("Select a file");
+
+        const text = await file.text();
+        let items;
+
+        try {
+            if (file.name.endsWith(".csv")) items = parseCSV(text);
+            else items = JSON.parse(text);
+        } catch {
+            return toast.error("Invalid file format");
         }
 
-        let text = await file.text();
-
-        let items;
-        try {
-            items = JSON.parse(text);
-            if (!Array.isArray(items)) {
-                toast.error("JSON must be an array");
-                return;
-            }
-        } catch {
-            toast.error("Invalid JSON");
-            return;
+        if (!Array.isArray(items) || !items.length) {
+            return toast.error("No valid items found");
         }
 
         await processItems(items);
     }
 
-    const percent = total === 0 ? 0 : Math.round((progress / total) * 100);
+    const percent = total ? Math.round((progress / total) * 100) : 0;
 
     return (
         <div className="space-y-4">
             <h2 className="text-xl font-bold text-[#1D3F9A]">Bulk Upload</h2>
 
             <input
+                id="bulkFile"
                 type="file"
-                accept=".json"
+                accept=".json,.csv"
+                className="hidden"
                 onChange={(e) => {
                     setFile(e.target.files[0]);
                     setProgress(0);
-                    setTotal(0);
                     setFailed([]);
                 }}
-                className="w-full p-3 border rounded-lg bg-gray-50"
             />
 
-            <div className="flex items-center gap-3">
+            <div className="flex justify-between items-center border p-3 rounded">
+                <span className="font-semibold text-[#1D3F9A]">
+                    {file ? `📄 ${file.name}` : "No file selected"}
+                </span>
                 <button
-                    onClick={handleBulkUpload}
-                    disabled={loading || !file}
-                    className="bg-[#1D3F9A] text-white px-6 py-3 rounded-lg shadow disabled:opacity-50"
+                    onClick={() => document.getElementById("bulkFile").click()}
+                    className="bg-[#1D3F9A] text-white px-4 py-2 rounded"
                 >
-                    {loading ? "Uploading..." : "Upload File"}
+                    Choose File
                 </button>
-
-                {failed.length > 0 && (
-                    <button
-                        onClick={retryFailed}
-                        disabled={loading}
-                        className="bg-red-600 text-white px-4 py-2 rounded disabled:opacity-50"
-                    >
-                        Retry {failed.length} failed
-                    </button>
-                )}
             </div>
 
-            {loading && (
-                <div className="mt-4">
-                    <div className="text-sm font-medium mb-1 text-gray-700">
-                        Uploading… {progress} / {total}
-                    </div>
+            <button
+                onClick={handleBulkUpload}
+                disabled={!file || loading}
+                className="bg-[#1D3F9A] text-white px-6 py-3 rounded disabled:opacity-50"
+            >
+                {loading ? "Uploading..." : "Upload File"}
+            </button>
 
-                    <div className="w-full h-2 bg-gray-300 rounded overflow-hidden">
+            {loading && (
+                <div>
+                    <div className="text-sm mb-1">
+                        Uploading {progress}/{total}
+                    </div>
+                    <div className="w-full h-2 bg-gray-300 rounded">
                         <div
-                            className="h-full bg-[#1D3F9A] transition-all duration-300"
+                            className="h-full bg-[#1D3F9A]"
                             style={{ width: `${percent}%` }}
                         />
                     </div>
-
-                    <div className="text-xs mt-2 text-gray-500">
-                        Processing item {currentIndex + 1} of {total}
-                    </div>
-                </div>
-            )}
-
-            {failed.length > 0 && !loading && (
-                <div className="mt-4 p-3 border rounded bg-red-50 text-sm">
-                    <div className="font-semibold text-red-700 mb-2">
-                        Failed items ({failed.length})
-                    </div>
-
-                    <ul className="list-disc pl-5 max-h-40 overflow-auto">
-                        {failed.slice(0, 20).map((f, i) => (
-                            <li key={i}>
-                                {f.item.question?.slice(0, 60)} — {f.reason}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <div className="mt-2 text-xs text-gray-600">
-                        Fix JSON or retry failed items.
+                    <div className="text-xs mt-1">
+                        Processing item {currentIndex + 1}
                     </div>
                 </div>
             )}

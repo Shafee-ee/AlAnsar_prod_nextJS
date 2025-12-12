@@ -45,7 +45,7 @@ export default function SingleUpload() {
             setAnswer("");
             setKeywords("");
         } else {
-            toast.error("Upload failed: " + data.message);
+            toast.error("Upload failed: " + (data.reason || "Unknown error"));
         }
     }
 
@@ -107,6 +107,7 @@ export default function SingleUpload() {
                     <div className="h-full bg-blue-600 animate-progress"></div>
                 </div>
             )}
+
             <button
                 disabled={loading}
                 onClick={handleSubmit}

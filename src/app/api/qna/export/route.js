@@ -8,13 +8,14 @@ export async function GET() {
         const d = doc.data();
 
         return {
-            id: doc.id,
-            originalQuestion: d.originalQuestion || null,
-            originalAnswer: d.originalAnswer || null,
-            translatedQuestion: d.translatedQuestion || null,
-            translatedAnswer: d.translatedAnswer || null,
-            lang: d.lang || null,
-            keywords: d.keywords || [],
+            // id: doc.id,
+            question_en: d.question_en || null,
+            answer_en: d.answer_en || null,
+            question_kn: d.question_kn || null,
+            answer_kn: d.answer_kn || null,
+            // lang_original: d.lang_original || null,
+            // keywords: d.keywords || [],
+            // createdAt: d.createdAt || null,
         };
     });
 

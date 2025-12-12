@@ -1,33 +1,16 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-/* ---------------------------------------
-   ISLAMIC TERMS TO PRESERVE ONLY IF THEY EXIST IN ORIGINAL
---------------------------------------- */
-const ISLAMIC_TERMS = [
-    "salah", "salat", "namaz", "prayer",
-    "wudu", "wudhu", "ghusl", "tayammum",
-    "fard", "sunnah", "mustahab", "makruh", "haram", "halal",
-    "takbir", "takbeer", "takbiratul ihram",
-    "rukoo", "sujud", "sujood", "rakah", "rakat",
-    "ramadan", "fasting", "sawm", "qada", "fidya",
-    "najis", "najasah", "impure",
-    "nikah", "talaq", "mahr", "dowry",
-    "mahram", "non-mahram",
-    "imam", "ma'mum", "jama'ah", "jamah", "iqamah",
-    "jumuah", "jummah",
-    "mayyit", "janazah", "funeral prayer",
-    "jinn", "shaytan", "iblis",
-    "malaikah", "angels",
-    "niyyah", "intention",
-    "surah", "fatiha",
-    "masbuq",
-    "kohl", "surmah"
-];
+/* -------------------------------------------------------
+   Detect Kannada (simple + reliable for our use case)
+------------------------------------------------------- */
+function isKannada(text = "") {
+    return /[\u0C80-\u0CFF]/.test(text);
+}
 
-/* ---------------------------------------
-   TRANSLATE USING FE PIPELINE
---------------------------------------- */
+/* -------------------------------------------------------
+   Translate using your existing pipeline
+------------------------------------------------------- */
 async function translate(text, target = "en") {
     try {
         const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -39,17 +22,16 @@ async function translate(text, target = "en") {
         });
 
         const j = await r.json();
-        return j?.translated?.trim() || null;
-
+        return j?.translated || text;
     } catch (err) {
         console.error("translate() error:", err);
-        return null;
+        return text;
     }
 }
 
-/* ---------------------------------------
-   EMBEDDING GENERATOR
---------------------------------------- */
+/* -------------------------------------------------------
+   Generate embedding (English only)
+------------------------------------------------------- */
 async function generateEmbedding(text) {
     try {
         const url =
@@ -66,39 +48,20 @@ async function generateEmbedding(text) {
 
         const j = await r.json();
         return Array.isArray(j?.embedding?.values) ? j.embedding.values : null;
-
     } catch (err) {
         console.error("Embedding error:", err);
         return null;
     }
 }
 
-/* ---------------------------------------
-   TERM PRESERVATION (ONLY IF ORIGINAL HAS IT)
---------------------------------------- */
-function checkPreservedTerms(original, translated) {
-    const missing = [];
-
-    const o = original.toLowerCase();
-    const t = translated.toLowerCase();
-
-    for (const term of ISLAMIC_TERMS) {
-        // Only enforce if ORIGINAL contains the term
-        if (o.includes(term) && !t.includes(term)) {
-            missing.push(term);
-        }
-    }
-    return missing;
-}
-
-/* ---------------------------------------
-   MAIN HANDLER (FINAL VERSION)
---------------------------------------- */
+/* -------------------------------------------------------
+   MAIN HANDLER (new schema, auto-detect override)
+------------------------------------------------------- */
 export async function POST(req) {
     try {
-        const { question, answer, lang, keywords = [] } = await req.json();
+        const { question, answer, lang: userLang, keywords = [] } = await req.json();
 
-        if (!question || !answer || !lang) {
+        if (!question || !answer || !userLang) {
             return NextResponse.json({ success: false, reason: "missing-fields" });
         }
 
@@ -109,61 +72,60 @@ export async function POST(req) {
             return NextResponse.json({ success: false, reason: "too-short" });
         }
 
-        let translatedQ = q;
-        let translatedA = a;
-        let embedText = q;
+        /* -------------------------------------------------------
+           AUTO-DETECT AND OVERRIDE USER SELECTION
+        ------------------------------------------------------- */
+        let detectedLang = isKannada(q) ? "kn" : "en";
 
-        /* ---------------------------------------
-           NON-ENGLISH PROCESSING
-        --------------------------------------- */
-        if (lang !== "en") {
-            translatedQ = await translate(q, "en");
-            translatedA = await translate(a, "en");
+        // If text is short (< 6 chars), user may be right → fallback to user selection
+        const finalLang =
+            q.length < 6 ? userLang : detectedLang;
 
-            if (!translatedQ || !translatedA) {
-                return NextResponse.json({
-                    success: false,
-                    reason: "translation-failed"
-                });
-            }
+        /* -------------------------------------------------------
+           CREATE EN + KN VERSIONS
+        ------------------------------------------------------- */
+        let question_en, answer_en, question_kn, answer_kn;
 
-            // Short answers allowed now.
+        if (finalLang === "en") {
+            // original is English
+            question_en = q;
+            answer_en = a;
 
-            embedText = translatedQ;
+            // auto-translate to Kannada
+            question_kn = await translate(q, "kn");
+            answer_kn = await translate(a, "kn");
 
-            // Term preservation check only if original contains them
-            const missingTerms = checkPreservedTerms(q, translatedQ);
+        } else {
+            // original is Kannada
+            question_kn = q;
+            answer_kn = a;
 
-            if (missingTerms.length > 0) {
-                return NextResponse.json({
-                    success: false,
-                    reason: "missing-key-terms",
-                    details: { missingTerms }
-                });
+            // auto-translate to English
+            question_en = await translate(q, "en");
+            answer_en = await translate(a, "en");
+
+            if (!question_en || !answer_en) {
+                return NextResponse.json({ success: false, reason: "translation-failed" });
             }
         }
 
-        /* ---------------------------------------
-           CREATE EMBEDDING
-        --------------------------------------- */
-        const embedding = await generateEmbedding(embedText);
-
+        /* -------------------------------------------------------
+           GENERATE EMBEDDING USING ENGLISH VERSION
+        ------------------------------------------------------- */
+        const embedding = await generateEmbedding(question_en);
         if (!embedding) {
-            return NextResponse.json({
-                success: false,
-                reason: "embedding-failed"
-            });
+            return NextResponse.json({ success: false, reason: "embedding-failed" });
         }
 
-        /* ---------------------------------------
-           SAVE TO FIRESTORE
-        --------------------------------------- */
+        /* -------------------------------------------------------
+           SAVE IN CLEAN FORMAT
+        ------------------------------------------------------- */
         await adminDB.collection("qna_items").add({
-            originalQuestion: q,
-            originalAnswer: a,
-            translatedQuestion: translatedQ,
-            translatedAnswer: translatedA,
-            lang,
+            question_en,
+            answer_en,
+            question_kn,
+            answer_kn,
+            lang_original: finalLang,
             keywords,
             embedding,
             createdAt: new Date().toISOString()
@@ -172,7 +134,7 @@ export async function POST(req) {
         return NextResponse.json({ success: true });
 
     } catch (err) {
-        console.error("upload error:", err);
+        console.error("Upload error:", err);
         return NextResponse.json(
             { success: false, reason: "server-error" },
             { status: 500 }

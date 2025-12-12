@@ -1,102 +1,102 @@
 [
     {
-        "question": "ವುದು ಹೇಗೆ ಮಾಡಬೇಕು?",
-        "answer": "ಮುಖ, ಕೈಗಳು, ತಲೆ ತೇವಿಸಿ ಕಾಲುಗಳನ್ನು ತೊಳೆಯುವುದು ವುದುದ ಕ್ರಮವಾಗಿದೆ.",
-        "keywords": [
-            "wudu",
-            "ablution",
-            "purification"
-        ],
-        "lang": "kn"
-    },
-    {
-        "question": "ವುದು ಮುರಿಯುವ ಕಾರಣಗಳು ಯಾವುವು?",
-        "answer": "ಮೂತ್ರ, ಶೌಚ, ಅನಿಲ ಹೊರಬರುವುದು, ರಕ್ತ ಹರಿಯುವುದು ಇತ್ಯಾದಿ ವುದು ಮುರಿಯುವ ಕಾರಣಗಳು.",
-        "keywords": [
-            "wudu",
-            "breaking wudu",
-            "purification"
-        ],
-        "lang": "kn"
-    },
-    {
-        "question": "ನಮಾಜಿನಲ್ಲಿ ಯಾವ ಯಾವ ವೇಳೆ ಕೈ ಎತ್ತುತ್ತಾರೆ?",
-        "answer": "ತಕ್ಬೀರ್ ತಹ್ರೀಮಾ, ರೂಕುಗೆ ಹೋಗುವಾಗ ಮತ್ತು ರೂಕುವಿನಿಂದ ಎದ್ದಾಗ ಕೈ ಎತ್ತುವ ಸುನ್ನತ್ ಇದೆ.",
+        "question": "Is it permissible to pray wearing shoes?",
+        "answer": "Yes, it is permissible to pray wearing shoes as long as they are clean and free from impurities.",
+        "lang": "en",
         "keywords": [
             "prayer",
-            "takbeer",
-            "rafayadain"
-        ],
-        "lang": "kn"
+            "shoes",
+            "purity"
+        ]
     },
     {
-        "question": "ತಕ್ಬೀರ್ ತಹ್ರೀಮಾ ಎಂದರೇನು?",
-        "answer": "ನಮಾಜು ಆರಂಭಿಸುವಾಗ 'ಅಲ್ಲಾಹು ಅಕ್ಬರ್' ಎಂದು ಹೇಳುವುದನ್ನು ತಕ್ಬೀರ್ ತಹ್ರೀಮಾ ಎನ್ನುತ್ತಾರೆ.",
+        "question": "Can a traveler shorten their prayers?",
+        "answer": "Yes, a traveler may shorten the Dhuhr, Asr, and Isha prayers to two raka'at.",
+        "lang": "en",
         "keywords": [
-            "takbeer",
-            "prayer",
-            "salah"
-        ],
-        "lang": "kn"
+            "traveler",
+            "qasr",
+            "shortened prayer"
+        ]
     },
     {
-        "question": "ರಕಾತ್ ಗಳ ಬಗ್ಗೆ ಸಂಶಯ ಬಂದರೆ ಏನು ಮಾಡಬೇಕು?",
-        "answer": "ಕಡಿಮೆ ಸಂಖ್ಯೆಯನ್ನು ಹಿಡಿದು ನಮಾಜನ್ನು ಮುಂದುವರಿಸಿ ಕೊನೆಯಲ್ಲಿ ಸಜ್ದೇ ಸಹ್ವ್ ಮಾಡಬೇಕು.",
+        "question": "What is the ruling on missing Jumu'ah prayer?",
+        "answer": "It is sinful to miss Jumu'ah without a valid excuse such as illness or travel.",
+        "lang": "en",
         "keywords": [
-            "sajdah sahw",
-            "doubt",
-            "prayer"
-        ],
-        "lang": "kn"
+            "jumuah",
+            "friday prayer",
+            "ruling"
+        ]
     },
     {
-        "question": "ಸಜ್ದೇ ಸಹ್ವ್ ಮಾಡುವುದು ಯಾವಾಗ ಕಡ್ಡಾಯ?",
-        "answer": "ನಮಾಜಿನಲ್ಲಿ ತಪ್ಪು, ಹೆಚ್ಚಾದುದು ಅಥವಾ ಕಡಿಮೆಯಾದಾಗ ಸಜ್ದೇ ಸಹ್ವ್ ಮಾಡುವುದು ಕಡ್ಡಾಯ.",
+        "question": "When should one perform Suhoor during Ramadan?",
+        "answer": "Suhoor should be eaten just before Fajr time begins, delaying it is recommended.",
+        "lang": "en",
         "keywords": [
-            "sajdah sahw",
-            "mistake",
-            "prayer"
-        ],
-        "lang": "kn"
-    },
-    {
-        "question": "ಝಕಾತ್ ಯಾರ ಮೇಲೆ ಕಡ್ಡಾಯ?",
-        "answer": "ನಿಸಾಬ್ ಪ್ರಮಾಣದ ಸಂಪತ್ತನ್ನು ಒಂದು ಚಂದ್ರಮಾನ ವರ್ಷ ಹೊಂದಿದವರ ಮೇಲೆ ಝಕಾತ್ ಕಡ್ಡಾಯ.",
-        "keywords": [
-            "zakat",
-            "nisab",
-            "wealth"
-        ],
-        "lang": "kn"
-    },
-    {
-        "question": "ನಿಸಾಬ್ ಪ್ರಮಾಣವೆಂದರೆ ಏನು?",
-        "answer": "ಝಕಾತ್ ಕಡ್ಡಾಯವಾಗಲು ಅಗತ್ಯವಾದ ಕನಿಷ್ಠ ಸಂಪತ್ತಿನ ಮಿತಿಯನ್ನು ನಿಸಾಬ್ ಪ್ರಮಾಣ ಎಂದು ಕರೆಯುತ್ತಾರೆ.",
-        "keywords": [
-            "nisab",
-            "zakat",
-            "wealth"
-        ],
-        "lang": "kn"
-    },
-    {
-        "question": "ರಮಝಾನ್ ಉಪವಾಸಕ್ಕೆ ನಿಯ್ಯತ್ ಯಾವಾಗ ಮಾಡಬೇಕು?",
-        "answer": "ಫಜ್ರ್ ಮುಂಚೆ ರಾತ್ರಿ ನಿಯ್ಯತ್ ಮಾಡುವುದು ಫರ್ಝ್ ಉಪವಾಸಕ್ಕೆ ಅಗತ್ಯ.",
-        "keywords": [
-            "fasting",
             "ramadan",
-            "niyyah"
-        ],
-        "lang": "kn"
+            "suhoor",
+            "fasting"
+        ]
     },
     {
-        "question": "ಉಪವಾಸ ಮುರಿಯುವ ಕಾರಣಗಳು ಯಾವುವು?",
-        "answer": "ಉದ್ದೇಶಪೂರ್ವಕವಾಗಿ ತಿನ್ನುವುದು, ಕುಡಿಯುವುದು ಅಥವಾ ವಾಂತಿ ಮಾಡುವುದು ಉಪವಾಸ ಮುರಿಯುತ್ತದೆ.",
+        "question": "Is giving charity in secret recommended?",
+        "answer": "Yes, giving charity secretly is highly recommended and carries greater reward.",
+        "lang": "en",
+        "keywords": [
+            "charity",
+            "sadaqah",
+            "reward"
+        ]
+    },
+    {
+        "question": "Can menstruating women read Quran?",
+        "answer": "Most scholars permit reciting Quran from memory or using a phone, but touching the mushaf directly is avoided.",
+        "lang": "en",
+        "keywords": [
+            "menstruation",
+            "quran",
+            "women"
+        ]
+    },
+    {
+        "question": "Is it allowed to fast on Fridays alone?",
+        "answer": "Fasting on Friday alone is disliked unless it coincides with a habitual fast or is paired with a day before or after.",
+        "lang": "en",
+        "keywords": [
+            "friday",
+            "fasting",
+            "ruling"
+        ]
+    },
+    {
+        "question": "What is the ruling on using perfume during fasting?",
+        "answer": "Using perfume does not break the fast, but inhaling incense smoke directly should be avoided.",
+        "lang": "en",
         "keywords": [
             "fasting",
-            "break fast",
+            "perfume",
             "ramadan"
-        ],
-        "lang": "kn"
+        ]
+    },
+    {
+        "question": "Can one pray sunnah prayers while the iqamah is being called?",
+        "answer": "It is disliked to start a sunnah prayer once the iqamah has begun, except the two rak'ah of Fajr if time permits.",
+        "lang": "en",
+        "keywords": [
+            "sunnah",
+            "iqamah",
+            "prayer"
+        ]
+    },
+    {
+        "question": "Is it permissible to raise hands during dua after salah?",
+        "answer": "Yes, raising hands while making dua after salah is permissible and practiced by many scholars.",
+        "lang": "en",
+        "keywords": [
+            "dua",
+            "salah",
+            "raising hands"
+        ]
     }
 ]

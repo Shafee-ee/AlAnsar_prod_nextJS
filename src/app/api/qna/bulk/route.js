@@ -1,15 +1,24 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-// detect Kannada script
+/* -----------------------------------------
+   Detect Kannada script (Unicode only)
+----------------------------------------- */
 function isKannada(text = "") {
     return /[\u0C80-\u0CFF]/.test(text);
 }
 
-// translate via your existing FE pipeline
+/* -----------------------------------------
+   Translate via internal API
+----------------------------------------- */
 async function translate(text, target = "en") {
     try {
-        const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+        const base =
+            process.env.NEXT_PUBLIC_BASE_URL ||
+                process.env.VERCEL_URL
+                ? `https://${process.env.VERCEL_URL}`
+                : "http://localhost:3000";
+
         const r = await fetch(`${base}/api/translate`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -24,29 +33,36 @@ async function translate(text, target = "en") {
     }
 }
 
-// generate English embedding
+/* -----------------------------------------
+   Generate English embedding
+----------------------------------------- */
 async function generateEmbedding(text) {
     try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${process.env.GOOGLE_API_KEY}`;
-
-        const r = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "text-embedding-004",
-                content: { parts: [{ text }] },
-            }),
-        });
+        const r = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${process.env.GOOGLE_API_KEY}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    model: "text-embedding-004",
+                    content: { parts: [{ text }] },
+                }),
+            }
+        );
 
         const j = await r.json();
-        return Array.isArray(j?.embedding?.values) ? j.embedding.values : null;
+        return Array.isArray(j?.embedding?.values)
+            ? j.embedding.values
+            : null;
     } catch (err) {
         console.error("Embedding error:", err);
         return null;
     }
 }
 
-// simple CSV parser (no dependencies)
+/* -----------------------------------------
+   Simple CSV parser (safe + predictable)
+----------------------------------------- */
 function parseCSV(text) {
     const lines = text.trim().split(/\r?\n/);
     const header = lines.shift().split(",").map(h => h.trim().toLowerCase());
@@ -59,37 +75,37 @@ function parseCSV(text) {
     });
 }
 
+/* -----------------------------------------
+   BULK UPLOAD HANDLER
+----------------------------------------- */
 export async function POST(request) {
     try {
         const formData = await request.formData();
         const file = formData.get("file");
 
         if (!file) {
-            return NextResponse.json({
-                success: false,
-                message: "No file uploaded",
-            });
+            return NextResponse.json({ success: false, message: "No file uploaded" });
         }
 
         const raw = await file.text();
-
         let items = [];
 
-        // Detect CSV vs JSON
+        // CSV vs JSON
         if (file.name.endsWith(".csv")) {
             items = parseCSV(raw).map(row => ({
-                question: row.question || row.q || "",
-                answer: row.answer || row.a || "",
-                keywords: row.keywords ? row.keywords.split(";").map(k => k.trim()) : []
+                question: row.question || "",
+                answer: row.answer || "",
+                keywords: row.keywords
+                    ? row.keywords.split(";").map(k => k.trim())
+                    : [],
             }));
         } else {
             try {
                 items = JSON.parse(raw);
-            } catch (err) {
+            } catch {
                 return NextResponse.json({
                     success: false,
                     message: "Invalid JSON format",
-                    error: err.toString(),
                 });
             }
         }
@@ -97,7 +113,6 @@ export async function POST(request) {
         let uploaded = 0;
         const failed = [];
 
-        // MAIN LOOP
         for (let i = 0; i < items.length; i++) {
             const { question, answer, keywords = [] } = items[i];
 
@@ -109,62 +124,60 @@ export async function POST(request) {
             const q = question.trim();
             const a = answer.trim();
 
-            let lang = isKannada(q) ? "kn" : "en";
+            // 🔒 CANONICAL: English first
+            let question_en, answer_en;
+            let question_kn = null, answer_kn = null;
 
-            let question_en, answer_en, question_kn, answer_kn;
+            if (isKannada(q)) {
+                // Kannada input
+                question_kn = q;
+                answer_kn = a;
 
-            try {
-                if (lang === "en") {
-                    question_en = q;
-                    answer_en = a;
-                    question_kn = await translate(q, "kn");
-                    answer_kn = await translate(a, "kn");
-                } else {
-                    question_kn = q;
-                    answer_kn = a;
-                    question_en = await translate(q, "en");
-                    answer_en = await translate(a, "en");
-                }
+                question_en = await translate(q, "en");
+                answer_en = await translate(a, "en");
+            } else {
+                // English input
+                question_en = q;
+                answer_en = a;
 
-                const embedding = await generateEmbedding(question_en);
-                if (!embedding) {
-                    failed.push({ index: i, reason: "embedding-failed" });
-                    continue;
-                }
-
-                await adminDB.collection("qna_items").add({
-                    question_en,
-                    answer_en,
-                    question_kn,
-                    answer_kn,
-                    lang_original: lang,
-                    keywords,
-                    embedding,
-                    createdAt: new Date().toISOString()
-                });
-
-                uploaded++;
-            } catch (err) {
-                console.error("Bulk row error:", err);
-                failed.push({ index: i, reason: "exception" });
+                question_kn = await translate(q, "kn");
+                answer_kn = await translate(a, "kn");
             }
+
+            // 🚨 FINAL SAFETY: validate Kannada again
+            if (!isKannada(question_kn)) question_kn = null;
+            if (!isKannada(answer_kn)) answer_kn = null;
+
+            const embedding = await generateEmbedding(question_en);
+            if (!embedding) {
+                failed.push({ index: i, reason: "embedding-failed" });
+                continue;
+            }
+
+            await adminDB.collection("qna_items").add({
+                question_en,
+                answer_en,
+                question_kn,
+                answer_kn,
+                lang_original: isKannada(q) ? "kn" : "en",
+                keywords,
+                embedding,
+                createdAt: new Date().toISOString(),
+            });
+
+            uploaded++;
         }
 
         return NextResponse.json({
             success: true,
             total: items.length,
             uploaded,
-            failed
+            failed,
         });
-
     } catch (err) {
         console.error("BulkUpload Server Error:", err);
         return NextResponse.json(
-            {
-                success: false,
-                message: "Server error",
-                error: err.toString(),
-            },
+            { success: false, message: "Server error" },
             { status: 500 }
         );
     }

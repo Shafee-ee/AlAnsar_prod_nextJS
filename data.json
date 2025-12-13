@@ -1,102 +1,182 @@
 [
     {
-        "question": "Is it permissible to pray wearing shoes?",
-        "answer": "Yes, it is permissible to pray wearing shoes as long as they are clean and free from impurities.",
-        "lang": "en",
+        "question": "Is it permissible to delay paying zakat?",
+        "answer": "Zakat should be paid promptly once it becomes obligatory, and delaying it without a valid reason is sinful.",
         "keywords": [
-            "prayer",
-            "shoes",
-            "purity"
-        ]
-    },
-    {
-        "question": "Can a traveler shorten their prayers?",
-        "answer": "Yes, a traveler may shorten the Dhuhr, Asr, and Isha prayers to two raka'at.",
-        "lang": "en",
-        "keywords": [
-            "traveler",
-            "qasr",
-            "shortened prayer"
-        ]
-    },
-    {
-        "question": "What is the ruling on missing Jumu'ah prayer?",
-        "answer": "It is sinful to miss Jumu'ah without a valid excuse such as illness or travel.",
-        "lang": "en",
-        "keywords": [
-            "jumuah",
-            "friday prayer",
-            "ruling"
-        ]
-    },
-    {
-        "question": "When should one perform Suhoor during Ramadan?",
-        "answer": "Suhoor should be eaten just before Fajr time begins, delaying it is recommended.",
-        "lang": "en",
-        "keywords": [
-            "ramadan",
-            "suhoor",
-            "fasting"
-        ]
-    },
-    {
-        "question": "Is giving charity in secret recommended?",
-        "answer": "Yes, giving charity secretly is highly recommended and carries greater reward.",
-        "lang": "en",
-        "keywords": [
+            "zakat",
             "charity",
-            "sadaqah",
-            "reward"
+            "obligation"
         ]
     },
     {
-        "question": "Can menstruating women read Quran?",
-        "answer": "Most scholars permit reciting Quran from memory or using a phone, but touching the mushaf directly is avoided.",
-        "lang": "en",
-        "keywords": [
-            "menstruation",
-            "quran",
-            "women"
-        ]
-    },
-    {
-        "question": "Is it allowed to fast on Fridays alone?",
-        "answer": "Fasting on Friday alone is disliked unless it coincides with a habitual fast or is paired with a day before or after.",
-        "lang": "en",
-        "keywords": [
-            "friday",
-            "fasting",
-            "ruling"
-        ]
-    },
-    {
-        "question": "What is the ruling on using perfume during fasting?",
-        "answer": "Using perfume does not break the fast, but inhaling incense smoke directly should be avoided.",
-        "lang": "en",
+        "question": "What is the ruling on missing a fast intentionally in Ramadan?",
+        "answer": "Intentionally breaking a fast in Ramadan without a valid excuse is a major sin and requires repentance and expiation.",
         "keywords": [
             "fasting",
+            "ramadan",
+            "sin"
+        ]
+    },
+    {
+        "question": "Can one perform salah while wearing perfume?",
+        "answer": "Wearing perfume during salah is permissible and recommended as long as it does not contain impure substances.",
+        "keywords": [
+            "salah",
             "perfume",
-            "ramadan"
-        ]
-    },
-    {
-        "question": "Can one pray sunnah prayers while the iqamah is being called?",
-        "answer": "It is disliked to start a sunnah prayer once the iqamah has begun, except the two rak'ah of Fajr if time permits.",
-        "lang": "en",
-        "keywords": [
-            "sunnah",
-            "iqamah",
             "prayer"
         ]
     },
     {
-        "question": "Is it permissible to raise hands during dua after salah?",
-        "answer": "Yes, raising hands while making dua after salah is permissible and practiced by many scholars.",
-        "lang": "en",
+        "question": "Is it allowed to recite Quran without wudu?",
+        "answer": "Reciting the Quran from memory is allowed without wudu, but touching the mushaf requires wudu according to most scholars.",
+        "keywords": [
+            "quran",
+            "wudu",
+            "recitation"
+        ]
+    },
+    {
+        "question": "What breaks the prayer during salah?",
+        "answer": "Prayer is invalidated by actions such as speaking, excessive movement, laughing aloud, or losing wudu.",
+        "keywords": [
+            "salah",
+            "prayer",
+            "invalid"
+        ]
+    },
+    {
+        "question": "Is intention required before every prayer?",
+        "answer": "Yes, intention is required before each prayer and is made in the heart, not necessarily spoken aloud.",
+        "keywords": [
+            "intention",
+            "niyyah",
+            "prayer"
+        ]
+    },
+    {
+        "question": "Can one combine prayers due to rain?",
+        "answer": "Some scholars permit combining Maghrib and Isha prayers due to heavy rain causing hardship.",
+        "keywords": [
+            "prayer",
+            "rain",
+            "combining prayers"
+        ]
+    },
+    {
+        "question": "Is making dua in sujood allowed?",
+        "answer": "Yes, making dua in sujood is highly recommended as it is a time when supplications are accepted.",
         "keywords": [
             "dua",
+            "sujood",
+            "prayer"
+        ]
+    },
+    {
+        "question": "What is the ruling on using a prayer app for salah times?",
+        "answer": "Using a prayer app to determine prayer times is permissible if the times are accurate.",
+        "keywords": [
             "salah",
-            "raising hands"
+            "prayer times",
+            "technology"
+        ]
+    },
+    {
+        "question": "Is it allowed to pray while sitting on a chair?",
+        "answer": "Praying while sitting on a chair is allowed if a person is unable to stand due to illness or weakness.",
+        "keywords": [
+            "salah",
+            "sitting",
+            "illness"
+        ]
+    },
+    {
+        "question": "Can zakat be given to relatives?",
+        "answer": "Zakat may be given to eligible relatives as long as they are not those one is obligated to financially support.",
+        "keywords": [
+            "zakat",
+            "relatives",
+            "charity"
+        ]
+    },
+    {
+        "question": "What is the minimum amount for zakat to be obligatory?",
+        "answer": "Zakat becomes obligatory when a person's wealth reaches the nisab and remains for one lunar year.",
+        "keywords": [
+            "zakat",
+            "nisab",
+            "wealth"
+        ]
+    },
+    {
+        "question": "Is listening to Quran the same as reciting it?",
+        "answer": "Listening to the Quran is virtuous, but reciting it carries a distinct reward for each letter read.",
+        "keywords": [
+            "quran",
+            "recitation",
+            "reward"
+        ]
+    },
+    {
+        "question": "Can a person pray without facing the qiblah?",
+        "answer": "Facing the qiblah is obligatory for prayer unless one is unable to determine it or is praying in extreme circumstances.",
+        "keywords": [
+            "qiblah",
+            "salah",
+            "direction"
+        ]
+    },
+    {
+        "question": "Is it allowed to break a voluntary fast?",
+        "answer": "Yes, a voluntary fast may be broken, but it is better to complete it once started.",
+        "keywords": [
+            "fasting",
+            "voluntary fast",
+            "nafl"
+        ]
+    },
+    {
+        "question": "What is the reward of praying on time?",
+        "answer": "Praying on time is among the most beloved deeds to Allah and carries great reward.",
+        "keywords": [
+            "salah",
+            "prayer time",
+            "reward"
+        ]
+    },
+    {
+        "question": "Can one perform tayammum if water is cold?",
+        "answer": "Tayammum is allowed if using water may cause harm due to extreme cold or illness.",
+        "keywords": [
+            "tayammum",
+            "wudu",
+            "hardship"
+        ]
+    },
+    {
+        "question": "Is it permissible to make dua in one's own language?",
+        "answer": "Yes, it is permissible to make dua in any language, especially outside of the formal parts of prayer.",
+        "keywords": [
+            "dua",
+            "language",
+            "supplication"
+        ]
+    },
+    {
+        "question": "Can a person pray while traveling on a vehicle?",
+        "answer": "A person may pray on a vehicle if stopping is not possible, facing the qiblah if able.",
+        "keywords": [
+            "travel",
+            "salah",
+            "vehicle"
+        ]
+    },
+    {
+        "question": "Is seeking knowledge considered an act of worship?",
+        "answer": "Yes, seeking beneficial knowledge is a form of worship and is highly encouraged in Islam.",
+        "keywords": [
+            "knowledge",
+            "worship",
+            "learning"
         ]
     }
 ]

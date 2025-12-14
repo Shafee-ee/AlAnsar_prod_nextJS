@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Send, Zap, MessageCircle, Share2 } from 'lucide-react';
 
+/* ----------------------------------
+   CONFIG
+---------------------------------- */
 const langs = [
     { code: 'en', label: 'EN' },
     { code: 'kn', label: 'KN' },
@@ -18,12 +21,19 @@ const headings = {
     },
 };
 
+// Confidence thresholds (frontend only)
+const CONFIDENCE = {
+    HIGH: 0.85,
+    LOW: 0.45,
+};
 
 /* ---------------------------------------------------------
-   BOT RESPONSE CARD (SOFTENED)
+   BOT RESPONSE CARD (CONFIDENCE AWARE)
 --------------------------------------------------------- */
 const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
-    if (!result?.bestMatch) {
+    const best = result?.bestMatch;
+
+    if (!best) {
         return (
             <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200">
                 <p className="font-semibold mb-1">No Direct Match Found</p>
@@ -34,39 +44,55 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
         );
     }
 
-    const { bestMatch, relatedQuestions = [] } = result;
+    const score = best.score ?? 0;
+    const isHighConfidence = score >= CONFIDENCE.HIGH;
+    const isClosestMatch = score >= CONFIDENCE.LOW && score < CONFIDENCE.HIGH;
 
     return (
         <div className="bg-white p-4 rounded-[16px_16px_16px_4px] border border-blue-100 shadow-sm text-sm">
+
+            {/* Confidence badge */}
+            {isHighConfidence && (
+                <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
+                    Verified answer
+                </div>
+            )}
+
+            {isClosestMatch && (
+                <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
+                    Closest matching answer
+                </div>
+            )}
+
             <div className="flex items-start text-blue-700 font-semibold mb-3">
                 <Zap className="w-4 h-4 mr-2 mt-0.5" />
-                {bestMatch.question}
+                {best.question}
             </div>
 
             <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-blue-50 rounded-lg">
-                {bestMatch.answer}
+                {best.answer}
             </div>
 
             <div className="flex justify-center mb-3">
                 <button
-                    onClick={() => onShare(bestMatch.question, bestMatch.answer)}
+                    onClick={() => onShare(best.question, best.answer)}
                     className="flex items-center gap-1 px-3 py-1 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
                 >
                     <Share2 className="w-3 h-3" /> Share
                 </button>
             </div>
 
-            {relatedQuestions.length > 0 && (
+            {result.relatedQuestions?.length > 0 && (
                 <div className="pt-3 border-t border-gray-100">
                     <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
                         <Search className="w-4 h-4 mr-2" />
-                        Related
+                        People also asked
                     </div>
 
                     <div className="space-y-2">
-                        {relatedQuestions.map((r, i) => (
+                        {result.relatedQuestions.map((r, i) => (
                             <button
-                                key={i}
+                                key={r.id || i}
                                 onClick={() => onRelatedClick(r)}
                                 className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
                             >
@@ -82,7 +108,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
 };
 
 /* ---------------------------------------------------------
-   MESSAGE BUBBLE (ASYMMETRIC)
+   MESSAGE BUBBLE
 --------------------------------------------------------- */
 const MessageBubble = ({ message, onRelatedClick, onShare }) => {
     if (message.type === "user") {
@@ -125,24 +151,9 @@ const ChatbotSection = () => {
     useEffect(() => {
         chatRef.current?.scrollTo({
             top: chatRef.current.scrollHeight,
-            behavior: 'smooth'
+            behavior: 'smooth',
         });
     }, [messages, isLoading]);
-
-    async function translateText(text, targetLang) {
-        if (!text || targetLang === "en") return text;
-        try {
-            const res = await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, targetLang })
-            });
-            const j = await res.json();
-            return j?.translated || text;
-        } catch {
-            return text;
-        }
-    }
 
     async function shareQA(q, a) {
         const payload = `${q}\n\n${a}`;
@@ -159,66 +170,55 @@ const ChatbotSection = () => {
     const handleSend = async (clicked = null) => {
         if (isLoading) return;
 
-        let queryEn;
-        let displayText;
+        let queryText;
 
         if (clicked) {
-            queryEn = clicked.queryEn;
-            displayText = clicked.displayText;
+            queryText = clicked.displayText;
         } else {
             const raw = userInput.trim();
             if (!raw) return;
-            displayText = raw;
-            queryEn = raw;
+            queryText = raw;
             setUserInput('');
         }
 
-        setMessages(prev => [...prev, { type: 'user', text: displayText }]);
+        setMessages(prev => [...prev, { type: 'user', text: queryText }]);
         setIsLoading(true);
 
         try {
             const res = await fetch("/api/qa-search", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: queryEn })
+                body: JSON.stringify({
+                    query: queryText,
+                    lang: selectedLang,
+                }),
             });
 
             const data = await res.json();
 
-            let q = data.bestMatch?.question;
-            let a = data.bestMatch?.answer;
+            const bestMatch = data.bestMatch
+                ? {
+                    question: data.bestMatch.question,
+                    answer: data.bestMatch.answer,
+                    score: data.bestMatch.score ?? 0,
+                }
+                : null;
 
-            if (selectedLang !== "en" && q && a) {
-                [q, a] = await Promise.all([
-                    translateText(q, selectedLang),
-                    translateText(a, selectedLang)
-                ]);
-            }
-
-            const relatedQuestions = await Promise.all(
-                (data.related || []).map(async r => ({
-                    queryEn: r.question,
-                    displayText:
-                        selectedLang === "en"
-                            ? r.question
-                            : await translateText(r.question, selectedLang)
-                }))
-            );
+            const relatedQuestions = (data.related || []).map(r => ({
+                id: r.id,
+                displayText: r.question,
+            }));
 
             setMessages(prev => [...prev, {
                 type: "bot",
-                result: {
-                    bestMatch: q ? { question: q, answer: a } : null,
-                    relatedQuestions
-                },
-                query: displayText
+                result: { bestMatch, relatedQuestions },
+                query: queryText,
             }]);
-
         } catch {
             setMessages(prev => [...prev, {
                 type: "bot",
                 result: { bestMatch: null },
-                query: displayText
+                query: queryText,
             }]);
         }
 
@@ -235,7 +235,6 @@ const ChatbotSection = () => {
                     {headings[selectedLang].subtitle}
                 </p>
             </header>
-
 
             <div className="flex gap-2 mb-4">
                 {langs.map(l => (
@@ -257,7 +256,11 @@ const ChatbotSection = () => {
                     {messages.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-full text-gray-400">
                             <Search className="w-10 h-10 mb-3" />
-                            <p>Type your question…</p>
+                            <p>
+                                {selectedLang === "kn"
+                                    ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                                    : "Type your question…"}
+                            </p>
                         </div>
                     )}
 

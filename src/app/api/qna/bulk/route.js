@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
+export const runtime = "nodejs";
 
 /* -----------------------------------------
    Detect Kannada script (Unicode only)

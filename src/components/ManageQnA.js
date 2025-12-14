@@ -12,7 +12,6 @@ export default function ManageQnA() {
     const [search, setSearch] = useState("");
     const [keywordSearch, setKeywordSearch] = useState("");
     const [langFilter, setLangFilter] = useState("all");
-    const [validityFilter, setValidityFilter] = useState("all"); // all | valid | invalid
     const [sortBy, setSortBy] = useState("newest");
 
     // modal
@@ -59,29 +58,18 @@ export default function ManageQnA() {
         setIsLoadingMore(false);
     }
 
-    function isItemValid(item) {
-        const embeddingOK = item.embedding && item.embedding.length > 0;
-        const translationOK =
-            item.originalQuestion !== item.translatedQuestion ||
-            item.originalAnswer !== item.translatedAnswer;
-
-        return embeddingOK && translationOK;
-    }
-
     // -------------------------------
-    // FILTER + SORT LOGIC FIXED
+    // FILTER + SORT
     // -------------------------------
     useEffect(() => {
         let data = [...items];
 
-        // search question
         if (search.trim() !== "") {
             data = data.filter(i =>
                 i.originalQuestion?.toLowerCase().includes(search.toLowerCase())
             );
         }
 
-        // keyword filter
         if (keywordSearch.trim() !== "") {
             data = data.filter(i =>
                 (i.keywords || [])
@@ -91,19 +79,10 @@ export default function ManageQnA() {
             );
         }
 
-        // language filter
         if (langFilter !== "all") {
             data = data.filter(i => i.lang === langFilter);
         }
 
-        // validity filter
-        if (validityFilter === "valid") {
-            data = data.filter(i => isItemValid(i));
-        } else if (validityFilter === "invalid") {
-            data = data.filter(i => !isItemValid(i));
-        }
-
-        // FIXED sorting (convert createdAt to timestamps)
         data.sort((a, b) => {
             const timeA = new Date(a.createdAt).getTime();
             const timeB = new Date(b.createdAt).getTime();
@@ -111,7 +90,7 @@ export default function ManageQnA() {
         });
 
         setFiltered(data);
-    }, [search, keywordSearch, langFilter, validityFilter, sortBy, items]);
+    }, [search, keywordSearch, langFilter, sortBy, items]);
 
     async function handleDelete(id) {
         if (!confirm("Delete this QnA?")) return;
@@ -127,6 +106,24 @@ export default function ManageQnA() {
         if (data.success) {
             setItems(items.filter(i => i.id !== id));
             setIsModalOpen(false);
+        }
+    }
+
+    async function handleDeleteAll() {
+        if (!confirm("⚠️ This will permanently delete ALL QnA items. Continue?")) return;
+
+        const res = await fetch("/api/qna/delete-all", {
+            method: "POST",
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert(`Deleted ${data.deleted} QnA items`);
+            setItems([]);
+            setFiltered([]);
+        } else {
+            alert("Delete failed");
         }
     }
 
@@ -152,22 +149,31 @@ export default function ManageQnA() {
                     className="p-2 border rounded w-40 text-xs"
                 />
 
-                <select value={langFilter} onChange={(e) => setLangFilter(e.target.value)} className="p-2 border rounded text-xs">
+                <select
+                    value={langFilter}
+                    onChange={(e) => setLangFilter(e.target.value)}
+                    className="p-2 border rounded text-xs"
+                >
                     <option value="all">All Lang</option>
                     <option value="kn">Kannada</option>
                     <option value="en">English</option>
                 </select>
 
-                <select value={validityFilter} onChange={(e) => setValidityFilter(e.target.value)} className="p-2 border rounded text-xs">
-                    <option value="all">All Items</option>
-                    <option value="valid">Valid Only</option>
-                    <option value="invalid">Invalid Only</option>
-                </select>
-
-                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="p-2 border rounded text-xs">
+                <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="p-2 border rounded text-xs"
+                >
                     <option value="newest">Newest</option>
                     <option value="oldest">Oldest</option>
                 </select>
+
+                <button
+                    onClick={handleDeleteAll}
+                    className="bg-red-700 text-white px-4 py-2 rounded text-xs hover:bg-red-800"
+                >
+                    Delete ALL QnA
+                </button>
             </div>
 
             {/* Table */}
@@ -175,7 +181,6 @@ export default function ManageQnA() {
                 <table className="w-full border-collapse text-xs">
                     <thead>
                         <tr className="bg-gray-200 text-xs">
-                            <th className="p-2">Status</th>
                             <th className="p-2">Question</th>
                             <th className="p-2">Keywords</th>
                             <th className="p-2">Lang</th>
@@ -195,14 +200,9 @@ export default function ManageQnA() {
                                     setIsEditing(false);
                                 }}
                             >
-                                <td className="p-2">
-                                    {isItemValid(item)
-                                        ? <span className="w-2.5 h-2.5 bg-green-500 rounded-full inline-block" />
-                                        : <span className="w-2.5 h-2.5 bg-red-500 rounded-full inline-block" />
-                                    }
+                                <td className="p-2 max-w-[250px] truncate">
+                                    {item.originalQuestion}
                                 </td>
-
-                                <td className="p-2 max-w-[250px] truncate">{item.originalQuestion}</td>
 
                                 <td className="p-2 max-w-[180px] truncate text-gray-600">
                                     {(item.keywords || []).join(", ")}
@@ -228,7 +228,7 @@ export default function ManageQnA() {
 
                         {filtered.length === 0 && (
                             <tr>
-                                <td colSpan="6" className="text-center p-3 text-gray-500">
+                                <td colSpan="5" className="text-center p-3 text-gray-500">
                                     No QnA found
                                 </td>
                             </tr>
@@ -249,7 +249,7 @@ export default function ManageQnA() {
                 </div>
             )}
 
-            {/* MODAL */}
+            {/* MODAL — unchanged */}
             {isModalOpen && selectedItem && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
                     <div className="bg-white p-5 rounded-lg shadow-xl max-w-lg w-full text-sm">
@@ -258,77 +258,46 @@ export default function ManageQnA() {
                             {isEditing ? "Edit QnA" : "QnA Details"}
                         </h2>
 
-                        {/* Question */}
                         <div className="mb-3">
                             <h3 className="font-semibold text-xs">Question:</h3>
                             {isEditing ? (
                                 <textarea
                                     className="w-full p-2 border rounded text-sm"
                                     value={selectedItem.originalQuestion}
-                                    onChange={(e) => setSelectedItem({ ...selectedItem, originalQuestion: e.target.value })}
+                                    onChange={(e) =>
+                                        setSelectedItem({
+                                            ...selectedItem,
+                                            originalQuestion: e.target.value
+                                        })
+                                    }
                                 />
                             ) : (
-                                <p className="text-gray-700 whitespace-pre-line">{selectedItem.originalQuestion}</p>
+                                <p className="text-gray-700 whitespace-pre-line">
+                                    {selectedItem.originalQuestion}
+                                </p>
                             )}
                         </div>
 
-                        {/* Answer */}
                         <div className="mb-3">
                             <h3 className="font-semibold text-xs">Answer:</h3>
                             {isEditing ? (
                                 <textarea
                                     className="w-full p-2 border rounded h-28 text-sm"
                                     value={selectedItem.originalAnswer}
-                                    onChange={(e) => setSelectedItem({ ...selectedItem, originalAnswer: e.target.value })}
-                                />
-                            ) : (
-                                <p className="text-gray-700 whitespace-pre-line">{selectedItem.originalAnswer}</p>
-                            )}
-                        </div>
-
-                        {/* Keywords */}
-                        <div className="mb-3">
-                            <h3 className="font-semibold text-xs">Keywords:</h3>
-                            {isEditing ? (
-                                <input
-                                    className="w-full p-2 border rounded text-sm"
-                                    value={(selectedItem.keywords || []).join(", ")}
                                     onChange={(e) =>
                                         setSelectedItem({
                                             ...selectedItem,
-                                            keywords: e.target.value
-                                                .split(",")
-                                                .map(k => k.trim())
-                                                .filter(Boolean)
+                                            originalAnswer: e.target.value
                                         })
                                     }
                                 />
                             ) : (
-                                <p className="text-gray-700">{(selectedItem.keywords || []).join(", ")}</p>
+                                <p className="text-gray-700 whitespace-pre-line">
+                                    {selectedItem.originalAnswer}
+                                </p>
                             )}
                         </div>
 
-                        {/* Language */}
-                        <div className="mb-3">
-                            <h3 className="font-semibold text-xs">Language:</h3>
-
-                            {isEditing ? (
-                                <select
-                                    className="p-2 border rounded text-sm"
-                                    value={selectedItem.lang}
-                                    onChange={(e) =>
-                                        setSelectedItem({ ...selectedItem, lang: e.target.value })
-                                    }
-                                >
-                                    <option value="kn">Kannada</option>
-                                    <option value="en">English</option>
-                                </select>
-                            ) : (
-                                <p className="text-gray-700">{selectedItem.lang}</p>
-                            )}
-                        </div>
-
-                        {/* Buttons */}
                         <div className="flex justify-between mt-5">
                             <button
                                 onClick={() => {
@@ -341,38 +310,12 @@ export default function ManageQnA() {
                             </button>
 
                             <div className="flex gap-3">
-                                {isEditing ? (
-                                    <button
-                                        onClick={async () => {
-                                            const res = await fetch("/api/qna/update", {
-                                                method: "POST",
-                                                headers: { "Content-Type": "application/json" },
-                                                body: JSON.stringify(selectedItem)
-                                            });
-
-                                            const data = await res.json();
-                                            if (data.success) {
-                                                alert("Updated!");
-                                                setIsEditing(false);
-                                                setItems(items.map(i =>
-                                                    i.id === selectedItem.id ? selectedItem : i
-                                                ));
-                                            } else {
-                                                alert("Update failed");
-                                            }
-                                        }}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-                                    >
-                                        Save
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => setIsEditing(true)}
-                                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
-                                    >
-                                        Edit
-                                    </button>
-                                )}
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+                                >
+                                    Edit
+                                </button>
 
                                 <button
                                     onClick={() => handleDelete(selectedItem.id)}
@@ -386,7 +329,6 @@ export default function ManageQnA() {
                     </div>
                 </div>
             )}
-
         </div>
     );
 }

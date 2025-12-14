@@ -1,9 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  // No invalid experimental keys
-  experimental: {
-    webpackBuildWorker: false,
-  },
-};
+const nextConfig = {};
 
 export default nextConfig;

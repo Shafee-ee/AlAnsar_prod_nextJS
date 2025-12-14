@@ -30,6 +30,17 @@ const categories = [
     { name: 'Vishleshanegalu', href: '/categories/vishleshanegalu' },
 ];
 
+const headings = {
+    en: {
+        title: "Ask & See Bot",
+        subtitle: "Ask your Islamic questions here",
+    },
+    kn: {
+        title: "ಕೇಳಿ ನೋಡಿ ಬಾಟ್",
+        subtitle: "ನಿಮ್ಮ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಇಲ್ಲಿ ಕೇಳಿ",
+    },
+};
+
 const Navbar = () => {
     const { user, loading, logout } = useAuth();
     const isAuthenticated = !!user;
@@ -68,12 +79,10 @@ const Navbar = () => {
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link href="/" className="flex-shrink-0 flex items-center space-x-2">
-                            <Image
+                            <img
                                 src="/logo.png"
                                 alt="ALANSARWEEKLY Logo"
-                                width={40}
-                                height={40}
-                                className="h-12 w-auto"
+                                className="h-16 w-auto block"
                             />
                         </Link>
                     </div>

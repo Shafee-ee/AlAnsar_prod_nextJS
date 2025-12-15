@@ -113,7 +113,7 @@ export default function ManageQnA() {
         if (!confirm("⚠️ This will permanently delete ALL QnA items. Continue?")) return;
 
         const res = await fetch("/api/qna/delete-all", {
-            method: "POST",
+            method: "DELETE",
         });
 
         const data = await res.json();

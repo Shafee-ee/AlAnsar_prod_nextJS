@@ -11,7 +11,7 @@ async function deleteAllQna() {
 
     console.log(`Found ${snap.size} QnA items. Deleting...`);
 
-    const batchSize = 500;
+    const batchSize = 400;
     let batch = adminDB.batch();
     let count = 0;
 

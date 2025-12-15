@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-export const runtime = "nodejs"; // REQUIRED for Firestore batch ops
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-export async function POST() {
+const BATCH_SIZE = 100;
+
+export async function DELETE() {
     try {
-        const collectionRef = adminDB.collection("qna_items");
+        const ref = adminDB.collection("qna_items");
         let totalDeleted = 0;
 
         while (true) {
-            const snap = await collectionRef.limit(500).get();
+            const snap = await ref.limit(BATCH_SIZE).get();
             if (snap.empty) break;
 
             const batch = adminDB.batch();
@@ -24,9 +27,9 @@ export async function POST() {
             deleted: totalDeleted,
         });
     } catch (err) {
-        console.error("QnA delete-all failed:", err);
+        console.error("Delete-all failed:", err);
         return NextResponse.json(
-            { success: false, message: "Delete failed" },
+            { success: false },
             { status: 500 }
         );
     }

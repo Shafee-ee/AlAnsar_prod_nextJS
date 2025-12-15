@@ -28,7 +28,7 @@ const CONFIDENCE = {
 };
 
 /* ---------------------------------------------------------
-   BOT RESPONSE CARD (CONFIDENCE AWARE)
+   BOT RESPONSE CARD
 --------------------------------------------------------- */
 const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     const best = result?.bestMatch;
@@ -51,7 +51,6 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     return (
         <div className="bg-white p-4 rounded-[16px_16px_16px_4px] border border-blue-100 shadow-sm text-sm">
 
-            {/* Confidence badge */}
             {isHighConfidence && (
                 <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
                     Verified answer
@@ -171,17 +170,22 @@ const ChatbotSection = () => {
         if (isLoading) return;
 
         let queryText;
+        let displayText;
 
         if (clicked) {
-            queryText = clicked.displayText;
+            queryText = clicked.query;
+            displayText = clicked.displayText;
         } else {
             const raw = userInput.trim();
             if (!raw) return;
             queryText = raw;
+            displayText = raw;
             setUserInput('');
         }
 
-        setMessages(prev => [...prev, { type: 'user', text: queryText }]);
+        if (!queryText) return; // HARD GUARD
+
+        setMessages(prev => [...prev, { type: 'user', text: displayText }]);
         setIsLoading(true);
 
         try {
@@ -206,19 +210,20 @@ const ChatbotSection = () => {
 
             const relatedQuestions = (data.related || []).map(r => ({
                 id: r.id,
-                displayText: r.question,
+                query: r.question,       // CANONICAL QUERY
+                displayText: r.question, // DISPLAY ONLY
             }));
 
             setMessages(prev => [...prev, {
                 type: "bot",
                 result: { bestMatch, relatedQuestions },
-                query: queryText,
+                query: displayText,
             }]);
         } catch {
             setMessages(prev => [...prev, {
                 type: "bot",
                 result: { bestMatch: null },
-                query: queryText,
+                query: displayText,
             }]);
         }
 
@@ -253,17 +258,6 @@ const ChatbotSection = () => {
 
             <div className="bg-gray-100 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
                 <div ref={chatRef} className="flex-grow px-4 py-6 overflow-y-auto">
-                    {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                            <Search className="w-10 h-10 mb-3" />
-                            <p>
-                                {selectedLang === "kn"
-                                    ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
-                                    : "Type your question…"}
-                            </p>
-                        </div>
-                    )}
-
                     {messages.map((m, i) => (
                         <MessageBubble
                             key={i}
@@ -272,16 +266,6 @@ const ChatbotSection = () => {
                             onShare={shareQA}
                         />
                     ))}
-
-                    {isLoading && (
-                        <div className="flex justify-start mb-4">
-                            <div className="bg-gray-200 px-4 py-3 rounded-[16px_16px_16px_4px] flex gap-1">
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.15s]" />
-                                <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.3s]" />
-                            </div>
-                        </div>
-                    )}
                 </div>
 
                 <div className="p-3 border-t bg-white rounded-b-xl">

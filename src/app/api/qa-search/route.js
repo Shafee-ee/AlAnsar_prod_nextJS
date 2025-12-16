@@ -1,3 +1,4 @@
+export const runtime = "node.js";
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 

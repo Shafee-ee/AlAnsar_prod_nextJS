@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-// --- Gemini Embedding (your working version) ---
+/* -----------------------------
+   EMBEDDING
+----------------------------- */
 async function generateEmbedding(text) {
     try {
         const response = await fetch(
@@ -11,10 +13,8 @@ async function generateEmbedding(text) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     model: "text-embedding-004",
-                    content: {
-                        parts: [{ text }]
-                    }
-                }),
+                    content: { parts: [{ text }] }
+                })
             }
         );
 
@@ -27,49 +27,61 @@ async function generateEmbedding(text) {
         }
 
         return values;
-
     } catch (err) {
-        console.error("Gemini embedding error:", err);
+        console.error("Embedding exception:", err);
         return [];
     }
 }
 
+/* -----------------------------
+   UPDATE QNA
+----------------------------- */
 export async function POST(req) {
     try {
-        const { id, question, answer, lang } = await req.json();
+        const { id, updates } = await req.json();
 
-        if (!id || !question || !answer) {
-            return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
+        if (!id || !updates) {
+            return NextResponse.json(
+                { success: false, error: "Missing id or updates" },
+                { status: 400 }
+            );
         }
 
         const docRef = adminDB.collection("qna_items").doc(id);
-        const oldDoc = await docRef.get();
-        const oldData = oldDoc.data();
+        const snap = await docRef.get();
 
-        if (!oldData) {
-            return NextResponse.json({ success: false, error: "Document not found" }, { status: 404 });
+        if (!snap.exists) {
+            return NextResponse.json(
+                { success: false, error: "Document not found" },
+                { status: 404 }
+            );
         }
 
-        let newEmbedding = oldData.embedding;
+        const oldData = snap.data();
 
-        // Only regenerate if question changed
-        if (oldData.question !== question) {
-            newEmbedding = await generateEmbedding(question);
+        let embedding = oldData.embedding || [];
+
+        // regenerate embedding ONLY if English question changed
+        if (
+            updates.question_en &&
+            updates.question_en !== oldData.question_en
+        ) {
+            embedding = await generateEmbedding(updates.question_en);
         }
 
-        // Update Firestore
         await docRef.update({
-            question,
-            answer,
-            lang,
-            embedding: newEmbedding,
-            updatedAt: new Date().toISOString(),
+            ...updates,
+            embedding,
+            updatedAt: new Date().toISOString()
         });
 
         return NextResponse.json({ success: true });
 
     } catch (err) {
-        console.error("UPDATE ERROR:", err);
-        return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+        console.error("QNA UPDATE ERROR:", err);
+        return NextResponse.json(
+            { success: false, error: err.message },
+            { status: 500 }
+        );
     }
 }

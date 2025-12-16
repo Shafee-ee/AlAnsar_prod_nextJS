@@ -44,19 +44,19 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     }
 
     const score = best.score ?? 0;
-    const isHighConfidence = score >= CONFIDENCE.HIGH;
-    const isClosestMatch = score >= CONFIDENCE.LOW && score < CONFIDENCE.HIGH;
+    const isHigh = score >= CONFIDENCE.HIGH;
+    const isClose = score >= CONFIDENCE.LOW && score < CONFIDENCE.HIGH;
 
     return (
         <div className="bg-white p-4 rounded-[16px_16px_16px_4px] border border-blue-100 shadow-sm text-sm">
 
-            {isHighConfidence && (
+            {isHigh && (
                 <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
                     Strong match
                 </div>
             )}
 
-            {isClosestMatch && (
+            {isClose && (
                 <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
                     Close match
                 </div>
@@ -90,8 +90,8 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                     <div className="space-y-2">
                         {result.relatedQuestions.map((r, i) => (
                             <button
-                                key={r.id || i}
-                                onClick={() => onRelatedClick(r)}
+                                key={i}
+                                onClick={() => onRelatedClick(r.displayText)}
                                 className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
                             >
                                 <MessageCircle className="w-3 h-3 inline mr-1" />
@@ -164,72 +164,22 @@ const ChatbotSection = () => {
         alert("Copied!");
     }
 
-    /* -------------------------
-       FETCH BY ID (RELATED CLICK)
-    ------------------------- */
-    async function fetchById(id, displayText) {
-        setMessages(prev => [...prev, { type: 'user', text: displayText }]);
-        setIsLoading(true);
-
-        try {
-            const res = await fetch("/api/qna/by-id", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id }),
-            });
-
-            const data = await res.json();
-
-            setMessages(prev => [...prev, {
-                type: "bot",
-                result: {
-                    bestMatch: {
-                        question: data.question,
-                        answer: data.answer,
-                        score: 1,
-                    },
-                    relatedQuestions: (data.related || []).map(r => ({
-                        id: r.id,
-                        displayText: r.question,
-                    })),
-                },
-                query: displayText,
-            }]);
-        } catch {
-            setMessages(prev => [...prev, {
-                type: "bot",
-                result: { bestMatch: null },
-                query: displayText,
-            }]);
-        }
-
-        setIsLoading(false);
-    }
-
-    /* -------------------------
-       SEARCH (USER INPUT ONLY)
-    ------------------------- */
-    const handleSend = async (clicked = null) => {
+    const handleSend = async (textOverride = null) => {
         if (isLoading) return;
 
-        // RELATED CLICK → FETCH BY ID
-        if (clicked?.id) {
-            fetchById(clicked.id, clicked.displayText);
-            return;
-        }
+        const queryText = (textOverride ?? userInput).trim();
+        if (!queryText) return;
 
-        const raw = userInput.trim();
-        if (!raw) return;
+        if (!textOverride) setUserInput('');
 
-        setUserInput('');
-        setMessages(prev => [...prev, { type: 'user', text: raw }]);
+        setMessages(prev => [...prev, { type: 'user', text: queryText }]);
         setIsLoading(true);
 
         try {
             const res = await fetch("/api/qa-search", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: raw, lang: selectedLang }),
+                body: JSON.stringify({ query: queryText, lang: selectedLang }),
             });
 
             const data = await res.json();
@@ -245,17 +195,16 @@ const ChatbotSection = () => {
                         }
                         : null,
                     relatedQuestions: (data.related || []).map(r => ({
-                        id: r.id,
                         displayText: r.question,
                     })),
                 },
-                query: raw,
+                query: queryText,
             }]);
         } catch {
             setMessages(prev => [...prev, {
                 type: "bot",
                 result: { bestMatch: null },
-                query: raw,
+                query: queryText,
             }]);
         }
 
@@ -279,8 +228,8 @@ const ChatbotSection = () => {
                         key={l.code}
                         onClick={() => setSelectedLang(l.code)}
                         className={`px-3 py-1 rounded-md font-semibold ${selectedLang === l.code
-                            ? "bg-indigo-600 text-white"
-                            : "bg-white border"
+                                ? "bg-indigo-600 text-white"
+                                : "bg-white border"
                             }`}
                     >
                         {l.label}

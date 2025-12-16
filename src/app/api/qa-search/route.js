@@ -44,7 +44,7 @@ function cosine(a = [], b = []) {
    SEARCH (language-respecting)
 ---------------------------------- */
 export async function POST(req) {
-    const { query, lang = "en" } = await req.json();
+    const { query, lang = "en", excludeId } = await req.json();
 
     if (!query?.trim()) {
         return NextResponse.json({ success: false });
@@ -86,7 +86,7 @@ export async function POST(req) {
             score = cosine(queryEmbedding, item.embedding || []);
         }
 
-        return { ...item, score };
+        return { ...item, score, _norm: itemNorm };
     });
 
     scored.sort((a, b) => b.score - a.score);
@@ -100,16 +100,33 @@ export async function POST(req) {
     }
 
     /* ----------------------------------
-       RELATED (semantic neighbors)
+       RELATED (deduped, no filler)
     ---------------------------------- */
-    const related = scored
-        .filter(i => i.id !== best.id && i.score > 0.3)
-        .slice(0, 3)
-        .map(i => ({
-            id: i.id,
-            question:
-                lang === "kn" ? i.question_kn : i.question_en,
-        }));
+    const seen = new Set();
+    seen.add(best.id);
+    if (excludeId) seen.add(excludeId);
+
+    const related = [];
+
+    for (const item of scored) {
+        if (related.length === 3) break;
+        if (item.score <= 0.3) continue;
+        if (seen.has(item.id)) continue;
+
+        const qText =
+            lang === "kn" ? item.question_kn : item.question_en;
+        const norm = normalize(qText);
+
+        if (seen.has(norm)) continue;
+
+        seen.add(item.id);
+        seen.add(norm);
+
+        related.push({
+            id: item.id,
+            question: qText,
+        });
+    }
 
     return NextResponse.json({
         success: true,

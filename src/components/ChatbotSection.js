@@ -228,8 +228,8 @@ const ChatbotSection = () => {
                         key={l.code}
                         onClick={() => setSelectedLang(l.code)}
                         className={`px-3 py-1 rounded-md font-semibold ${selectedLang === l.code
-                                ? "bg-indigo-600 text-white"
-                                : "bg-white border"
+                            ? "bg-indigo-600 text-white"
+                            : "bg-white border"
                             }`}
                     >
                         {l.label}
@@ -261,7 +261,7 @@ const ChatbotSection = () => {
                                     ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                                     : "Type your question..."
                             }
-                            className="flex-grow px-4 py-3 rounded-full border focus:ring-2 focus:ring-indigo-500"
+                            className="flex-grow px-4 py-3 rounded-full text-gray-700 border focus:ring-2 focus:ring-indigo-500"
                         />
                         <button
                             disabled={isLoading || !userInput.trim()}

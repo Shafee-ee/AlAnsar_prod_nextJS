@@ -21,7 +21,6 @@ const headings = {
     },
 };
 
-// Confidence thresholds (frontend only)
 const CONFIDENCE = {
     HIGH: 0.85,
     LOW: 0.45,
@@ -35,10 +34,10 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
 
     if (!best) {
         return (
-            <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200">
-                <p className="font-semibold mb-1">No Direct Match Found</p>
+            <div className="bg-gray-50 text-gray-700 p-4 rounded-xl border">
+                <p className="font-semibold mb-1">No confident answer found</p>
                 <p className="text-sm">
-                    I couldn’t find a confident answer for: <b>"{query}"</b>.
+                    We couldn’t find a reliable answer for <b>"{query}"</b>.
                 </p>
             </div>
         );
@@ -53,13 +52,13 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
 
             {isHighConfidence && (
                 <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
-                    Verified answer
+                    Strong match
                 </div>
             )}
 
             {isClosestMatch && (
                 <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
-                    Closest matching answer
+                    Close match
                 </div>
             )}
 
@@ -115,7 +114,7 @@ const MessageBubble = ({ message, onRelatedClick, onShare }) => {
             <div className="flex justify-end mb-3">
                 <div className="bg-[#0B4C8C] text-white px-4 py-2.5 
                                 rounded-[16px_16px_4px_16px]
-                                max-w-[70%] text-sm leading-relaxed shadow">
+                                max-w-[70%] text-sm shadow">
                     {message.text}
                 </div>
             </div>
@@ -144,7 +143,6 @@ const ChatbotSection = () => {
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedLang, setSelectedLang] = useState('kn');
-
     const chatRef = useRef(null);
 
     useEffect(() => {
@@ -166,57 +164,35 @@ const ChatbotSection = () => {
         alert("Copied!");
     }
 
-    const handleSend = async (clicked = null) => {
-        if (isLoading) return;
-
-        let queryText;
-        let displayText;
-
-        if (clicked) {
-            queryText = clicked.query;
-            displayText = clicked.displayText;
-        } else {
-            const raw = userInput.trim();
-            if (!raw) return;
-            queryText = raw;
-            displayText = raw;
-            setUserInput('');
-        }
-
-        if (!queryText) return; // HARD GUARD
-
+    /* -------------------------
+       FETCH BY ID (RELATED CLICK)
+    ------------------------- */
+    async function fetchById(id, displayText) {
         setMessages(prev => [...prev, { type: 'user', text: displayText }]);
         setIsLoading(true);
 
         try {
-            const res = await fetch("/api/qa-search", {
+            const res = await fetch("/api/qna/by-id", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    query: queryText,
-                    lang: selectedLang,
-                }),
+                body: JSON.stringify({ id }),
             });
 
             const data = await res.json();
 
-            const bestMatch = data.bestMatch
-                ? {
-                    question: data.bestMatch.question,
-                    answer: data.bestMatch.answer,
-                    score: data.bestMatch.score ?? 0,
-                }
-                : null;
-
-            const relatedQuestions = (data.related || []).map(r => ({
-                id: r.id,
-                query: r.question,       // CANONICAL QUERY
-                displayText: r.question, // DISPLAY ONLY
-            }));
-
             setMessages(prev => [...prev, {
                 type: "bot",
-                result: { bestMatch, relatedQuestions },
+                result: {
+                    bestMatch: {
+                        question: data.question,
+                        answer: data.answer,
+                        score: 1,
+                    },
+                    relatedQuestions: (data.related || []).map(r => ({
+                        id: r.id,
+                        displayText: r.question,
+                    })),
+                },
                 query: displayText,
             }]);
         } catch {
@@ -224,6 +200,62 @@ const ChatbotSection = () => {
                 type: "bot",
                 result: { bestMatch: null },
                 query: displayText,
+            }]);
+        }
+
+        setIsLoading(false);
+    }
+
+    /* -------------------------
+       SEARCH (USER INPUT ONLY)
+    ------------------------- */
+    const handleSend = async (clicked = null) => {
+        if (isLoading) return;
+
+        // RELATED CLICK → FETCH BY ID
+        if (clicked?.id) {
+            fetchById(clicked.id, clicked.displayText);
+            return;
+        }
+
+        const raw = userInput.trim();
+        if (!raw) return;
+
+        setUserInput('');
+        setMessages(prev => [...prev, { type: 'user', text: raw }]);
+        setIsLoading(true);
+
+        try {
+            const res = await fetch("/api/qa-search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: raw, lang: selectedLang }),
+            });
+
+            const data = await res.json();
+
+            setMessages(prev => [...prev, {
+                type: "bot",
+                result: {
+                    bestMatch: data.bestMatch
+                        ? {
+                            question: data.bestMatch.question,
+                            answer: data.bestMatch.answer,
+                            score: data.bestMatch.score ?? 0,
+                        }
+                        : null,
+                    relatedQuestions: (data.related || []).map(r => ({
+                        id: r.id,
+                        displayText: r.question,
+                    })),
+                },
+                query: raw,
+            }]);
+        } catch {
+            setMessages(prev => [...prev, {
+                type: "bot",
+                result: { bestMatch: null },
+                query: raw,
             }]);
         }
 
@@ -274,13 +306,13 @@ const ChatbotSection = () => {
                             disabled={isLoading}
                             value={userInput}
                             onChange={e => setUserInput(e.target.value)}
-                            onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
+                            onKeyDown={e => e.key === "Enter" && handleSend()}
                             placeholder={
                                 selectedLang === "kn"
                                     ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                                     : "Type your question..."
                             }
-                            className="flex-grow px-4 py-3 rounded-full text-gray-900 border focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="flex-grow px-4 py-3 rounded-full border focus:ring-2 focus:ring-indigo-500"
                         />
                         <button
                             disabled={isLoading || !userInput.trim()}

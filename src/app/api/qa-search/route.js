@@ -1,36 +1,15 @@
-export const runtime = "node.js";
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
 /* ----------------------------------
-   Detect Kannada
----------------------------------- */
-function isKannada(text = "") {
-    return /[\u0C80-\u0CFF]/.test(text);
-}
-
-/* ----------------------------------
-   Normalize text
+   Normalize
 ---------------------------------- */
 function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
 /* ----------------------------------
-   Translate ONLY if Kannada (ONCE)
----------------------------------- */
-async function translate(text) {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/translate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, targetLang: "en" }),
-    });
-    const j = await res.json();
-    return j?.translated || text;
-}
-
-/* ----------------------------------
-   Embed English text
+   Embed text (language-agnostic)
 ---------------------------------- */
 async function embed(text) {
     const res = await fetch(
@@ -43,6 +22,7 @@ async function embed(text) {
             }),
         }
     );
+
     const j = await res.json();
     return j?.embedding?.values || [];
 }
@@ -61,7 +41,7 @@ function cosine(a = [], b = []) {
 }
 
 /* ----------------------------------
-   SEARCH (HYBRID)
+   SEARCH (language-respecting)
 ---------------------------------- */
 export async function POST(req) {
     const { query, lang = "en" } = await req.json();
@@ -70,11 +50,9 @@ export async function POST(req) {
         return NextResponse.json({ success: false });
     }
 
-    // 🔹 Translate ONCE if Kannada
-    const englishQuery = isKannada(query) ? await translate(query) : query;
-    const qNorm = normalize(englishQuery);
+    const qNorm = normalize(query);
+    const queryEmbedding = await embed(query);
 
-    const queryEmbedding = await embed(englishQuery);
     if (!queryEmbedding.length) {
         return NextResponse.json({ success: false });
     }
@@ -85,12 +63,15 @@ export async function POST(req) {
     let confidence = "low";
 
     const scored = items.map(item => {
-        const itemQ = item.question_en || "";
-        const itemNorm = normalize(itemQ);
+        const question =
+            lang === "kn" ? item.question_kn : item.question_en;
 
+        if (!question) return { ...item, score: 0 };
+
+        const itemNorm = normalize(question);
         let score = 0;
 
-        // 1️⃣ EXACT / NEAR EXACT (FTS-style)
+        // 1️⃣ Lexical match (strong signal)
         if (itemNorm === qNorm) {
             score = 3;
             confidence = "high";
@@ -109,7 +90,6 @@ export async function POST(req) {
     });
 
     scored.sort((a, b) => b.score - a.score);
-
     const best = scored[0];
 
     if (!best || best.score < 0.25) {
@@ -127,7 +107,8 @@ export async function POST(req) {
         .slice(0, 3)
         .map(i => ({
             id: i.id,
-            question: lang === "kn" ? i.question_kn : i.question_en,
+            question:
+                lang === "kn" ? i.question_kn : i.question_en,
         }));
 
     return NextResponse.json({
@@ -135,8 +116,11 @@ export async function POST(req) {
         confidence,
         bestMatch: {
             id: best.id,
-            question: lang === "kn" ? best.question_kn : best.question_en,
-            answer: lang === "kn" ? best.answer_kn : best.answer_en,
+            question:
+                lang === "kn" ? best.question_kn : best.question_en,
+            answer:
+                lang === "kn" ? best.answer_kn : best.answer_en,
+            score: best.score,
         },
         related,
     });

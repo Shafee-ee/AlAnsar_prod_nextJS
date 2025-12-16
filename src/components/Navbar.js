@@ -30,16 +30,7 @@ const categories = [
     { name: 'Vishleshanegalu', href: '/categories/vishleshanegalu' },
 ];
 
-const headings = {
-    en: {
-        title: "Ask & See Bot",
-        subtitle: "Ask your Islamic questions here",
-    },
-    kn: {
-        title: "ಕೇಳಿ ನೋಡಿ ಬಾಟ್",
-        subtitle: "ನಿಮ್ಮ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಇಲ್ಲಿ ಕೇಳಿ",
-    },
-};
+
 
 const Navbar = () => {
     const { user, loading, logout } = useAuth();

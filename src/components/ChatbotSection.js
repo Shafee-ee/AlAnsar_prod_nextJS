@@ -12,12 +12,14 @@ const langs = [
 
 const headings = {
     en: {
-        title: "Ask & See Bot",
+        title: "Ask & See",
         subtitle: "Ask your Islamic questions here",
+        disclaimer: "These answers are sourced from AlAnsar Weekly’s archive. Some English responses are translations of questions previously asked in the Keli Nodi section.",
     },
     kn: {
-        title: "ಕೇಳಿ ನೋಡಿ ಬಾಟ್",
+        title: "ಕೇಳಿ ನೋಡಿ",
         subtitle: "ನಿಮ್ಮ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳನ್ನು ಇಲ್ಲಿ ಕೇಳಿ",
+        disclaimer: "ಈ ಉತ್ತರಗಳು AlAnsar Weeklyಯ ಆರ್ಕೈವ್‌ನಿಂದ ಪಡೆಯಲ್ಪಟ್ಟವು. ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿರುವ ಕೆಲವು ಉತ್ತರಗಳು ‘ಕೇಳಿ ನೋಡಿ’ ವಿಭಾಗದಲ್ಲಿ ಹಿಂದೆಯೇ ಕೇಳಲಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದವಾಗಿರುತ್ತವೆ.",
     },
 };
 
@@ -26,11 +28,22 @@ const CONFIDENCE = {
     LOW: 0.45,
 };
 
+const TypingDots = () => (
+    <div className="flex items-center gap-1 px-4 py-2 bg-white border rounded-xl shadow-sm">
+        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.2s]" />
+        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.1s]" />
+        <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+    </div>
+);
+
+
 /* ---------------------------------------------------------
    BOT RESPONSE CARD
 --------------------------------------------------------- */
 const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     const best = result?.bestMatch;
+    const isSystem = result?.isSystem;
+
 
     if (!best) {
         return (
@@ -50,13 +63,13 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
     return (
         <div className="bg-white p-4 rounded-[16px_16px_16px_4px] border border-blue-100 shadow-sm text-sm">
 
-            {isHigh && (
+            {!isSystem && isHigh && (
                 <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
                     Strong match
                 </div>
             )}
 
-            {isClose && (
+            {!isSystem && isClose && (
                 <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
                     Close match
                 </div>
@@ -67,7 +80,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                 {best.question}
             </div>
 
-            <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-blue-50 rounded-lg">
+            <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-blue-50 rounded-lg whitespace-pre-line">
                 {best.answer}
             </div>
 
@@ -84,7 +97,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                 <div className="pt-3 border-t border-gray-100">
                     <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
                         <Search className="w-4 h-4 mr-2" />
-                        People also asked
+                        Related questions
                     </div>
 
                     <div className="space-y-2">
@@ -143,6 +156,7 @@ const ChatbotSection = () => {
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedLang, setSelectedLang] = useState('kn');
+    const [seenQuestions, setSeenQuestions] = useState(new Set());
     const chatRef = useRef(null);
 
     useEffect(() => {
@@ -172,6 +186,43 @@ const ChatbotSection = () => {
 
         if (!textOverride) setUserInput('');
 
+        const normalized = queryText.toLowerCase();
+
+        const greetings = [
+            "hello", "hi", "hey",
+            "salam", "salaam",
+            "assalamu alaikum",
+            "assalamualaikum"
+        ];
+
+        if (greetings.some(g => normalized.startsWith(g))) {
+            setMessages(prev => [
+                ...prev,
+                { type: 'user', text: queryText },
+                {
+                    type: 'bot',
+                    query: queryText,
+                    result: {
+                        isSystem: true,
+                        bestMatch: {
+                            question:
+                                selectedLang === "kn"
+                                    ? "ಈ ಚಾಟ್‌ಬಾಟ್ ಬಗ್ಗೆ"
+                                    : "About this chatbot",
+                            answer:
+                                selectedLang === "kn"
+                                    ? "ನಾನು AlAnsarWeekly ಪ್ರಕಟಿಸಿದ ದೃಢೀಕೃತ ಪ್ರಶ್ನೋತ್ತರಗಳ ಆಧಾರದ ಮೇಲೆ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ ನೀಡುತ್ತೇನೆ.\n\nಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿರುವ ಕೆಲವು ಉತ್ತರಗಳು AlAnsar Weeklyಯ ಕೇಳಿ ನೋಡಿ ವಿಭಾಗದಲ್ಲಿ ಹಿಂದೆಯೇ ಕೇಳಲಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದವಾಗಿರುತ್ತವೆ."
+                                    : "I provide answers to Islamic questions based on AlAnsarWeekly’s verified Q&A archive.\n\nSome answers in English are translations of questions previously asked in the Keli Nodi section of AlAnsar Weekly.",
+                            score: 1,
+                        },
+                        relatedQuestions: [],
+                    },
+                },
+            ]);
+            return;
+        }
+
+
         setMessages(prev => [...prev, { type: 'user', text: queryText }]);
         setIsLoading(true);
 
@@ -184,6 +235,26 @@ const ChatbotSection = () => {
 
             const data = await res.json();
 
+            // mark best match as seen
+
+            const nextSeen = new Set(seenQuestions);
+
+            if (data.bestMatch?.question) {
+                nextSeen.add(data.bestMatch.question);
+                setSeenQuestions(nextSeen);
+            }
+
+
+            const relatedFiltered = (data.related || [])
+                .filter(r => {
+                    if (!r.question) return false;
+                    if (r.score != null && r.score < CONFIDENCE.LOW) return false;
+                    if (nextSeen.has(r.question)) return false;
+                    return true;
+                })
+                .slice(0, 3)
+                .map(r => ({ displayText: r.question }));
+
             setMessages(prev => [...prev, {
                 type: "bot",
                 result: {
@@ -194,12 +265,11 @@ const ChatbotSection = () => {
                             score: data.bestMatch.score ?? 0,
                         }
                         : null,
-                    relatedQuestions: (data.related || []).map(r => ({
-                        displayText: r.question,
-                    })),
+                    relatedQuestions: relatedFiltered,
                 },
                 query: queryText,
             }]);
+
         } catch {
             setMessages(prev => [...prev, {
                 type: "bot",
@@ -238,16 +308,37 @@ const ChatbotSection = () => {
             </div>
 
             <div className="bg-gray-100 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
-                <div ref={chatRef} className="flex-grow px-4 py-6 overflow-y-auto">
-                    {messages.map((m, i) => (
-                        <MessageBubble
-                            key={i}
-                            message={m}
-                            onRelatedClick={handleSend}
-                            onShare={shareQA}
-                        />
-                    ))}
+                <div
+                    ref={chatRef}
+                    className="flex-grow px-4 py-6 overflow-y-auto flex flex-col"
+                >
+                    {messages.length === 0 && !isLoading ? (
+                        /* CENTERED EMPTY STATE */
+                        <div className="flex flex-1 items-center justify-center text-center">
+                            <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
+                                {headings[selectedLang].disclaimer}
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {messages.map((m, i) => (
+                                <MessageBubble
+                                    key={i}
+                                    message={m}
+                                    onRelatedClick={handleSend}
+                                    onShare={shareQA}
+                                />
+                            ))}
+
+                            {isLoading && (
+                                <div className="flex justify-start mb-4">
+                                    <TypingDots />
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
+
 
                 <div className="p-3 border-t bg-white rounded-b-xl">
                     <div className="flex items-center gap-2">

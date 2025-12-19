@@ -37,12 +37,20 @@ const TypingDots = () => (
 );
 
 
+
+
 /* ---------------------------------------------------------
    BOT RESPONSE CARD
 --------------------------------------------------------- */
-const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
+const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase }) => {
     const best = result?.bestMatch;
     const isSystem = result?.isSystem;
+
+    const editorNote =
+        best?.editorNote ||
+        best?.editorNote_en ||
+        best?.editorNote_kn ||
+        "";
 
 
     if (!best) {
@@ -84,14 +92,36 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
                 {best.answer}
             </div>
 
-            <div className="flex justify-center mb-3">
+            {editorNote && (
+                <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded text-xs text-gray-700">
+                    <div className="font-semibold text-yellow-800 mb-1">
+                        Editor’s Note
+                    </div>
+                    <div className="whitespace-pre-line">
+                        {editorNote}
+                    </div>
+                </div>
+            )}
+
+            <div className="flex justify-center gap-3 mb-3 text-xs">
+                {!isSystem && isClose && (
+                    <button
+                        onClick={onRephrase}
+                        className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        title="Rephrase your question"
+                    >
+                        ✏️ Rephrase
+                    </button>
+                )}
+
                 <button
                     onClick={() => onShare(best.question, best.answer)}
-                    className="flex items-center gap-1 px-3 py-1 text-xs bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                    className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
                 >
                     <Share2 className="w-3 h-3" /> Share
                 </button>
             </div>
+
 
             {result.relatedQuestions?.length > 0 && (
                 <div className="pt-3 border-t border-gray-100">
@@ -121,7 +151,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare }) => {
 /* ---------------------------------------------------------
    MESSAGE BUBBLE
 --------------------------------------------------------- */
-const MessageBubble = ({ message, onRelatedClick, onShare }) => {
+const MessageBubble = ({ message, onRelatedClick, onShare, onRephrase }) => {
     if (message.type === "user") {
         return (
             <div className="flex justify-end mb-3">
@@ -142,6 +172,8 @@ const MessageBubble = ({ message, onRelatedClick, onShare }) => {
                     query={message.query}
                     onRelatedClick={onRelatedClick}
                     onShare={onShare}
+                    onRephrase={() => onRephrase(message.query)}
+
                 />
             </div>
         </div>
@@ -158,6 +190,17 @@ const ChatbotSection = () => {
     const [selectedLang, setSelectedLang] = useState('kn');
     const [seenQuestions, setSeenQuestions] = useState(new Set());
     const chatRef = useRef(null);
+    const inputRef = useRef(null);
+
+    /*handle rephrase*/
+    function handleRephrase(text) {
+        setUserInput(text);
+        requestAnimationFrame(() => {
+            inputRef.current?.focus();
+        });
+    }
+
+
 
     useEffect(() => {
         chatRef.current?.scrollTo({
@@ -263,6 +306,11 @@ const ChatbotSection = () => {
                             question: data.bestMatch.question,
                             answer: data.bestMatch.answer,
                             score: data.bestMatch.score ?? 0,
+
+                            editorNote:
+                                selectedLang === "kn"
+                                    ? data.bestMatch.editorNote_kn
+                                    : data.bestMatch.editorNote_en,
                         }
                         : null,
                     relatedQuestions: relatedFiltered,
@@ -327,6 +375,8 @@ const ChatbotSection = () => {
                                     message={m}
                                     onRelatedClick={handleSend}
                                     onShare={shareQA}
+                                    onRephrase={handleRephrase}
+
                                 />
                             ))}
 
@@ -343,6 +393,8 @@ const ChatbotSection = () => {
                 <div className="p-3 border-t bg-white rounded-b-xl">
                     <div className="flex items-center gap-2">
                         <input
+
+                            ref={inputRef}
                             disabled={isLoading}
                             value={userInput}
                             onChange={e => setUserInput(e.target.value)}

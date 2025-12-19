@@ -138,6 +138,8 @@ export async function POST(req) {
             answer:
                 lang === "kn" ? best.answer_kn : best.answer_en,
             score: best.score,
+            editorNote_en: best.editorNote_en || "",
+            editorNote_kn: best.editorNote_kn || "",
         },
         related,
     });

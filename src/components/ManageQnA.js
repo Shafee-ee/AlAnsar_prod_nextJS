@@ -189,13 +189,15 @@ export default function ManageQnA() {
                     question_en: selectedItem.question_en || "",
                     answer_en: selectedItem.answer_en || "",
                     question_kn: selectedItem.question_kn || "",
-                    answer_kn: selectedItem.answer_kn || ""
+                    answer_kn: selectedItem.answer_kn || "", 
+                    editorNote_en:selectedItem.editorNote_en||"", 
+                    editorNote_kn:selectedItem.editorNote_kn||""
                 }
             })
         });
 
         const text = await res.text();
-        console.error("UPDATE RESPONSE:", res.status, text);
+        console.log("UPDATE RESPONSE:", res.status, text);
 
         if (!res.ok) {
             alert(`Save failed: ${text}`);
@@ -405,6 +407,44 @@ export default function ManageQnA() {
                                 }
                             />
                         </div>
+
+                        <hr />
+
+{/* Editor's Notes */}
+<div>
+    <h3 className="text-xs font-semibold mb-1">
+        Editor’s Notes
+    </h3>
+    <textarea
+        className="w-full p-2 border rounded h-20 text-xs"
+        placeholder="Optional. Clarifications, usage notes, sources, etc."
+        value={selectedItem.editorNote_en || ""}
+        onChange={e =>
+            setSelectedItem({
+                ...selectedItem,
+                editorNote_en: e.target.value
+            })
+        }
+    />
+</div>
+
+<div>
+    <h3 className="text-xs font-semibold mb-1">
+        Editor’s Note (Kannada)
+    </h3>
+    <textarea
+        className="w-full p-2 border rounded h-20 text-xs"
+        placeholder="ಐಚ್ಛಿಕ. ವಿವರಣೆ, ಬಳಕೆಯ ಮಾಹಿತಿ, ಮೂಲಗಳು ಇತ್ಯಾದಿ."
+        value={selectedItem.editorNote_kn || ""}
+        onChange={e =>
+            setSelectedItem({
+                ...selectedItem,
+                editorNote_kn: e.target.value
+            })
+        }
+    />
+</div>
+
 
                         {/* Translation buttons (UI only) */}
                         <div className="flex justify-between pt-2">

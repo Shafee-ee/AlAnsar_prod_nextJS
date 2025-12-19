@@ -16,6 +16,9 @@ export async function GET() {
             // lang_original: d.lang_original || null,
             // keywords: d.keywords || [],
             // createdAt: d.createdAt || null,
+            
+    editorNote_en: d.editorNote_en || null,
+    editorNote_kn: d.editorNote_kn || null,
         };
     });
 

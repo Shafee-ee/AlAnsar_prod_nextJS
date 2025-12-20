@@ -189,9 +189,9 @@ export default function ManageQnA() {
                     question_en: selectedItem.question_en || "",
                     answer_en: selectedItem.answer_en || "",
                     question_kn: selectedItem.question_kn || "",
-                    answer_kn: selectedItem.answer_kn || "", 
-                    editorNote_en:selectedItem.editorNote_en||"", 
-                    editorNote_kn:selectedItem.editorNote_kn||""
+                    answer_kn: selectedItem.answer_kn || "",
+                    editorNote_en: selectedItem.editorNote_en || "",
+                    editorNote_kn: selectedItem.editorNote_kn || ""
                 }
             })
         });
@@ -354,7 +354,7 @@ export default function ManageQnA() {
             {/* MODAL */}
             {isModalOpen && selectedItem && (
                 <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-xl w-full space-y-4">
+                    <div className="bg-white rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
 
                         <h2 className="text-lg font-bold text-[#1D3F9A]">
                             QnA Editor
@@ -410,40 +410,40 @@ export default function ManageQnA() {
 
                         <hr />
 
-{/* Editor's Notes */}
-<div>
-    <h3 className="text-xs font-semibold mb-1">
-        Editor’s Notes
-    </h3>
-    <textarea
-        className="w-full p-2 border rounded h-20 text-xs"
-        placeholder="Optional. Clarifications, usage notes, sources, etc."
-        value={selectedItem.editorNote_en || ""}
-        onChange={e =>
-            setSelectedItem({
-                ...selectedItem,
-                editorNote_en: e.target.value
-            })
-        }
-    />
-</div>
+                        {/* Editor's Notes */}
+                        <div>
+                            <h3 className="text-xs font-semibold mb-1">
+                                Editor’s Notes
+                            </h3>
+                            <textarea
+                                className="w-full p-2 border rounded h-20 text-xs"
+                                placeholder="Optional. Clarifications, usage notes, sources, etc."
+                                value={selectedItem.editorNote_en || ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        editorNote_en: e.target.value
+                                    })
+                                }
+                            />
+                        </div>
 
-<div>
-    <h3 className="text-xs font-semibold mb-1">
-        Editor’s Note (Kannada)
-    </h3>
-    <textarea
-        className="w-full p-2 border rounded h-20 text-xs"
-        placeholder="ಐಚ್ಛಿಕ. ವಿವರಣೆ, ಬಳಕೆಯ ಮಾಹಿತಿ, ಮೂಲಗಳು ಇತ್ಯಾದಿ."
-        value={selectedItem.editorNote_kn || ""}
-        onChange={e =>
-            setSelectedItem({
-                ...selectedItem,
-                editorNote_kn: e.target.value
-            })
-        }
-    />
-</div>
+                        <div>
+                            <h3 className="text-xs font-semibold mb-1">
+                                Editor’s Note (Kannada)
+                            </h3>
+                            <textarea
+                                className="w-full p-2 border rounded h-20 text-xs"
+                                placeholder="ಐಚ್ಛಿಕ. ವಿವರಣೆ, ಬಳಕೆಯ ಮಾಹಿತಿ, ಮೂಲಗಳು ಇತ್ಯಾದಿ."
+                                value={selectedItem.editorNote_kn || ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        editorNote_kn: e.target.value
+                                    })
+                                }
+                            />
+                        </div>
 
 
                         {/* Translation buttons (UI only) */}

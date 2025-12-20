@@ -25,7 +25,7 @@ const headings = {
 
 const CONFIDENCE = {
     HIGH: 0.85,
-    LOW: 0.45,
+    LOW: 0.35,
 };
 
 const TypingDots = () => (

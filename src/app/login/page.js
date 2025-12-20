@@ -66,24 +66,12 @@ export default function LoginPage() {
                         />
                     </div>
 
-                    <button
+                    <input
                         type="submit"
                         disabled={loading}
-                        className="
-        w-full
-        bg-blue-600
-        text-white
-        rounded-md
-        border border-blue-700
-        px-4
-        py-3
-        text-base
-        font-semibold
-        disabled:opacity-60
-    "
-                    >
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
+                        value={loading ? "Logging in..." : "Login"}
+                        className="w-full bg-blue-600 text-white rounded-md border border-blue-700 px-4 py-3 text-base font-semibold disabled:opacity-60 cursor-pointer"
+                    />
 
                 </form>
 

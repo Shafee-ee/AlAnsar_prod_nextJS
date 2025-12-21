@@ -45,5 +45,5 @@ button,
 input[type="submit"] {
   appearance: auto;
   -webkit-appearance: auto;
-  display: inline-block;
+  display: inline-flex;
 }

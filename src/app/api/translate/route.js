@@ -30,13 +30,12 @@ export async function POST(req) {
 
         // language checks
         const looksKannada = /[\u0C80-\u0CFF]/.test(trimmed);
-        const looksEnglish = /^[A-Za-z0-9 ,.'"!?-]+$/.test(trimmed);
+
+
 
         // avoid unnecessary translation
-        if (
-            (targetLang === "kn" && looksKannada) ||
-            (targetLang === "en" && looksEnglish)
-        ) {
+        if (targetLang === "kn" && looksKannada) {
+
             return NextResponse.json({ translated: trimmed });
         }
 

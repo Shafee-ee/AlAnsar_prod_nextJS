@@ -12,22 +12,26 @@ function isKannada(text = "") {
    Translate using your existing pipeline
 ------------------------------------------------------- */
 async function translate(text, target = "en") {
-    try {
-        const base = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+    const base =
+        process.env.VERCEL_URL
+            ? `https://${process.env.VERCEL_URL}`
+            : "http://localhost:3000";
 
-        const r = await fetch(`${base}/api/translate`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, targetLang: target })
-        });
+    const r = await fetch(`${base}/api/translate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, targetLang: target })
+    });
 
-        const j = await r.json();
-        return j?.translated || text;
-    } catch (err) {
-        console.error("translate() error:", err);
-        return text;
+    const j = await r.json();
+
+    if (!j?.translated) {
+        throw new Error("Translation failed");
     }
+
+    return j.translated;
 }
+
 
 /* -------------------------------------------------------
    Generate embedding (English only)

@@ -23,7 +23,10 @@ async function translate(text, target = "en") {
         body: JSON.stringify({ text, targetLang: target })
     });
 
+    console.log("TRANSLATE_STATUS", r.status);
+
     const j = await r.json();
+    console.log("TRANSLATE_RESPONSE", j);
 
     if (!j?.translated) {
         throw new Error("Translation failed");
@@ -31,6 +34,7 @@ async function translate(text, target = "en") {
 
     return j.translated;
 }
+
 
 
 /* -------------------------------------------------------

@@ -50,7 +50,8 @@ STRICT RULES:
 TEXT:
 ${trimmed}
         `;
-
+        console.log("TRANSLATE_BASE_URL", process.env.NEXT_PUBLIC_BASE_URL);
+        console.log("VERCEL_URL", process.env.VERCEL_URL);
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1/${MODEL}:generateContent?key=${process.env.GOOGLE_API_KEY}`,
             {
@@ -62,6 +63,7 @@ ${trimmed}
                 })
             }
         );
+        console.log("TRANSLATE_RESPONSE_OK", response.ok);
 
         const data = await response.json();
 

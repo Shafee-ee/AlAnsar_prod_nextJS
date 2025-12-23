@@ -12,27 +12,42 @@ function isKannada(text = "") {
 /* -----------------------------------------
    Translate via internal API
 ----------------------------------------- */
-async function translate(text, target = "en") {
-    try {
-        const base =
-            process.env.NEXT_PUBLIC_BASE_URL ||
-                process.env.VERCEL_URL
-                ? `https://${process.env.VERCEL_URL}`
-                : "http://localhost:3000";
+async function translate(text, targetLang) {
+    const prompt = `
+Translate the text into ${targetLang}.
+STRICT RULES:
+- ONLY return the translated sentence.
+- NO explanations.
+- NO markdown.
+- Preserve Islamic terms exactly: wudu, ghusl, salah, zakat, sunnah, takbir, qibla, mahr, talaq.
 
-        const r = await fetch(`${base}/api/translate`, {
+TEXT:
+${text}
+    `;
+
+    const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+        {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text, targetLang: target }),
-        });
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.0 }
+            })
+        }
+    );
 
-        const j = await r.json();
-        return j?.translated || text;
-    } catch (err) {
-        console.error("translate() failed:", err);
-        return text;
+    if (!r.ok) {
+        throw new Error("Gemini translate failed");
     }
+
+    const data = await r.json();
+
+    return (
+        data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text
+    );
 }
+
 
 /* -----------------------------------------
    Generate English embedding

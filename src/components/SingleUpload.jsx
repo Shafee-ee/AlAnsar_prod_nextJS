@@ -9,6 +9,8 @@ export default function SingleUpload() {
     const [lang, setLang] = useState("kn");
     const [keywords, setKeywords] = useState("");
     const [loading, setLoading] = useState(false);
+    const [editorNoteEn, setEditorNoteEn] = useState("");
+    const [editorNoteKn, setEditorNoteKn] = useState("");
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -32,7 +34,9 @@ export default function SingleUpload() {
                 question,
                 answer,
                 lang,
-                keywords: keywordArray
+                keywords: keywordArray,
+                editor_note_en: editorNoteEn,
+                editor_note_kn: editorNoteKn
             })
         });
 
@@ -44,6 +48,8 @@ export default function SingleUpload() {
             setQuestion("");
             setAnswer("");
             setKeywords("");
+            setEditorNoteEn("");
+            setEditorNoteKn("");
         } else {
             toast.error("Upload failed: " + (data.reason || "Unknown error"));
         }
@@ -101,6 +107,29 @@ export default function SingleUpload() {
                     <option value="en">English</option>
                 </select>
             </div>
+
+            {/* Editor Note (English) */}
+            <div className="space-y-2">
+                <label className="font-medium">Editor Note (English)</label>
+                <textarea
+                    value={editorNoteEn}
+                    onChange={(e) => setEditorNoteEn(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-[#1D3F9A]"
+                    placeholder="Optional internal note (English)..."
+                />
+            </div>
+
+            {/* Editor Note (Kannada) */}
+            <div className="space-y-2">
+                <label className="font-medium">Editor Note (Kannada)</label>
+                <textarea
+                    value={editorNoteKn}
+                    onChange={(e) => setEditorNoteKn(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-[#1D3F9A]"
+                    placeholder="Optional internal note (Kannada)..."
+                />
+            </div>
+
 
             {loading && (
                 <div className="mt-3 h-[3px] w-full bg-blue-200 overflow-hidden rounded">

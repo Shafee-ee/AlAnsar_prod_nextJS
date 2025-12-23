@@ -80,7 +80,7 @@ async function generateEmbedding(text) {
 ------------------------------------------------------- */
 export async function POST(req) {
     try {
-        const { question, answer, lang: userLang, keywords = [] } = await req.json();
+        const { question, answer, lang: userLang, keywords = [], editor_note_en = "", editor_note_kn } = await req.json();
 
         if (!question || !answer || !userLang) {
             return NextResponse.json({ success: false, reason: "missing-fields" });
@@ -146,6 +146,9 @@ export async function POST(req) {
             answer_en,
             question_kn,
             answer_kn,
+
+            editor_note_en,
+            editor_note_kn,
             lang_original: finalLang,
             keywords,
             embedding,

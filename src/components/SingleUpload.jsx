@@ -63,11 +63,10 @@ export default function SingleUpload() {
             {/* Question */}
             <div className="space-y-2">
                 <label className="font-medium">Question</label>
-                <input
-                    type="text"
+                <textarea
                     value={question}
                     onChange={(e) => setQuestion(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 h-24 focus:ring-[#1D3F9A]"
                     placeholder="Enter question..."
                 />
             </div>

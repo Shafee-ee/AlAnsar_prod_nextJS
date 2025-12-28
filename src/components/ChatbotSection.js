@@ -46,6 +46,32 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
     const best = result?.bestMatch;
     const isSystem = result?.isSystem;
 
+    // 🔧 HANDLE EXPLORE MODE (keyword search)
+    if (result?.mode === "explore" && Array.isArray(result.results)) {
+        return (
+            <div className="bg-white p-4 rounded-xl border">
+                <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
+                    <Search className="w-4 h-4 mr-2" />
+                    Related questions
+                </div>
+
+                <div className="space-y-2">
+                    {result.results.map((r, i) => (
+                        <button
+                            key={i}
+                            onClick={() => onRelatedClick(r.question)}
+                            className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
+                        >
+                            <MessageCircle className="w-3 h-3 inline mr-1" />
+                            {r.question}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+
     const editorNote =
         best?.editorNote ||
         best?.editorNote_en ||
@@ -300,21 +326,26 @@ const ChatbotSection = () => {
 
             setMessages(prev => [...prev, {
                 type: "bot",
-                result: {
-                    bestMatch: data.bestMatch
-                        ? {
-                            question: data.bestMatch.question,
-                            answer: data.bestMatch.answer,
-                            score: data.bestMatch.score ?? 0,
+                result: data.mode === "explore"
+                    ? {
+                        mode: "explore",
+                        results: data.results || [],
+                    }
+                    : {
+                        bestMatch: data.bestMatch
+                            ? {
+                                question: data.bestMatch.question,
+                                answer: data.bestMatch.answer,
+                                score: data.bestMatch.score ?? 0,
+                                editorNote:
+                                    selectedLang === "kn"
+                                        ? data.bestMatch.editorNote_kn
+                                        : data.bestMatch.editorNote_en,
+                            }
+                            : null,
+                        relatedQuestions: relatedFiltered,
+                    },
 
-                            editorNote:
-                                selectedLang === "kn"
-                                    ? data.bestMatch.editorNote_kn
-                                    : data.bestMatch.editorNote_en,
-                        }
-                        : null,
-                    relatedQuestions: relatedFiltered,
-                },
                 query: queryText,
             }]);
 

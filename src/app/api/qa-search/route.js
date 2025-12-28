@@ -1,35 +1,26 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
-/* ----------------------------------
-   Normalize
----------------------------------- */
+
 function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-/* ----------------------------------
-   BASIC INTENT GATE
-   (prevents junk queries)
----------------------------------- */
+
 function hasValidIntent(query = "") {
     const q = normalize(query);
 
-    // too short
     if (q.length < 10) return false;
 
-    // must have multiple words
     const words = q.split(" ");
     if (words.length < 3) return false;
 
-    // common question starters
     const questionStarters = [
         "can", "is", "are", "does", "do",
         "what", "how", "when", "where",
         "should", "must", "may", "will"
     ];
 
-    // ends with question mark OR starts with a question word
     const looksLikeQuestion =
         q.endsWith("?") ||
         questionStarters.some(w => q.startsWith(w + " "));
@@ -37,9 +28,6 @@ function hasValidIntent(query = "") {
     return looksLikeQuestion;
 }
 
-/* ----------------------------------
-   Embed text (language-agnostic)
----------------------------------- */
 async function embed(text) {
     const res = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${process.env.GOOGLE_API_KEY}`,
@@ -56,9 +44,6 @@ async function embed(text) {
     return j?.embedding?.values || [];
 }
 
-/* ----------------------------------
-   Cosine similarity
----------------------------------- */
 function cosine(a = [], b = []) {
     let dot = 0, na = 0, nb = 0;
     for (let i = 0; i < a.length; i++) {
@@ -68,10 +53,6 @@ function cosine(a = [], b = []) {
     }
     return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
-
-/* ----------------------------------
-   SEARCH
----------------------------------- */
 export async function POST(req) {
     const { query, lang = "en", excludeId } = await req.json();
 
@@ -79,8 +60,48 @@ export async function POST(req) {
         return NextResponse.json({ success: false });
     }
 
-    /* ---------- INTENT GATE ---------- */
-    if (!hasValidIntent(query)) {
+    const qNorm = normalize(query);
+    const isKeywordQuery = qNorm.split(" ").length === 1;
+    const isLongQuery = qNorm.length > 80;
+
+    const snap = await adminDB.collection("qna_items").get();
+    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+
+    const exactMatchItem = items.find(item => {
+        const qEN = normalize(item.question_en || "");
+        const qKN = normalize(item.question_kn || "");
+        return qEN === qNorm || qKN === qNorm;
+    });
+
+    if (exactMatchItem) {
+        return NextResponse.json({
+            success: true,
+            bestMatch: {
+                id: exactMatchItem.id,
+                question:
+                    lang === "kn"
+                        ? exactMatchItem.question_kn
+                        : exactMatchItem.question_en,
+                answer:
+                    lang === "kn"
+                        ? exactMatchItem.answer_kn
+                        : exactMatchItem.answer_en,
+                score: 1,
+                editorNote_en: exactMatchItem.editorNote_en || "",
+                editorNote_kn: exactMatchItem.editorNote_kn || "",
+            },
+            related: [],
+        });
+    }
+
+
+    // Intent gate ONLY for English full questions
+    if (
+        lang === "en" &&
+        !isKeywordQuery &&
+        !hasValidIntent(query)
+    ) {
         return NextResponse.json({
             success: true,
             noMatch: true,
@@ -88,19 +109,14 @@ export async function POST(req) {
         });
     }
 
+
     const queryEmbedding = await embed(query);
     if (!queryEmbedding.length) {
         return NextResponse.json({ success: false });
     }
 
-    const snap = await adminDB.collection("qna_items").get();
-    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    /* ----------------------------------
-       SCORE ITEMS
-       - rankScore: ordering only
-       - confidenceScore: cosine only
-    ---------------------------------- */
+
     const scored = items.map(item => {
         const question =
             lang === "kn" ? item.question_kn : item.question_en;
@@ -109,14 +125,12 @@ export async function POST(req) {
             return { ...item, rankScore: 0, confidenceScore: 0 };
         }
 
-        const qNorm = normalize(query);
         const itemNorm = normalize(question);
 
         const confidenceScore = cosine(queryEmbedding, item.embedding);
 
         let rankScore = confidenceScore;
 
-        // lexical bonus ONLY for ranking (not confidence)
         if (itemNorm === qNorm) rankScore += 0.3;
         else if (itemNorm.includes(qNorm) || qNorm.includes(itemNorm))
             rankScore += 0.15;
@@ -131,8 +145,19 @@ export async function POST(req) {
     scored.sort((a, b) => b.rankScore - a.rankScore);
     const best = scored[0];
 
-    /* ---------- CONFIDENCE GATE ---------- */
-    if (!best || best.confidenceScore < 0.35) {
+    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.22 : 0.28;
+
+    const isExactOrNearMatch =
+        normalize(best?.question_en || "") === qNorm ||
+        normalize(best?.question_kn || "") === qNorm ||
+        normalize(best?.question_en || "").includes(qNorm) ||
+        normalize(best?.question_kn || "").includes(qNorm);
+
+    if (
+        !isKeywordQuery &&
+        !isExactOrNearMatch &&
+        (!best || best.confidenceScore < CONFIDENCE_THRESHOLD)
+    ) {
         return NextResponse.json({
             success: true,
             noMatch: true,
@@ -140,9 +165,7 @@ export async function POST(req) {
         });
     }
 
-    /* ----------------------------------
-       RELATED QUESTIONS
-    ---------------------------------- */
+
     const seen = new Set();
     seen.add(best.id);
     if (excludeId) seen.add(excludeId);
@@ -166,6 +189,25 @@ export async function POST(req) {
             question: qText,
         });
     }
+
+    // ---------- EXPLORE MODE (keyword search) ----------
+    if (isKeywordQuery) {
+        const results = scored
+            .filter(i => i.confidenceScore > 0.18)
+            .slice(0, 5)
+            .map(i => ({
+                id: i.id,
+                question:
+                    lang === "kn" ? i.question_kn : i.question_en,
+            }));
+
+        return NextResponse.json({
+            success: true,
+            mode: "explore",
+            results,
+        });
+    }
+
 
     return NextResponse.json({
         success: true,

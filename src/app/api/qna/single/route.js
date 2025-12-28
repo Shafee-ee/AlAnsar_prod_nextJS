@@ -146,7 +146,6 @@ export async function POST(req) {
             answer_en,
             question_kn,
             answer_kn,
-
             editor_note_en,
             editor_note_kn,
             lang_original: finalLang,

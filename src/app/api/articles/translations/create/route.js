@@ -5,7 +5,7 @@ export async function POST(req) {
     try {
         const body = await req.json();
         const {
-            parentArticleId,
+            articleId,
             language,
             title,
             excerpt,
@@ -13,53 +13,55 @@ export async function POST(req) {
             author,
         } = body;
 
-        if (!parentArticleId || !language || !title || !content) {
+        if (!articleId || !language || !title || !content) {
             return NextResponse.json(
                 { error: "Missing required fields" },
                 { status: 400 }
             );
         }
 
-        // verify parent article exists
-        const parentRef = adminDB.collection("articles").doc(parentArticleId);
-        const parentSnap = await parentRef.get();
+        const normalizedLanguage = language.trim().toLowerCase();
 
-        if (!parentSnap.exists) {
+        // verify parent article exists
+        const articleRef = adminDB.collection("articles").doc(articleId);
+        const articleSnap = await articleRef.get();
+
+        if (!articleSnap.exists) {
             return NextResponse.json(
-                { error: "Parent article not found" },
+                { error: " article not found" },
                 { status: 404 }
             );
         }
 
-        // ensure unique language per article
-        const existing = await adminDB
-            .collection("article_translations")
-            .where("parentArticleId", "==", parentArticleId)
-            .where("language", "==", language)
-            .limit(1)
-            .get();
+        const translationRef = adminDB
+            .collection("articles")
+            .doc(articleId)
+            .collection("translations")
+            .doc(normalizedLanguage);
 
-        if (!existing.empty) {
+        const existingTranslation = await translationRef.get();
+        if (existingTranslation.exists) {
             return NextResponse.json(
                 { error: "Translation already exists for this language" },
                 { status: 409 }
-            );
+            )
         }
 
-        const docRef = await adminDB.collection("article_translations").add({
-            parentArticleId,
-            language,
+        await translationRef.set({
+            language: normalizedLanguage,
             title,
             excerpt: excerpt || "",
             content,
-            author: author || "Unknown",
+            author: author || "unknown",
+            visibility: true,
             status: "draft",
-            lastUpdated: new Date(),
-        });
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
 
         return NextResponse.json({
-            id: docRef.id,
-            language,
+            articleId,
+            language: normalizedLanguage,
         });
     } catch (err) {
         console.error("Create translation failed:", err);

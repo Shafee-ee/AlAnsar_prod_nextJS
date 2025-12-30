@@ -5,18 +5,22 @@ export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
         const slug = searchParams.get("slug");
-        const lang = searchParams.get("lang") || "kn"; // default Kannada
+        const rawLang = searchParams.get("lang") || "kn";
+        const lang = rawLang.trim().toLowerCase();
 
         if (!slug) {
             return NextResponse.json({ error: "Slug required" }, { status: 400 });
         }
 
-        // 1. get parent article
+        // 1. construct article
         const articleSnap = await adminDB
             .collection("articles")
             .where("slug", "==", slug)
+            .where("status", "==", "published")
             .limit(1)
             .get();
+
+
 
         if (articleSnap.empty) {
             return NextResponse.json({ error: "Article not found" }, { status: 404 });
@@ -25,35 +29,50 @@ export async function GET(req) {
         const articleDoc = articleSnap.docs[0];
         const article = { id: articleDoc.id, ...articleDoc.data() };
 
-        // 2. try requested language
-        let translationSnap = await adminDB
-            .collection("article_translations")
-            .where("parentArticleId", "==", article.id)
-            .where("language", "==", lang)
-            .where("status", "==", "published")
-            .limit(1)
-            .get();
+        const translationRef = adminDB
+            .collection("articles")
+            .doc(article.id)
+            .collection("translations")
+            .doc(lang);
 
-        // 3. fallback to Kannada
-        if (translationSnap.empty && lang !== "kn") {
-            translationSnap = await adminDB
-                .collection("article_translations")
-                .where("parentArticleId", "==", article.id)
-                .where("language", "==", "kn")
-                .where("status", "==", "published")
-                .limit(1)
-                .get();
+        let translationSnap = await translationRef.get();
+
+        let translation = null;
+
+        if (
+            translationSnap.exists &&
+            translationSnap.data().status === "published" &&
+            translationSnap.data().visibility === true
+        ) {
+            translation = translationSnap.data();
         }
 
-        if (translationSnap.empty) {
+        if (!translation && lang !== "kn") {
+            const fallbackSnap = await adminDB
+                .collection("articles")
+                .doc(article.id)
+                .collection("translations")
+                .doc("kn")
+                .get();
+
+            if (
+                fallbackSnap.exists &&
+                fallbackSnap.data().status === "published" &&
+                fallbackSnap.data().visibility === true
+            ) {
+                translation = fallbackSnap.data()
+            }
+
+        }
+
+        if (!translation) {
             return NextResponse.json(
                 { error: "No published translation found" },
                 { status: 404 }
             );
         }
 
-        const translationDoc = translationSnap.docs[0];
-        const translation = translationDoc.data();
+
 
         // 4. merge + return
         return NextResponse.json({

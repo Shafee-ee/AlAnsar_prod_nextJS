@@ -10,6 +10,13 @@ export default function ArticleEditorPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    //language editor form
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [excerpt, setExcerpt] = useState("");
+    const [visibility, setVisibility] = useState(true);
+    const [saving, setSaving] = useState(false);
+
     //active language tab (UI only for now)
     const [activeLang, setActiveLang] = useState("kn");
 
@@ -42,6 +49,27 @@ export default function ArticleEditorPage() {
     }, [id]);
 
 
+    const activeTranslation = translations.find(
+        (t) => t.language === activeLang
+    );
+
+    useEffect(() => {
+        if (activeTranslation) {
+            setTitle(activeTranslation.title || "");
+            setContent(activeTranslation.content || "");
+            setExcerpt(activeTranslation.excerpt || "");
+            setVisibility(activeTranslation.visibility !== false);
+        } else {
+            //new language
+            setTitle("");
+            setContent("");
+            setExcerpt("");
+            setVisibility(true);
+
+        }
+    }, [activeLang, activeTranslation])
+
+
     useEffect(
         () => {
             async function loadArticle() {
@@ -65,6 +93,48 @@ export default function ArticleEditorPage() {
             if (id) loadArticle();
         }, [id]);
 
+    async function handleSaveTranslation() {
+        if (!title || !content) {
+            alert("Title and content are required");
+            return;
+        }
+
+        setSaving(true);
+
+        try {
+            const res = await fetch("/api/articles/translations/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    articleId: id,
+                    language: activeLang,
+                    title,
+                    excerpt,
+                    content,
+                    visibility,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to save translation");
+            }
+
+            // refresh translations
+            const refresh = await fetch(
+                `/api/articles/translations/list?articleId=${id}`
+            );
+            const refreshed = await refresh.json();
+            setTranslations(refreshed.translations || []);
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setSaving(false);
+        }
+    }
+
+
     if (loading) {
         return <div className="p-6">Loading Article....</div>
     }
@@ -76,6 +146,8 @@ export default function ArticleEditorPage() {
     if (!article) {
         return <div className="p-6">Article not found</div>
     }
+
+
 
     return (
         <div className="max-w-4xl space-y-6">
@@ -110,14 +182,58 @@ export default function ArticleEditorPage() {
             </div>
 
             {/*Placeholder for language editor*/}
-            <div className="p-4 border rounded bg-gray-50">
-                <p className="text-sm text-gray-600">
-                    Editing language: <strong>{activeLang.toUpperCase()}</strong>
-                </p>
-                <p className="text-xs text-gray-500">
-                    Language editor form comes next
-                </p>
+            <div className="p-4 border rounded bg-gray-50 space-y-4">
+                <h3 className="font-semibold">
+                    {activeTranslation ? "Edit" : "Add"} language:{" "}
+                    {activeLang.toUpperCase()}
+                </h3>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Title</label>
+                    <input
+                        type="text"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="w-full p-2 border rounded"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Excerpt</label>
+                    <textarea
+                        value={excerpt}
+                        onChange={(e) => setExcerpt(e.target.value)}
+                        className="w-full p-2 border rounded h-20"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Content</label>
+                    <textarea
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        className="w-full p-2 border rounded h-40"
+                    />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        checked={visibility}
+                        onChange={(e) => setVisibility(e.target.checked)}
+                    />
+                    <label>Visible on site</label>
+                </div>
+
+                <button
+                    onClick={handleSaveTranslation}
+                    disabled={saving}
+                    className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+                >
+                    {saving ? "Saving…" : "Save Language"}
+                </button>
             </div>
+
 
         </div>
     )

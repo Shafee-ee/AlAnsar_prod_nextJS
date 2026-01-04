@@ -7,6 +7,8 @@ export default function ArticleEditorPage() {
     const { id } = useParams();
 
     const [article, setArticle] = useState(null);
+    // added 
+    const [articleStatus, setArticleStatus] = useState("draft");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -17,11 +19,26 @@ export default function ArticleEditorPage() {
     const [visibility, setVisibility] = useState(true);
     const [saving, setSaving] = useState(false);
 
+    const SUPPORTED_LANGUAGES = [
+        { code: "kn", label: "Kannada" },
+        { code: "en", label: "English" },
+    ];
+
+
+
+
+
     //active language tab (UI only for now)
     const [activeLang, setActiveLang] = useState("kn");
 
     // translations 
     const [translations, setTranslations] = useState([]);
+
+    const existingLanguages = translations.map(t => t.language);
+
+    const availableLanguages = SUPPORTED_LANGUAGES.filter(
+        lang => !existingLanguages.includes(lang.code)
+    );
 
     useEffect(() => {
         async function loadTranslations() {
@@ -84,6 +101,7 @@ export default function ArticleEditorPage() {
 
                     const data = await res.json();
                     setArticle(data);
+                    setArticleStatus(data.status || "draft");
                 } catch (err) {
                     setError(err.message)
                 } finally {
@@ -112,6 +130,7 @@ export default function ArticleEditorPage() {
                     excerpt,
                     content,
                     visibility,
+                    status: activeTranslation?.status || "draft",
                 }),
             });
 
@@ -134,6 +153,32 @@ export default function ArticleEditorPage() {
         }
     }
 
+    async function handleArticleStatusChange(newStatus) {
+        setArticleStatus(newStatus);
+        try {
+            const res = await fetch("/api/articles/update-status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(
+                    {
+                        articleId: id,
+                        status: newStatus,
+                    }
+                );
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to update article status"
+                )
+            }
+        } catch (err) {
+            alert(err.message)
+        }
+    }
+
+
 
     if (loading) {
         return <div className="p-6">Loading Article....</div>
@@ -154,17 +199,49 @@ export default function ArticleEditorPage() {
             {/*Header*/}
             <div className="border-b pb-4">
                 <h1 className="text-2xl font-bold">Edit Article</h1>
-                <p className="text-sm text-gray-600">
-                    slug: <span className="font-mono">{article.slug}</span>
-                </p>
-                <p className="text-sm">
-                    status: <strong>{article.status}</strong>
-                </p>
+                <div className="space-y-1">
+                    <p className="text-sm text-gray-600">
+                        slug: <span className="font-mono">{article.slug}</span>
+                    </p>
+
+
+                    {/* Slug is intentionally read-only after creation */}
+
+                    {articleStatus === "published" && (
+                        <p className="text-xs text-red-600">
+                            ⚠️ Slug is locked after publishing. Changing it will break links.
+                        </p>
+                    )}
+                </div>
+
+
+                <div className="flex items-center gap-4 mt-2">
+                    <span className="text-sm font-medium">Article status:</span>
+
+                    <select
+                        value={articleStatus}
+                        onChange={(e) =>
+                            handleArticleStatusChange(e.target.value)
+                        }
+                        className="p-1 border rounded"
+                    >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </select>
+
+                    {articleStatus === "published" && (
+                        <span className="text-xs text-green-700">
+                            Article is live
+                        </span>
+                    )}
+                </div>
+
+
             </div>
 
             {/*Language tabs (UI scaffold)*/}
 
-            <div className="flex gap-2 border-b">
+            <div className="flex items-center gap-2 border-b pb-2">
 
                 {translations.map((t) => (
                     <button
@@ -179,7 +256,27 @@ export default function ArticleEditorPage() {
                     </button>
                 ))}
 
+                {availableLanguages.length > 0 && (
+                    <select
+                        onChange={(e) => {
+                            setActiveLang(e.target.value);
+                        }}
+                        className="ml-4 p-1 border rounded text-sm"
+                        defaultValue=""
+                    >
+                        <option value="" disabled>
+                            + Add language
+                        </option>
+                        {availableLanguages.map(lang => (
+                            <option key={lang.code} value={lang.code}>
+                                {lang.label}
+                            </option>
+                        ))}
+                    </select>
+                )}
+
             </div>
+
 
             {/*Placeholder for language editor*/}
             <div className="p-4 border rounded bg-gray-50 space-y-4">

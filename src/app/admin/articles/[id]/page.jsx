@@ -19,72 +19,11 @@ export default function ArticleEditorPage() {
     const [visibility, setVisibility] = useState(true);
     const [saving, setSaving] = useState(false);
 
-    const SUPPORTED_LANGUAGES = [
-        { code: "kn", label: "Kannada" },
-        { code: "en", label: "English" },
-    ];
-
-
-
-
-
-    //active language tab (UI only for now)
+    //Language tabs
+    // language tabs
+    const LANGUAGES = ["kn", "en"];
+    const [translations, setTranslations] = useState([]); // existing saved languages
     const [activeLang, setActiveLang] = useState("kn");
-
-    // translations 
-    const [translations, setTranslations] = useState([]);
-
-    const existingLanguages = translations.map(t => t.language);
-
-    const availableLanguages = SUPPORTED_LANGUAGES.filter(
-        lang => !existingLanguages.includes(lang.code)
-    );
-
-    useEffect(() => {
-        async function loadTranslations() {
-            try {
-                const res = await fetch(
-                    `/api/articles/translations/list?articleId=${id}`
-                );
-
-                if (!res.ok) {
-                    throw new Error("Failed to load translations");
-                }
-
-                const data = await res.json();
-                setTranslations(data.translations || []);
-
-                if (data.translations?.length > 0) {
-                    setActiveLang(data.translations[0].language);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        if (id) loadTranslations();
-    }, [id]);
-
-
-    const activeTranslation = translations.find(
-        (t) => t.language === activeLang
-    );
-
-    useEffect(() => {
-        if (activeTranslation) {
-            setTitle(activeTranslation.title || "");
-            setContent(activeTranslation.content || "");
-            setExcerpt(activeTranslation.excerpt || "");
-            setVisibility(activeTranslation.visibility !== false);
-        } else {
-            //new language
-            setTitle("");
-            setContent("");
-            setExcerpt("");
-            setVisibility(true);
-
-        }
-    }, [activeLang, activeTranslation])
 
 
     useEffect(
@@ -111,6 +50,29 @@ export default function ArticleEditorPage() {
             if (id) loadArticle();
         }, [id]);
 
+    useEffect(() => {
+        async function loadTranslations() {
+            try {
+                const res = await fetch(
+                    `/api/articles/translations/list?articleId=${id}`
+                );
+                if (!res.ok) return;
+
+                const data = await res.json();
+                setTranslations(data.translations || []);
+
+                if (data.translations?.length > 0) {
+                    setActiveLang(data.translations[0].language);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        if (id) loadTranslations();
+    }, [id]);
+
+
     async function handleSaveTranslation() {
         if (!title || !content) {
             alert("Title and content are required");
@@ -130,7 +92,6 @@ export default function ArticleEditorPage() {
                     excerpt,
                     content,
                     visibility,
-                    status: activeTranslation?.status || "draft",
                 }),
             });
 
@@ -140,12 +101,7 @@ export default function ArticleEditorPage() {
                 throw new Error(data.error || "Failed to save translation");
             }
 
-            // refresh translations
-            const refresh = await fetch(
-                `/api/articles/translations/list?articleId=${id}`
-            );
-            const refreshed = await refresh.json();
-            setTranslations(refreshed.translations || []);
+
         } catch (err) {
             alert(err.message);
         } finally {
@@ -164,7 +120,7 @@ export default function ArticleEditorPage() {
                         articleId: id,
                         status: newStatus,
                     }
-                );
+                )
             });
 
             const data = await res.json();
@@ -239,51 +195,36 @@ export default function ArticleEditorPage() {
 
             </div>
 
-            {/*Language tabs (UI scaffold)*/}
 
-            <div className="flex items-center gap-2 border-b pb-2">
+            {/* Language Tabs */}
+            <div className="flex gap-2 border-b pb-2">
+                {LANGUAGES.map((lang) => {
+                    const exists = translations.some(t => t.language === lang);
 
-                {translations.map((t) => (
-                    <button
-                        key={t.language}
-                        onClick={() => setActiveLang(t.language)}
-                        className={`px-4 py-2 border-b-2 ${activeLang === t.language
-                            ? "border-blue-600 font-medium"
-                            : "border-transparent text-gray-500"
-                            }`}
-                    >
-                        {t.language.toUpperCase()}
-                    </button>
-                ))}
-
-                {availableLanguages.length > 0 && (
-                    <select
-                        onChange={(e) => {
-                            setActiveLang(e.target.value);
-                        }}
-                        className="ml-4 p-1 border rounded text-sm"
-                        defaultValue=""
-                    >
-                        <option value="" disabled>
-                            + Add language
-                        </option>
-                        {availableLanguages.map(lang => (
-                            <option key={lang.code} value={lang.code}>
-                                {lang.label}
-                            </option>
-                        ))}
-                    </select>
-                )}
-
+                    return (
+                        <button
+                            key={lang}
+                            onClick={() => exists && setActiveLang(lang)}
+                            disabled={!exists}
+                            className={`px-4 py-2 rounded-t border-b-2 text-sm
+                    ${exists
+                                    ? "border-green-600 text-green-700 font-medium"
+                                    : "border-gray-300 text-gray-400 cursor-not-allowed"
+                                }
+                    ${activeLang === lang ? "bg-gray-100" : ""}
+                `}
+                        >
+                            {lang.toUpperCase()}
+                        </button>
+                    );
+                })}
             </div>
+
 
 
             {/*Placeholder for language editor*/}
             <div className="p-4 border rounded bg-gray-50 space-y-4">
-                <h3 className="font-semibold">
-                    {activeTranslation ? "Edit" : "Add"} language:{" "}
-                    {activeLang.toUpperCase()}
-                </h3>
+                <h3 className="font-semibold">Article Content</h3>
 
                 <div className="space-y-1">
                     <label className="text-sm font-medium">Title</label>

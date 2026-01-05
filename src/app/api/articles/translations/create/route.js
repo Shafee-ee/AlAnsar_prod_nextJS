@@ -11,6 +11,8 @@ export async function POST(req) {
             excerpt,
             content,
             author,
+            visibility = true,
+            status = "draft",
         } = body;
 
         if (!articleId || !language || !title || !content) {
@@ -53,8 +55,8 @@ export async function POST(req) {
             excerpt: excerpt || "",
             content,
             author: author || "unknown",
-            visibility: true,
-            status: "draft",
+            visibility,
+            status,
             createdAt: new Date(),
             updatedAt: new Date(),
         })

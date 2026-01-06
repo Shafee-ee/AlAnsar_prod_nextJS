@@ -101,6 +101,13 @@ export default function ArticleEditorPage() {
                 throw new Error(data.error || "Failed to save translation");
             }
 
+            const refresh = await fetch(
+                `/api/articles/translations/list?articleId=${id}`
+            );
+            const refreshed = await refresh.json();
+            setTranslations(refreshed.translations || []);
+            setActiveLang(activeLang);
+
 
         } catch (err) {
             alert(err.message);

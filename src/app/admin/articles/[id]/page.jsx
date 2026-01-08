@@ -25,6 +25,27 @@ export default function ArticleEditorPage() {
     const [translations, setTranslations] = useState([]); // existing saved languages
     const [activeLang, setActiveLang] = useState("kn");
 
+    const existingTranslation = translations.find(
+        (t) => t.language === activeLang
+    );
+    const isEditMode = Boolean(existingTranslation);
+
+    useEffect(() => {
+        const t = translations.find(tr => tr.language === activeLang);
+
+        if (t) {
+            setTitle(t.title || "");
+            setExcerpt(t.excerpt || "");
+            setContent(t.content || "");
+            setVisibility(t.visibility !== false);
+        } else {
+            setTitle("");
+            setExcerpt("");
+            setContent("");
+            setVisibility(true);
+        }
+    }, [activeLang, translations]);
+
 
     useEffect(
         () => {
@@ -82,7 +103,12 @@ export default function ArticleEditorPage() {
         setSaving(true);
 
         try {
-            const res = await fetch("/api/articles/translations/create", {
+
+            const endpoint = isEditMode
+                ? "/api/articles/translations/update"
+                : "/api/articles/translations/create";
+
+            const res = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -275,7 +301,11 @@ export default function ArticleEditorPage() {
                     disabled={saving}
                     className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
                 >
-                    {saving ? "Saving…" : "Save Language"}
+                    {saving
+                        ? "Saving..."
+                        : isEditMode
+                            ? "Update Language"
+                            : "Save Language"}
                 </button>
             </div>
 

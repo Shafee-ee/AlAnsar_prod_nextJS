@@ -18,12 +18,12 @@ export default function ArticleEditorPage() {
     const [excerpt, setExcerpt] = useState("");
     const [visibility, setVisibility] = useState(true);
     const [saving, setSaving] = useState(false);
-
-    //Language tabs
     // language tabs
     const LANGUAGES = ["kn", "en"];
     const [translations, setTranslations] = useState([]); // existing saved languages
     const [activeLang, setActiveLang] = useState("kn");
+    //image States
+    const [imageUploading, setImageUploading] = useState(false);
 
     const existingTranslation = translations.find(
         (t) => t.language === activeLang
@@ -93,6 +93,34 @@ export default function ArticleEditorPage() {
         if (id) loadTranslations();
     }, [id]);
 
+    async function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("articleId", id);
+
+        setImageUploading(true);
+
+        try {
+            const res = await fetch("/api/articles/upload-image", {
+                method: "POST",
+                body: formData,
+            })
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+
+            setArticle(prev => ({ ...prev, coverImage: data.imageUrl }));
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setImageUploading(false)
+        }
+
+    }
 
     async function handleSaveTranslation() {
         if (!title || !content) {
@@ -127,12 +155,35 @@ export default function ArticleEditorPage() {
                 throw new Error(data.error || "Failed to save translation");
             }
 
+            // 👉 Only populate EN, do NOT save it
+            if (activeLang === "kn") {
+                const translateRes = await fetch("/api/translate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        sourceLang: "kn",
+                        targetLang: "en",
+                        title,
+                        excerpt,
+                        content,
+                    }),
+                });
+
+                const translated = await translateRes.json();
+
+                setTitle(translated.title || "");
+                setExcerpt(translated.excerpt || "");
+                setContent(translated.content || "");
+                setActiveLang("en");
+
+                return;
+            }
+
             const refresh = await fetch(
                 `/api/articles/translations/list?articleId=${id}`
             );
             const refreshed = await refresh.json();
             setTranslations(refreshed.translations || []);
-            setActiveLang(activeLang);
 
 
         } catch (err) {
@@ -228,21 +279,46 @@ export default function ArticleEditorPage() {
 
             </div>
 
+            {/*image upload*/}
 
+            <div className="space-y-2">
+                <label className="text-sm font-medium">Cover Image</label>
+                {article.coverImage && (
+                    <img
+                        src={article.coverImage}
+                        alt="cover"
+                        className="w-full max-h-64 object-cover rounded border" />
+                )}
+
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={imageUploading}
+                />
+
+                {imageUploading && (
+                    <p className="text-xs text-gray-500">Uploading image...</p>
+                )}
+
+            </div>
             {/* Language Tabs */}
             <div className="flex gap-2 border-b pb-2">
                 {LANGUAGES.map((lang) => {
                     const exists = translations.some(t => t.language === lang);
+                    const isTempActive = activeLang === lang;
 
                     return (
                         <button
                             key={lang}
-                            onClick={() => exists && setActiveLang(lang)}
-                            disabled={!exists}
+                            disabled={!exists && !isTempActive}
+                            onClick={() => setActiveLang(lang)}
                             className={`px-4 py-2 rounded-t border-b-2 text-sm
                     ${exists
                                     ? "border-green-600 text-green-700 font-medium"
-                                    : "border-gray-300 text-gray-400 cursor-not-allowed"
+                                    : isTempActive
+                                        ? "border-yellow-500 text-yellow-700 font-medium"
+                                        : "border-gray-300 text-gray-400 cursor-not-allowed"
                                 }
                     ${activeLang === lang ? "bg-gray-100" : ""}
                 `}

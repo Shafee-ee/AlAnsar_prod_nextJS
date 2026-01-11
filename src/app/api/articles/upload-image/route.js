@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { getStorage } from "firebase-admin/storage"
-import admin from "firebase-admin";
+// import admin from "firebase-admin";
 
 export async function POST(req) {
     try {
@@ -23,13 +23,17 @@ export async function POST(req) {
 
         await fileRef.save(buffer, {
             contentType: file.type,
-            public: true,
+        });
+
+        const [signedUrl] = await fileRef.getSignedUrl({
+            action: "read",
+            expires: "03-01-2500"
         })
 
-        const imageUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+        const imageUrl = signedUrl;
 
         await adminDB.collection("articles").doc(articleId).update({
-            coverImage: imageUrl,
+            coverImage: signedUrl,
             updatedAt: new Date(),
         })
 

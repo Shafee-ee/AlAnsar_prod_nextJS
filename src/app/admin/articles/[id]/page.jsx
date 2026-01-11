@@ -155,7 +155,14 @@ export default function ArticleEditorPage() {
                 throw new Error(data.error || "Failed to save translation");
             }
 
-            // 👉 Only populate EN, do NOT save it
+            // 🔄 Always refresh translations after save
+            const refresh = await fetch(
+                `/api/articles/translations/list?articleId=${id}`
+            );
+            const refreshed = await refresh.json();
+            setTranslations(refreshed.translations || []);
+
+            // 🌐 If KN was saved, auto-translate into EN (populate only)
             if (activeLang === "kn") {
                 const translateRes = await fetch("/api/translate", {
                     method: "POST",
@@ -175,16 +182,7 @@ export default function ArticleEditorPage() {
                 setExcerpt(translated.excerpt || "");
                 setContent(translated.content || "");
                 setActiveLang("en");
-
-                return;
             }
-
-            const refresh = await fetch(
-                `/api/articles/translations/list?articleId=${id}`
-            );
-            const refreshed = await refresh.json();
-            setTranslations(refreshed.translations || []);
-
 
         } catch (err) {
             alert(err.message);
@@ -290,12 +288,18 @@ export default function ArticleEditorPage() {
                         className="w-full max-h-64 object-cover rounded border" />
                 )}
 
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={imageUploading}
-                />
+                <label className="inline-block">
+                    <span className="px-4 py-2 bg-gray-800 text-white rounded cursor-pointer">
+                        {imageUploading ? "Uploading..." : "Upload Cover Image"}
+                    </span>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        disabled={imageUploading}
+                        className="hidden"
+                    />
+                </label>
 
                 {imageUploading && (
                     <p className="text-xs text-gray-500">Uploading image...</p>

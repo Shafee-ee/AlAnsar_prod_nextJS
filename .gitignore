@@ -9,6 +9,8 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+vertex-sa.json
+
 
 # testing
 /coverage
@@ -16,6 +18,8 @@
 # next.js
 /.next/
 /out/
+
+
 
 # production
 /build

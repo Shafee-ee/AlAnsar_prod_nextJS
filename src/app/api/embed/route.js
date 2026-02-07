@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+
+//Debug 
+console.log("API KEY PRESENT:", !!process.env.GOOGLE_API_KEY);
+
 // Initialize Gemini with your API key
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });

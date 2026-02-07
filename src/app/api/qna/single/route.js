@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
+import { generateEmbedding } from "@/lib/vertexEmbedding";
 
 /* -------------------------------------------------------
    Detect Kannada (simple + reliable for our use case)
@@ -25,7 +26,7 @@ ${text}
     `;
 
     const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
         {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -53,27 +54,10 @@ ${text}
 /* -------------------------------------------------------
    Generate embedding (English only)
 ------------------------------------------------------- */
-async function generateEmbedding(text) {
-    try {
-        const url =
-            `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${process.env.GOOGLE_API_KEY}`;
 
-        const r = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "text-embedding-004",
-                content: { parts: [{ text }] }
-            })
-        });
 
-        const j = await r.json();
-        return Array.isArray(j?.embedding?.values) ? j.embedding.values : null;
-    } catch (err) {
-        console.error("Embedding error:", err);
-        return null;
-    }
-}
+
+
 
 /* -------------------------------------------------------
    MAIN HANDLER (new schema, auto-detect override)

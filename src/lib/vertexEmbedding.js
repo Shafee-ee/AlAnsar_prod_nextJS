@@ -4,7 +4,15 @@ const PROJECT_ID = process.env.FIREBASE_PROJECT_ID;
 const LOCATION = "us-central1";
 
 export async function generateEmbedding(text) {
+    const credentials = JSON.parse(
+        process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON
+    );
+
     const auth = new GoogleAuth({
+        credentials: {
+            client_email: credentials.client_email,
+            private_key: credentials.private_key,
+        },
         scopes: ["https://www.googleapis.com/auth/cloud-platform"],
     });
 
@@ -20,9 +28,7 @@ export async function generateEmbedding(text) {
             "Authorization": `Bearer ${accessToken.token}`,
         },
         body: JSON.stringify({
-            instances: [
-                { content: text }
-            ]
+            instances: [{ content: text }]
         })
     });
 

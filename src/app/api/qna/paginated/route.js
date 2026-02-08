@@ -4,34 +4,37 @@ import { adminDB } from "@/lib/firebaseAdmin";
 export async function GET(req) {
     try {
         const { searchParams } = new URL(req.url);
-        const cursor = searchParams.get("cursor");
+        const page = parseInt(searchParams.get("page") || "1", 10)
         const limit = 20;
+        const offset = (page - 1) * limit;
 
-        let query = adminDB
+        //total count
+        const countSnap = await adminDB.collection("qna_items").count().get();
+        const totalCount = countSnap.data().count;
+
+
+
+        //offset pagination
+        let snap = await adminDB
             .collection("qna_items")
             .orderBy("createdAt", "desc")
-            .limit(limit);
-
-        if (cursor) {
-            query = query.startAfter(cursor);
-        }
-
-        const snap = await query.get();
+            .offset(offset)
+            .limit(limit)
+            .get();
 
         const items = snap.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-        }));
+        }))
 
-        // Last cursor = createdAt of last item
-        const lastCursor =
-            items.length > 0 ? items[items.length - 1].createdAt : null;
+
 
         return NextResponse.json({
             success: true,
             items,
-            lastCursor,
-            noMore: items.length < limit
+            totalCount,
+            page,
+            limit
         });
 
     } catch (err) {

@@ -17,31 +17,50 @@ export default function ManageQnA() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // pagination
-    const [cursor, setCursor] = useState(null);
-    const [noMore, setNoMore] = useState(false);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+
+    //total count state
+    const [totalCount, setTotalCount] = useState(0);
+
+    //page state
+    const [page, setPage] = useState(1);
+    const PAGE_SIZE = 20;
+
+    //total pages 
+    const totalPages = Math.ceil(totalCount / PAGE_SIZE)
+
+    const startIndex =
+        totalCount === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+
+    const endIndex =
+        totalCount === 0
+            ? 0
+            : Math.min(startIndex + filtered.length - 1, totalCount);
+
+
 
     /* -----------------------------
        INITIAL LOAD
     ----------------------------- */
     useEffect(() => {
         fetchAudit();
-        fetchPaginated();
-    }, []);
+    }, [])
 
+
+    useEffect(() => {
+        fetchPaginated(page);
+    }, [page]);
     /* -----------------------------
        DATA FETCHING
     ----------------------------- */
-    async function fetchPaginated() {
-        const res = await fetch("/api/qna/paginated");
+    async function fetchPaginated(pageNum = 1) {
+        const res = await fetch(`/api/qna/paginated?page=${pageNum}`);
         const data = await res.json();
 
         if (data.success) {
             setItems(data.items);
             setFiltered(data.items);
-            setCursor(data.lastCursor);
-            setNoMore(data.noMore);
+            setTotalCount(data.totalCount);
         }
     }
 
@@ -69,29 +88,13 @@ export default function ManageQnA() {
     ----------------------------- */
     useEffect(() => {
         if (qualityFilter === "all") {
-            fetchPaginated();
+            fetchPaginated(1);
         } else {
             fetchAll();
         }
     }, [qualityFilter]);
 
-    async function loadMore() {
-        if (noMore || qualityFilter !== "all") return;
 
-        setIsLoadingMore(true);
-
-        const res = await fetch(`/api/qna/paginated?cursor=${cursor}`);
-        const data = await res.json();
-
-        if (data.success) {
-            setItems(prev => [...prev, ...data.items]);
-            setFiltered(prev => [...prev, ...data.items]);
-            setCursor(data.lastCursor);
-            setNoMore(data.noMore);
-        }
-
-        setIsLoadingMore(false);
-    }
 
     /* -----------------------------
        FILTER + SORT
@@ -242,6 +245,9 @@ export default function ManageQnA() {
                     <option value="newest">Newest</option>
                     <option value="oldest">Oldest</option>
                 </select>
+                <div className="text-xs text-gray-600">
+                    Showing {startIndex}–{endIndex} of {totalCount}
+                </div>
             </div>
 
             {/* Table */}
@@ -339,17 +345,49 @@ export default function ManageQnA() {
                 </table>
             </div>
 
-            {qualityFilter === "all" && !noMore && (
-                <div className="flex justify-center mt-4">
+
+
+
+            {qualityFilter === "all" && totalPages > 1 && (
+                <div className="flex justify-center gap-1 mt-4 flex-wrap">
                     <button
-                        onClick={loadMore}
-                        disabled={isLoadingMore}
-                        className="bg-gray-800 text-white px-4 py-2 rounded text-xs hover:bg-black disabled:opacity-50"
+                        disabled={page === 1}
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        className="px-2 py-1 text-xs border rounded disabled:opacity-40"
                     >
-                        {isLoadingMore ? "Loading..." : "Load More"}
+                        Prev
+                    </button>
+
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .slice(
+                            Math.max(0, page - 3),
+                            Math.min(totalPages, page + 2)
+                        )
+                        .map(p => (
+                            <button
+                                key={p}
+                                onClick={() => setPage(p)}
+                                className={`px-2 py-1 text-xs border rounded ${p === page
+                                    ? "bg-black text-white"
+                                    : "bg-white"
+                                    }`}
+                            >
+                                {p}
+                            </button>
+                        ))}
+
+
+                    <button
+                        disabled={page === totalPages}
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        className="px-2 py-1 text-xs border rounded disabled:opacity-40"
+                    >
+                        Next
                     </button>
                 </div>
             )}
+
 
             {/* MODAL */}
             {isModalOpen && selectedItem && (

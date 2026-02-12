@@ -67,6 +67,10 @@ export async function POST(req) {
     const snap = await adminDB.collection("qna_items").get();
     const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
+    //temp test
+    if (items.length > 0) {
+        console.log("First stored embedding length:", items[0].embedding?.length);
+    }
 
     const exactMatchItem = items.find(item => {
         const qEN = normalize(item.question_en || "");
@@ -111,6 +115,10 @@ export async function POST(req) {
 
 
     const queryEmbedding = await embed(query);
+
+    //temp testing
+    console.log("Query embedding length:", queryEmbedding.length);
+
     if (!queryEmbedding.length) {
         return NextResponse.json({ success: false });
     }

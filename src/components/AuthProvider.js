@@ -71,8 +71,6 @@ function AuthProviderWrapper({ children }) {
         const unsub = onAuthStateChanged(auth, async (currentUser) => {
             console.debug("[AuthProvider] onAuthStateChanged:", !!currentUser);
             setUser(currentUser || null);
-            //temporary line to check the uid
-            console.log("ADMIN CHECK — UID:", currentUser?.uid);
 
 
             // reset admin state while checking

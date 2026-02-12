@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
+import { generateEmbedding } from "@/lib/vertexEmbedding";
 
 
 function normalize(s = "") {
@@ -28,21 +29,7 @@ function hasValidIntent(query = "") {
     return looksLikeQuestion;
 }
 
-async function embed(text) {
-    const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key=${process.env.GOOGLE_API_KEY}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                content: { parts: [{ text }] },
-            }),
-        }
-    );
 
-    const j = await res.json();
-    return j?.embedding?.values || [];
-}
 
 function cosine(a = [], b = []) {
     let dot = 0, na = 0, nb = 0;
@@ -114,7 +101,7 @@ export async function POST(req) {
     }
 
 
-    const queryEmbedding = await embed(query);
+    const queryEmbedding = await generateEmbedding(query);
 
     //temp testing
     console.log("Query embedding length:", queryEmbedding.length);

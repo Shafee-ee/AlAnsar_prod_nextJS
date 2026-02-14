@@ -271,7 +271,6 @@ const ChatbotSection = () => {
             "assalamu alaikum",
             "assalamualaikum"
         ];
-        console.log("Best match ID:", data.bestMatch?.id);
 
         if (greetings.some(g => normalized.startsWith(g))) {
             setMessages(prev => [
@@ -311,7 +310,10 @@ const ChatbotSection = () => {
                 body: JSON.stringify({ query: queryText, lang: selectedLang }),
             });
 
+            //console remove
             const data = await res.json();
+            console.log("Best match ID:", data.bestMatch?.id);
+
 
             // mark best match as seen
 

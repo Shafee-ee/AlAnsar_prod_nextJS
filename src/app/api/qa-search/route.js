@@ -11,22 +11,12 @@ function normalize(s = "") {
 function hasValidIntent(query = "") {
     const q = normalize(query);
 
-    if (q.length < 10) return false;
+    if (q.length < 8) return false;
 
     const words = q.split(" ");
-    if (words.length < 3) return false;
+    if (words.length < 2) return false;
 
-    const questionStarters = [
-        "can", "is", "are", "does", "do",
-        "what", "how", "when", "where",
-        "should", "must", "may", "will"
-    ];
-
-    const looksLikeQuestion =
-        q.endsWith("?") ||
-        questionStarters.some(w => q.startsWith(w + " "));
-
-    return looksLikeQuestion;
+    return true;
 }
 
 

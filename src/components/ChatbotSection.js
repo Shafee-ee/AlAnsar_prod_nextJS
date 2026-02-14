@@ -141,7 +141,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
                 )}
 
                 <button
-                    onClick={() => onShare(best.question, best.answer)}
+                    onClick={() => onShare(best.id)}
                     className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
                 >
                     <Share2 className="w-3 h-3" /> Share
@@ -235,16 +235,24 @@ const ChatbotSection = () => {
         });
     }, [messages, isLoading]);
 
-    async function shareQA(q, a) {
-        const payload = `${q}\n\n${a}`;
+    //qna Share
+    async function shareQA(id) {
+        const shareUrl = `${window.location.origin}/qna/${id}`
+
         if (navigator.share) {
             try {
-                await navigator.share({ title: q, text: payload });
+                await navigator.share({
+                    title: "Al Ansar Weekly",
+                    url: shareUrl,
+                });
                 return;
-            } catch { }
+            } catch (err) {
+                console.error(err);
+            }
         }
-        await navigator.clipboard.writeText(payload);
-        alert("Copied!");
+
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied")
     }
 
     const handleSend = async (textOverride = null) => {
@@ -263,6 +271,7 @@ const ChatbotSection = () => {
             "assalamu alaikum",
             "assalamualaikum"
         ];
+        console.log("Best match ID:", data.bestMatch?.id);
 
         if (greetings.some(g => normalized.startsWith(g))) {
             setMessages(prev => [
@@ -334,6 +343,7 @@ const ChatbotSection = () => {
                     : {
                         bestMatch: data.bestMatch
                             ? {
+                                id: data.bestMatch.id,
                                 question: data.bestMatch.question,
                                 answer: data.bestMatch.answer,
                                 score: data.bestMatch.score ?? 0,

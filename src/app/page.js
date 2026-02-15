@@ -10,44 +10,10 @@ import { CATEGORIES_DATA } from "@/components/ArticleComponents";
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
 
-  const [articles, setArticles] = useState([]);
-  const [isArticlesLoading, setIsArticlesLoading] = useState(true);
 
-  const featuredArticles = useMemo(() => {
-    return articles.filter(a => a.isFeatured === true).slice(0, 10);
-  }, [articles]);
 
-  const latestArticles = useMemo(() => {
-    return articles.slice(0, 10);
-  }, [articles]);
 
-  useEffect(() => {
-    if (loading) return;
 
-    const fetchArticles = async () => {
-      setIsArticlesLoading(true);
-      try {
-        const response = await fetch("/api/articles", { cache: "no-store" });
-        const { articles: fetched } = await response.json();
-
-        const clean = Array.isArray(fetched)
-          ? fetched.map(a => ({
-            ...a,
-            image: a.image ? `${a.image}` : null,
-          }))
-          : [];
-
-        setArticles(clean);
-      } catch (e) {
-        console.error("Article fetch error:", e);
-        setArticles([]);
-      } finally {
-        setIsArticlesLoading(false);
-      }
-    };
-
-    fetchArticles();
-  }, [loading, isAdmin]);
 
   if (loading) {
     return (
@@ -85,60 +51,7 @@ export default function Home() {
           <ChatbotSection />
         </div>
 
-        <main className="w-full max-w-7xl mx-auto space-y-12">
 
-          {isArticlesLoading ? (
-            <div className="text-center text-gray-500 text-lg p-20">
-              <Loader className="w-6 h-6 animate-spin mx-auto mb-2" />
-              Loading articles...
-            </div>
-          ) : (
-            <>
-              {/* Latest 
-              {latestArticles.length > 0 && (
-                <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-                  <ArticleCarousel
-                    title="Latest Articles"
-                    articles={latestArticles}
-                    variant="gradient-carousel"
-                  />
-                </div>
-              )}
-
-              {featuredArticles.length > 0 && (
-                <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
-                  <ArticleCarousel
-                    title="Featured Reads"
-                    articles={featuredArticles}
-                    variant="carousel"
-                  />
-                </div>
-              )}
-
-              <section className="mt-6">
-                <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-[#0B4C8C] pl-3 mb-8">
-                  Explore Categories
-                </h2>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
-                  {CATEGORIES_DATA.map(category => (
-                    <div
-                      key={category.slug}
-                      className="p-4 md:p-6 bg-white rounded-xl shadow-md hover:shadow-lg border-t-4 border-[#0B4C8C] transition transform hover:scale-[1.02] active:scale-[0.98] cursor-pointer text-center"
-                    >
-                      <h3 className="text-lg font-bold text-blue-900">
-                        {category.name}
-                      </h3>
-                      <p className="text-xs text-gray-600 mt-1 hidden md:block">
-                        {category.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </section>*/}
-            </>
-          )}
-        </main>
       </div>
     </div>
   );

@@ -42,7 +42,7 @@ const ArticleCarousel = ({ title, articles, className = "" }) => {
                     className="flex overflow-x-scroll pb-12 px-4 md:px-0 gap-6 hide-scrollbar"
                 >
                     {articles.map((article) => (
-                        <div key={article._id} className="flex-shrink-0">
+                        <div key={article.id} className="flex-shrink-0">
                             <ArticleCard article={article} />
                         </div>
                     ))}

@@ -94,7 +94,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Latest */}
+              {/* Latest 
               {latestArticles.length > 0 && (
                 <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
                   <ArticleCarousel
@@ -105,7 +105,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Featured */}
               {featuredArticles.length > 0 && (
                 <div className="bg-white rounded-xl shadow-md p-4 md:p-6">
                   <ArticleCarousel
@@ -116,7 +115,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Categories */}
               <section className="mt-6">
                 <h2 className="text-3xl font-bold text-gray-900 border-l-4 border-[#0B4C8C] pl-3 mb-8">
                   Explore Categories
@@ -137,7 +135,7 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-              </section>
+              </section>*/}
             </>
           )}
         </main>

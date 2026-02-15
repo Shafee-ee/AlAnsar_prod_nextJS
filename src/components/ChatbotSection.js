@@ -253,6 +253,11 @@ const ChatbotSection = () => {
 
         await navigator.clipboard.writeText(shareUrl);
         alert("Link copied")
+
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
+            "_blank"
+        );
     }
 
     const handleSend = async (textOverride = null) => {

@@ -66,7 +66,7 @@ export default async function QnAPage({ params }) {
                                 Have any Islamic question?
                             </p>
                             <p className="text-sm text-indigo-700 mb-4">
-                                Ask instantly through Keli Nodi.
+                                Ask instantly through KELI NODI.
                             </p>
                             <a
                                 href="/"

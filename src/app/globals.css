@@ -21,6 +21,8 @@
   --foreground: #171717;
 }
 
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -45,5 +47,4 @@ button,
 input[type="submit"] {
   appearance: auto;
   -webkit-appearance: auto;
-  display: inline-flex;
 }

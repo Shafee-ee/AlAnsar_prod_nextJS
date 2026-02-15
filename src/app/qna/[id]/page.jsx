@@ -2,8 +2,8 @@ import { adminDB } from "@/lib/firebaseAdmin";
 import { notFound } from "next/navigation";
 
 /* ---------- METADATA FUNCTION ---------- */
-export async function generateMetadata({ params }) {
-    const { id } = await params;
+export async function generateMetadata({ params, searchParams }) {
+    const { id } = params;
 
     const docRef = adminDB.collection("qna_items").doc(id);
     const snap = await docRef.get();
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }) {
 }
 
 /* ---------- PAGE COMPONENT ---------- */
-export default async function QnAPage({ params }) {
-    const { id } = await params;
+export default async function QnAPage({ params, searchParams }) {
+    const { id } = params;
 
     if (!id) notFound();
 
@@ -47,18 +47,37 @@ export default async function QnAPage({ params }) {
 
     const data = snap.data();
 
+    const lang =
+        searchParams?.lang === "en" || searchParams?.lang === "kn"
+            ? searchParams.lang
+            : data.lang_original || "kn";
+
+    const question = lang === "en" ? data.question_en : data.question_kn;
+    const answer = lang === "en" ? data.answer_en : data.answer_kn;
+    const editorNote =
+        lang === "en" ? data.editor_note_en : data.editor_note_kn;
+
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
             <div className="max-w-3xl mx-auto">
                 <div className="bg-white shadow-xl rounded-2xl border border-gray-100 p-8">
 
                     <h1 className="text-2xl font-semibold mb-6 leading-snug text-gray-900">
-                        {data.question_en}
+                        {question}
                     </h1>
 
                     <div className="text-base leading-relaxed text-gray-700 whitespace-pre-line">
-                        {data.answer_en}
+                        {answer}
                     </div>
+
+                    {editorNote && (
+                        <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm text-gray-700 whitespace-pre-line">
+                            <div className="font-semibold text-yellow-800 mb-1">
+                                Editor’s Note
+                            </div>
+                            {editorNote}
+                        </div>
+                    )}
 
                     <div className="mt-10 pt-6 border-t">
                         <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 text-center">

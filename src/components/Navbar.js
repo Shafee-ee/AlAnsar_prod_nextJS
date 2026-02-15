@@ -1,14 +1,20 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { useLanguage } from '@/context/LanguageContext';
 import { Menu, X } from 'lucide-react';
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+
 
 const primaryBlue = 'bg-[#0B4C8C]';
 
 const Navbar = () => {
-    const { lang, setLang } = useLanguage();
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
+    const currentLang =
+        searchParams.get("lang") === "en" ? "en" : "kn";
 
     React.useEffect(() => {
         const handleResize = () => {
@@ -58,8 +64,12 @@ const Navbar = () => {
                         {/* Language Pill */}
                         <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
                             <button
-                                onClick={() => setLang('en')}
-                                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${lang === 'en'
+                                onClick={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.set("lang", "en");
+                                    router.push(`${pathname}?${params.toString()}`);
+                                }}
+                                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'en'
                                     ? 'bg-white text-[#0B4C8C]'
                                     : 'text-white'
                                     }`}
@@ -68,8 +78,11 @@ const Navbar = () => {
                             </button>
 
                             <button
-                                onClick={() => setLang('kn')}
-                                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${lang === 'kn'
+                                onClick={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    params.set("lang", "kn");
+                                    router.push(`${pathname}?${params.toString()}`);
+                                }} className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'kn'
                                     ? 'bg-white text-[#0B4C8C]'
                                     : 'text-white'
                                     }`}

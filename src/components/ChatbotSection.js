@@ -1,14 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Send, Zap, MessageCircle, Share2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 /* ----------------------------------
    CONFIG
 ---------------------------------- */
-const langs = [
-    { code: 'en', label: 'EN' },
-    { code: 'kn', label: 'KN' },
-];
+
 
 const headings = {
     en: {
@@ -213,10 +211,18 @@ const ChatbotSection = () => {
     const [messages, setMessages] = useState([]);
     const [userInput, setUserInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedLang, setSelectedLang] = useState('kn');
     const [seenQuestions, setSeenQuestions] = useState(new Set());
     const chatRef = useRef(null);
     const inputRef = useRef(null);
+
+    //toaster notification
+    const [toast, setToast] = useState(null);
+
+    //language selection
+    const searchParams = useSearchParams();
+    const selectedLang =
+        searchParams.get("lang") === "en" ? "en" : "kn";
+
 
     /*handle rephrase*/
     function handleRephrase(text) {
@@ -237,9 +243,10 @@ const ChatbotSection = () => {
 
     //qna Share
     async function shareQA(id) {
-        const shareUrl = `${window.location.origin}/qna/${id}`
+        const shareUrl = `${window.location.origin}/qna/${id}?lang=${selectedLang}`;
 
-        if (navigator.share) {
+        // Mobile native share
+        if (navigator.share && /Mobi|Android/i.test(navigator.userAgent)) {
             try {
                 await navigator.share({
                     title: "Al Ansar Weekly",
@@ -247,18 +254,21 @@ const ChatbotSection = () => {
                 });
                 return;
             } catch (err) {
-                console.error(err);
+                console.error("Share cancelled:", err);
             }
         }
 
-        await navigator.clipboard.writeText(shareUrl);
-        alert("Link copied")
-
-        window.open(
-            `https://wa.me/?text=${encodeURIComponent(shareUrl)}`,
-            "_blank"
-        );
+        // Desktop → copy only
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            setToast("Link copied to clipboard");
+            setTimeout(() => setToast(null), 2000);
+        } catch (err) {
+            setToast("Unable to copy link");
+            setTimeout(() => setToast(null), 2000);
+        }
     }
+
 
     const handleSend = async (textOverride = null) => {
         if (isLoading) return;
@@ -379,6 +389,14 @@ const ChatbotSection = () => {
 
     return (
         <section className="min-h-[70vh] flex flex-col items-center px-2">
+
+            {toast && (
+                <div className="fixed top-20 left-1/2 -translate-x-1/2 
+                    bg-blue-500 text-white text-sm px-4 py-2 
+                    rounded-full shadow-lg z-50">
+                    {toast}
+                </div>
+            )}
             <header className="text-center mb-4">
                 <h1 className="text-3xl font-extrabold">
                     {headings[selectedLang].title}
@@ -388,20 +406,7 @@ const ChatbotSection = () => {
                 </p>
             </header>
 
-            <div className="flex gap-2 mb-4">
-                {langs.map(l => (
-                    <button
-                        key={l.code}
-                        onClick={() => setSelectedLang(l.code)}
-                        className={`px-3 py-1 rounded-md font-semibold ${selectedLang === l.code
-                            ? "bg-indigo-600 text-white"
-                            : "bg-white border"
-                            }`}
-                    >
-                        {l.label}
-                    </button>
-                ))}
-            </div>
+
 
             <div className="bg-gray-100 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
                 <div

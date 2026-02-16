@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FiTrash2 } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 export default function ManageQnA() {
     const [items, setItems] = useState([]);
@@ -180,6 +181,7 @@ export default function ManageQnA() {
         return data.translated || "";
     }
 
+    //edit QnA saving
     async function saveChanges() {
         if (!selectedItem) return;
 
@@ -199,16 +201,23 @@ export default function ManageQnA() {
             })
         });
 
-        const text = await res.text();
-        console.log("UPDATE RESPONSE:", res.status, text);
-
         if (!res.ok) {
-            alert(`Save failed: ${text}`);
+            const errorText = await res.text();
+            toast.error("Save failed");
             return;
         }
 
-        const data = JSON.parse(text);
+        setItems(prev =>
+            prev.map(i =>
+                i.id === selectedItem.id ? { ...i, ...selectedItem } : i
+            )
+        );
+
+        setIsModalOpen(false);
+
+        toast.success("Changes saved");
     }
+
 
 
     /* -----------------------------

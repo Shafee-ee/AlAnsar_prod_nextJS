@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { generateEmbedding } from "@/lib/vertexEmbedding";
-
+import { translateText } from "@/lib/translate";
 
 function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
+function looksLikeEnglish(text = "") {
+    const q = normalize(text);
+
+    const englishMarkers = [
+        "how", "what", "when", "why",
+        "where", "who", "is", "are",
+        "can", "do", "does"
+    ];
+
+    return englishMarkers.some(word => q.startsWith(word));
+}
 
 function hasValidIntent(query = "") {
     const q = normalize(query);
@@ -87,8 +98,20 @@ export async function POST(req) {
         });
     }
 
+    let embeddingText = query;
 
-    const queryEmbedding = await generateEmbedding(query);
+    const shouldTranslate =
+        lang === "kn" || !looksLikeEnglish(query);
+
+    if (shouldTranslate) {
+        const translated = await translateText(query, "en");
+        if (translated) {
+            embeddingText = translateText;
+        }
+    }
+
+
+    const queryEmbedding = await generateEmbedding(embeddingText);
 
 
 
@@ -108,6 +131,7 @@ export async function POST(req) {
 
         const itemNorm = normalize(question);
 
+
         const confidenceScore = cosine(queryEmbedding, item.embedding);
 
         let rankScore = confidenceScore;
@@ -125,8 +149,32 @@ export async function POST(req) {
 
     scored.sort((a, b) => b.rankScore - a.rankScore);
     const best = scored[0];
+    const secondBest = scored[1];
 
-    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.22 : 0.28;
+    const semanticGap = secondBest ? best.confidenceScore - secondBest.confidenceScore : 0;
+
+    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.30 : 0.35;
+
+    const intentWords = ["how", "when", "who", "what", "where", "why"];
+
+
+    //intent words for stricter search
+    function extractIntent(text = "") {
+        const q = normalize(text);
+        return intentWords.find(w => q.startsWith(w));
+    }
+
+    const userIntent = extractIntent(qNorm);
+    const bestIntent = extractIntent(normalize(best?.question_en || ""));
+
+    if (userIntent && bestIntent && userIntent !== bestIntent) {
+        return NextResponse.json({
+            success: true,
+            noMatch: true,
+            reason: "intent_mismatch",
+        });
+    }
+
 
     const isExactOrNearMatch =
         normalize(best?.question_en || "") === qNorm ||
@@ -136,8 +184,11 @@ export async function POST(req) {
 
     if (
         !isKeywordQuery &&
-        !isExactOrNearMatch &&
-        (!best || best.confidenceScore < CONFIDENCE_THRESHOLD)
+        (
+            !best ||
+            best.confidenceScore < CONFIDENCE_THRESHOLD ||
+            semanticGap < 0.05
+        )
     ) {
         return NextResponse.json({
             success: true,
@@ -155,7 +206,7 @@ export async function POST(req) {
 
     for (const item of scored) {
         if (related.length === 3) break;
-        if (item.confidenceScore < 0.4) continue;
+        if (item.confidenceScore < 0.5) continue;
         if (seen.has(item.id)) continue;
 
         const qText =
@@ -174,7 +225,7 @@ export async function POST(req) {
     // ---------- EXPLORE MODE (keyword search) ----------
     if (isKeywordQuery) {
         const results = scored
-            .filter(i => i.confidenceScore > 0.18)
+            .filter(i => i.confidenceScore > 0.25)
             .slice(0, 5)
             .map(i => ({
                 id: i.id,

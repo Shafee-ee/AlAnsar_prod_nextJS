@@ -12,5 +12,13 @@ export async function translateText(text, targetLang) {
     );
 
     const data = await res.json();
-    return data?.data?.translations?.[0]?.translatedText || "";
+
+    const translated =
+        data?.data?.translations?.[0]?.translatedText || "";
+
+    console.log("Translating:", text);
+    console.log("Translated to:", targetLang);
+    console.log("Translation result:", translated);
+
+    return translated;
 }

@@ -100,16 +100,25 @@ export async function POST(req) {
 
     let embeddingText = query;
 
+
+
+
     const shouldTranslate =
         lang === "kn" || !looksLikeEnglish(query);
 
     if (shouldTranslate) {
         const translated = await translateText(query, "en");
         if (translated) {
-            embeddingText = translateText;
+            embeddingText = translated;
         }
     }
 
+    console.log("Lang:", lang);
+    console.log("looksLikeEnglish:", looksLikeEnglish(query));
+    console.log("shouldTranslate:", shouldTranslate);
+
+    console.log("Original query:", query);
+    console.log("Embedding text:", embeddingText);
 
     const queryEmbedding = await generateEmbedding(embeddingText);
 
@@ -164,7 +173,8 @@ export async function POST(req) {
         return intentWords.find(w => q.startsWith(w));
     }
 
-    const userIntent = extractIntent(qNorm);
+    const intentSource = normalize(embeddingText);
+    const userIntent = extractIntent(intentSource);
     const bestIntent = extractIntent(normalize(best?.question_en || ""));
 
     if (userIntent && bestIntent && userIntent !== bestIntent) {

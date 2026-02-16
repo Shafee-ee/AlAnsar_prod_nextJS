@@ -59,46 +59,28 @@ const Navbar = () => {
                     </div>
 
                     {/* Right Side */}
-                    <div className="flex items-center space-x-3">
-
-                        {/* Language Pill */}
-                        <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
-                            <button
-                                onClick={() => {
-                                    const params = new URLSearchParams(searchParams.toString());
-                                    params.set("lang", "en");
-                                    router.push(`${pathname}?${params.toString()}`);
-                                }}
-                                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'en'
-                                    ? 'bg-white text-[#0B4C8C]'
-                                    : 'text-white'
-                                    }`}
-                            >
-                                EN
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    const params = new URLSearchParams(searchParams.toString());
-                                    params.set("lang", "kn");
-                                    router.push(`${pathname}?${params.toString()}`);
-                                }} className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'kn'
-                                    ? 'bg-white text-[#0B4C8C]'
-                                    : 'text-white'
-                                    }`}
-                            >
-                                KN
-                            </button>
-                        </div>
-
-                        {/* Burger */}
+                    <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
                         <button
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-blue-100 hover:text-white hover:bg-blue-700/50 md:hidden"
+                            onClick={() => router.push(`${pathname}?lang=en`)}
+                            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'en'
+                                ? 'bg-white text-[#0B4C8C]'
+                                : 'text-white'
+                                }`}
                         >
-                            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            EN
+                        </button>
+
+                        <button
+                            onClick={() => router.push(`${pathname}?lang=kn`)}
+                            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'kn'
+                                ? 'bg-white text-[#0B4C8C]'
+                                : 'text-white'
+                                }`}
+                        >
+                            KN
                         </button>
                     </div>
+
                 </div>
             </div>
 

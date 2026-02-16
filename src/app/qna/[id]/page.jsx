@@ -2,7 +2,9 @@ import { adminDB } from "@/lib/firebaseAdmin";
 import { notFound } from "next/navigation";
 
 /* ---------- METADATA FUNCTION ---------- */
-export async function generateMetadata({ params, searchParams }) {
+export async function generateMetadata(props) {
+
+    const params = await props.params;
     const { id } = params;
 
     const docRef = adminDB.collection("qna_items").doc(id);
@@ -35,7 +37,10 @@ export async function generateMetadata({ params, searchParams }) {
 }
 
 /* ---------- PAGE COMPONENT ---------- */
-export default async function QnAPage({ params, searchParams }) {
+export default async function QnAPage(props) {
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+
     const { id } = params;
 
     if (!id) notFound();

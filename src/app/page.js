@@ -7,6 +7,7 @@ import ChatbotSection from "@/components/ChatbotSection";
 // import ArticleCarousel from "@/components/ArticleCarousel";
 // import { CATEGORIES_DATA } from "@/components/ArticleComponents";
 import { useLanguage } from "@/context/LanguageContext";
+import AskQuestionBox from "@/components/AskQuestionBox";
 
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
@@ -56,6 +57,10 @@ rounded-sm shadow-lg">
             <ChatbotSection />
           </div>
         </Suspense>
+        <div className="ask-wrapper">
+          <AskQuestionBox />
+        </div>
+
 
 
       </div>

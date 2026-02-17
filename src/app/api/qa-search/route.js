@@ -31,6 +31,20 @@ function cosine(a = [], b = []) {
     }
     return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
+
+function tokenOverlapScore(a = "", b = "") {
+    const aTokens = new Set(normalize(a).split(" "));
+    const bTokens = new Set(normalize(b).split(" "));
+
+    let overlap = 0;
+
+    for (const word of aTokens) {
+        if (bTokens.has(word)) overlap++;
+    }
+
+    return overlap / Math.max(aTokens.size, 1);
+}
+
 export async function POST(req) {
     const { query, lang = "en", excludeId } = await req.json();
 
@@ -62,6 +76,12 @@ export async function POST(req) {
         return qEN === qNorm || qKN === qNorm;
     });
 
+    const fuzzyMatchItem = items.find(item => {
+        const qEN = normalize(item.question_en || "");
+        const score = tokenOverlapScore(qEN, qNorm);
+        return score >= 0.80;
+    });
+
     if (exactMatchItem) {
         return NextResponse.json({
             success: true,
@@ -82,6 +102,29 @@ export async function POST(req) {
             related: [],
         });
     }
+
+    if (fuzzyMatchItem) {
+        return NextResponse.json({
+            success: true,
+            bestMatch: {
+                id: fuzzyMatchItem.id,
+                question:
+                    lang === "kn"
+                        ? fuzzyMatchItem.question_kn
+                        : fuzzyMatchItem.question_en,
+                answer:
+                    lang === "kn"
+                        ? fuzzyMatchItem.answer_kn
+                        : fuzzyMatchItem.answer_en,
+                score: 0.95,
+                editorNote_en: fuzzyMatchItem.editorNote_en || "",
+                editorNote_kn: fuzzyMatchItem.editorNote_kn || "",
+            },
+            related: [],
+        });
+    }
+
+
 
 
     // Intent gate ONLY for English full questions
@@ -166,11 +209,7 @@ export async function POST(req) {
     }
 
 
-    const isExactOrNearMatch =
-        normalize(best?.question_en || "") === qNorm ||
-        normalize(best?.question_kn || "") === qNorm ||
-        normalize(best?.question_en || "").includes(qNorm) ||
-        normalize(best?.question_kn || "").includes(qNorm);
+
 
     if (
         !isKeywordQuery &&

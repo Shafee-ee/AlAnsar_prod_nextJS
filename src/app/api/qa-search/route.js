@@ -7,17 +7,7 @@ function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
 }
 
-function looksLikeEnglish(text = "") {
-    const q = normalize(text);
 
-    const englishMarkers = [
-        "how", "what", "when", "why",
-        "where", "who", "is", "are",
-        "can", "do", "does"
-    ];
-
-    return englishMarkers.some(word => q.startsWith(word));
-}
 
 function hasValidIntent(query = "") {
     const q = normalize(query);
@@ -48,7 +38,16 @@ export async function POST(req) {
         return NextResponse.json({ success: false });
     }
 
-    const qNorm = normalize(query);
+    let embeddingText = query;
+
+    if (lang === "kn") {
+        const translated = await translateText(query, "en");
+        if (translated) {
+            embeddingText = translated;
+        }
+    }
+
+    const qNorm = normalize(embeddingText);
     const isKeywordQuery = qNorm.split(" ").length === 1;
     const isLongQuery = qNorm.length > 80;
 
@@ -98,27 +97,9 @@ export async function POST(req) {
         });
     }
 
-    let embeddingText = query;
+    //translate embedding
 
 
-
-
-    const shouldTranslate =
-        lang === "kn" || !looksLikeEnglish(query);
-
-    if (shouldTranslate) {
-        const translated = await translateText(query, "en");
-        if (translated) {
-            embeddingText = translated;
-        }
-    }
-
-    console.log("Lang:", lang);
-    console.log("looksLikeEnglish:", looksLikeEnglish(query));
-    console.log("shouldTranslate:", shouldTranslate);
-
-    console.log("Original query:", query);
-    console.log("Embedding text:", embeddingText);
 
     const queryEmbedding = await generateEmbedding(embeddingText);
 
@@ -131,8 +112,7 @@ export async function POST(req) {
 
 
     const scored = items.map(item => {
-        const question =
-            lang === "kn" ? item.question_kn : item.question_en;
+        const question = item.question_en;
 
         if (!question || !item.embedding) {
             return { ...item, rankScore: 0, confidenceScore: 0 };
@@ -162,7 +142,7 @@ export async function POST(req) {
 
     const semanticGap = secondBest ? best.confidenceScore - secondBest.confidenceScore : 0;
 
-    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.30 : 0.35;
+    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.23 : 0.28;
 
     const intentWords = ["how", "when", "who", "what", "where", "why"];
 
@@ -197,7 +177,7 @@ export async function POST(req) {
         (
             !best ||
             best.confidenceScore < CONFIDENCE_THRESHOLD ||
-            semanticGap < 0.05
+            semanticGap < 0.03
         )
     ) {
         return NextResponse.json({

@@ -10,7 +10,7 @@ import { useSearchParams } from 'next/navigation';
 
 const headings = {
     en: {
-        title: "Ask & See",
+        title: "Seek & Discover",
         subtitle: "Ask your Islamic questions here",
         disclaimer: "These answers are sourced from AlAnsar Weekly’s archive. Some English responses are translations of questions previously asked in the Keli Nodi section.",
     },

@@ -143,7 +143,6 @@ function EnglishContent() {
             <AboutSection
                 name="Unni Haji"
                 meta="The Silent Backbone of Al Ansar"
-                image="/legacy/unni-haji.jpeg"
             >
                 <p>
                     The continued survival of Al Ansar was made

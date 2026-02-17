@@ -37,11 +37,10 @@ export async function generateMetadata(props) {
 }
 
 /* ---------- PAGE COMPONENT ---------- */
-export default async function QnAPage(props) {
-    const params = await props.params;
-    const searchParams = await props.searchParams;
+export default async function QnAPage({ params, searchParams }) {
 
-    const { id } = params;
+    const { id } = await params;
+    const sp = await searchParams;
 
     if (!id) notFound();
 
@@ -53,14 +52,15 @@ export default async function QnAPage(props) {
     const data = snap.data();
 
     const lang =
-        searchParams?.lang === "en" || searchParams?.lang === "kn"
-            ? searchParams.lang
+        sp?.lang === "en" || sp?.lang === "kn"
+            ? sp.lang
             : data.lang_original || "kn";
 
     const question = lang === "en" ? data.question_en : data.question_kn;
     const answer = lang === "en" ? data.answer_en : data.answer_kn;
     const editorNote =
         lang === "en" ? data.editor_note_en : data.editor_note_kn;
+
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
@@ -87,18 +87,27 @@ export default async function QnAPage(props) {
                     <div className="mt-10 pt-6 border-t">
                         <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 text-center">
                             <p className="font-semibold text-indigo-900 mb-2">
-                                Have any Islamic question?
+                                {lang === "en"
+                                    ? "Have any Islamic question?"
+                                    : "ನಿಮಗೆ ಯಾವುದೇ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಯಿದೆಯೇ?"
+                                }
                             </p>
+
                             <p className="text-sm text-indigo-700 mb-4">
-                                Ask instantly through KELI NODI.
+                                {lang === "en"
+                                    ? "Ask instantly through KELI NODI."
+                                    : "ಕೆಳಿ ನೋಡಿ ಮೂಲಕ ತಕ್ಷಣ ಕೇಳಿ."
+                                }
                             </p>
+
                             <a
-                                href="/"
+                                href={`/?lang=${lang}`}
                                 className="inline-block bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition"
                             >
-                                Ask Now
+                                {lang === "en" ? "Ask Now" : "ಈಗ ಕೇಳಿ"}
                             </a>
                         </div>
+
                     </div>
 
                 </div>

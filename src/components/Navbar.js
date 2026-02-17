@@ -15,8 +15,12 @@ const Navbar = () => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const currentLang =
-        searchParams.get("lang") === "en" ? "en" : "kn";
+    const currentLang = React.useMemo(() => {
+        if (!searchParams) return "kn";
+        const lang = searchParams.get("lang");
+        return lang === "en" ? "en" : "kn";
+    }, [searchParams]);
+
 
     React.useEffect(() => {
         const handleResize = () => {

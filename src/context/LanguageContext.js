@@ -1,28 +1,23 @@
-'use client'
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext } from "react";
+import { useSearchParams } from "next/navigation";
 
-const LanguageContext = createContext()
+const LanguageContext = createContext({ lang: "kn" });
 
 export function LanguageProvider({ children }) {
-    const [lang, setLang] = useState('kn') // default Kannada
+    const searchParams = useSearchParams();
 
-    useEffect(() => {
-        const stored = localStorage.getItem('site-lang')
-        if (stored) setLang(stored)
-    }, [])
-
-    useEffect(() => {
-        localStorage.setItem('site-lang', lang)
-    }, [lang])
+    const lang =
+        searchParams?.get("lang") === "en" ? "en" : "kn";
 
     return (
-        <LanguageContext.Provider value={{ lang, setLang }}>
+        <LanguageContext.Provider value={{ lang }}>
             {children}
         </LanguageContext.Provider>
-    )
+    );
 }
 
 export function useLanguage() {
-    return useContext(LanguageContext)
+    return useContext(LanguageContext);
 }

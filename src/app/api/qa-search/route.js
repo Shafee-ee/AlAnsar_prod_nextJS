@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { generateEmbedding } from "@/lib/vertexEmbedding";
-import { translateText } from "@/lib/translate";
+import { geminiTranslate } from "@/lib/geminiTranslate";
 
 function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
@@ -54,12 +54,30 @@ export async function POST(req) {
 
     let embeddingText = query;
 
-    if (lang === "kn") {
-        const translated = await translateText(query, "en");
+    function isKannada(text = "") {
+        return /[\u0C80-\u0CFF]/.test(text);
+    }
+
+
+    if (isKannada(query)) {
+        const cleanedQuery = query.replace(/[“”‘’]/g, "").trim();
+
+        console.log("Original query:", query);
+        console.log("Cleaned query:", cleanedQuery);
+
+        const translated = await geminiTranslate(cleanedQuery, "en");
+        console.log("Translated text:", translated);
+
+
         if (translated) {
             embeddingText = translated;
+        } else {
+            embeddingText = cleanedQuery; // fallback
         }
+        console.log("Final embeddingText used for embedding:", embeddingText);
+
     }
+
 
     const qNorm = normalize(embeddingText);
     const isKeywordQuery = qNorm.split(" ").length === 1;
@@ -76,11 +94,7 @@ export async function POST(req) {
         return qEN === qNorm || qKN === qNorm;
     });
 
-    const fuzzyMatchItem = items.find(item => {
-        const qEN = normalize(item.question_en || "");
-        const score = tokenOverlapScore(qEN, qNorm);
-        return score >= 0.80;
-    });
+
 
     if (exactMatchItem) {
         return NextResponse.json({
@@ -103,26 +117,6 @@ export async function POST(req) {
         });
     }
 
-    if (fuzzyMatchItem) {
-        return NextResponse.json({
-            success: true,
-            bestMatch: {
-                id: fuzzyMatchItem.id,
-                question:
-                    lang === "kn"
-                        ? fuzzyMatchItem.question_kn
-                        : fuzzyMatchItem.question_en,
-                answer:
-                    lang === "kn"
-                        ? fuzzyMatchItem.answer_kn
-                        : fuzzyMatchItem.answer_en,
-                score: 0.95,
-                editorNote_en: fuzzyMatchItem.editorNote_en || "",
-                editorNote_kn: fuzzyMatchItem.editorNote_kn || "",
-            },
-            related: [],
-        });
-    }
 
 
 
@@ -208,9 +202,6 @@ export async function POST(req) {
         });
     }
 
-
-
-
     if (
         !isKeywordQuery &&
         (
@@ -219,12 +210,45 @@ export async function POST(req) {
             semanticGap < 0.03
         )
     ) {
+        // ----- FUZZY FALLBACK -----
+        const fuzzyMatchItem = items.find(item => {
+            const qEN = normalize(item.question_en || "");
+            const qKN = normalize(item.question_kn || "");
+
+            const enScore = tokenOverlapScore(qEN, qNorm);
+            const knScore = tokenOverlapScore(qKN, normalize(query));
+
+            return enScore >= 0.70 || knScore >= 0.70;
+        });
+
+        if (fuzzyMatchItem) {
+            return NextResponse.json({
+                success: true,
+                bestMatch: {
+                    id: fuzzyMatchItem.id,
+                    question:
+                        lang === "kn"
+                            ? fuzzyMatchItem.question_kn
+                            : fuzzyMatchItem.question_en,
+                    answer:
+                        lang === "kn"
+                            ? fuzzyMatchItem.answer_kn
+                            : fuzzyMatchItem.answer_en,
+                    score: 0.75,
+                    editorNote_en: fuzzyMatchItem.editorNote_en || "",
+                    editorNote_kn: fuzzyMatchItem.editorNote_kn || "",
+                },
+                related: [],
+            });
+        }
+
         return NextResponse.json({
             success: true,
             noMatch: true,
             reason: "low_confidence",
         });
     }
+
 
 
     const seen = new Set();

@@ -9,6 +9,8 @@ const primaryBlue = 'bg-[#0B4C8C]';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [highlight, setHighlight] = React.useState(true);
+
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -25,6 +27,16 @@ const Navbar = () => {
 
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
+
+
+    }, []);
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setHighlight(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
     }, []);
 
     return (
@@ -68,6 +80,10 @@ const Navbar = () => {
                                 }`}
                         >
                             EN
+
+                            {highlight && currentLang === 'en' && (
+                                <span className="lang-underline" />
+                            )}
                         </button>
 
                         <button
@@ -78,6 +94,9 @@ const Navbar = () => {
                                 }`}
                         >
                             KN
+                            {highlight && currentLang === 'kn' && (
+                                <span className="lang-underline" />
+                            )}
                         </button>
                     </div>
 
@@ -104,6 +123,8 @@ const Navbar = () => {
                     </Link>
                 </div>
             )}
+
+
         </nav>
     );
 };

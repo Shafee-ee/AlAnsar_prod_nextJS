@@ -1,16 +1,19 @@
 // src/app/about/page.jsx
+import Image from "next/image";
 
-export default async function AboutPage(props) {
-    const searchParams = await props.searchParams;
+export default async function AboutPage({ searchParams }) {
 
+    const params = await searchParams;
     const lang =
-        searchParams?.lang === "en" || searchParams?.lang === "kn"
-            ? searchParams.lang
+        params?.lang === "en" || params?.lang === "kn"
+            ? params.lang
             : "en";
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
-            <div className="max-w-4xl mx-auto space-y-16">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-20 px-4">
+            <div className="max-w-5xl mx-auto space-y-20">
+
+                <LegacyHeader lang={lang} />
 
                 {lang === "en" ? <EnglishContent /> : <KannadaContent />}
 
@@ -21,126 +24,247 @@ export default async function AboutPage(props) {
 
 
 /* ============================
-   ENGLISH
+   LEGACY HEADER
+============================ */
+
+function LegacyHeader({ lang }) {
+
+    const isKannada = lang === "kn";
+
+    return (
+        <div className="text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-[#1D3F9A]">
+                {isKannada ? "ನಮ್ಮ ಪರಂಪರೆ" : "Our Legacy"}
+            </h1>
+
+            <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed text-lg">
+                {isKannada
+                    ? "ಅಲ್ ಅನ್ಸಾರ್ ಮಹಾನ್ ಪಂಡಿತರು, ದೂರದೃಷ್ಟಿಯ ನಾಯಕರು ಮತ್ತು ಮೌನ ಸೇವಕರಿಂದ ನಿರ್ಮಿತವಾದ ದೃಢವಾದ ಅಡಿಪಾಯದ ಮೇಲೆ ನಿಂತಿದೆ. ಅವರು ಅಹ್ಲುಸ್ಸುನ್ನತ್‌ನ ಏಕತೆಯನ್ನು ಕಾಪಾಡಿ, ನಿಖರವಾದ ಜ್ಞಾನವನ್ನು ಹರಡುವ ಕಾರ್ಯದಲ್ಲಿ ತಮ್ಮ ಜೀವನವನ್ನು ಸಮರ್ಪಿಸಿದರು. ಅವರ ಸೇವಾ ಪರಂಪರೆ ಇಂದಿಗೂ ನಮ್ಮ ದಾರಿಯನ್ನು ಬೆಳಗಿಸುತ್ತದೆ."
+                    : "Al Ansar stands upon a foundation built by great scholars, visionary leaders, and silent contributors who safeguarded authentic knowledge and upheld the unity of Ahlus Sunnah. Their dedication continues to guide our mission today."
+                }
+            </p>
+
+            <div className="w-24 h-1 bg-[#1D3F9A] mx-auto rounded-full"></div>
+        </div>
+    );
+}
+
+/* ============================
+   ENGLISH CONTENT
 ============================ */
 
 function EnglishContent() {
     return (
         <>
             <AboutSection
-                name="Tajul Ulama Shaykhuna Abduyyid Alu Rahmana Al Bukhari Ustad Tanjeef"
-                meta="Hijri 1341–1435"
+                name="Tajul Ulama Sheikhuna Assayyid Abdurrahman Al Bukhari"
+                meta="1341–1435 AH | Widely known as ‘Ullal Thangal’"
+                image="/legacy/tajul-ulama.jpeg"
             >
                 <p>
-                    A distinguished scholar, Amir Nayib, leader of Ulama, mentor of scholars, and spiritual guide, Tajul Ulama Tanjeef Ustad was born on 25th Rabi'ul Awwal, Hijri 1341. He departed from this world on 30th Rabi'ul Awwal, Hijri 1435 at the age of 95.
+                    A preeminent scholar of the contemporary Muslim world
+                    and legendary leader of Ahlus Sunnah, Sheikhuna lived
+                    a blessed life of 95 years dedicated entirely to Islam.
                 </p>
 
                 <p>
-                    Sayyid Muhammad Al Bukhari dedicated his entire life to the service of Islam and to addressing societal challenges. Numerous madrasas were established, structured educational systems were created, and training programs for Imams and scholars were conducted.
+                    He belonged to the prestigious Bukhari family,
+                    tracing lineage to Sayyid Ahmad Jalaluddin Thangal,
+                    who brought the Prophetic family tradition to South India.
                 </p>
 
                 <p>
-                    Discipline, honesty, humility, devotion, and sacrifice were clearly reflected throughout his life. His works continue to inspire many people even today.
+                    After studying under renowned scholars including
+                    Kanniyat Ahmed Musliyar, he graduated first rank as
+                    ‘Baqavi’ (MFB) from Bakiyat, Vellore.
+                </p>
+
+                <p>
+                    Arriving in Ullal in 1951, he served as Mudarris
+                    for 20 years, became Principal in 1972, accepted
+                    the role of Qazi in 1978, and later served as
+                    President of Samastha from 1989 onward.
                 </p>
             </AboutSection>
 
+
             <AboutSection
-                name="Tajul Muhammad Bekal Ustad"
-                meta="Chief Editor of Al Ansar Newspaper (1949–2020)"
+                name="Tajul Fuqaha Bekal Ustad"
+                meta="1949–2020 | Chief Editor of Al Ansar (26 Years)"
+                image="/legacy/bekal-ustad.jpeg"
             >
                 <p>
-                    Born in 1949 near Adyar, Mangalore, he completed his religious education and was a disciple of Ibrahim Ustad.
+                    Born as P.M. Ibrahim in 1949, Bekal Ustad
+                    served as a teacher at Bekal Juma Masjid for
+                    40 years and later became Principal of
+                    Jamia Sa-adiya Sharia College.
                 </p>
 
                 <p>
-                    In 1976, he joined Al Ansar newspaper and later became its Chief Editor. He served for 26 years.
+                    He led Al Ansar as Chief Editor for 26 years,
+                    personally handling the respected “Keli Nodi”
+                    Q&A column.
                 </p>
 
                 <p>
-                    “Tajul Muhammad Bekal Ustad” will always be remembered.
+                    He was the first Beary-speaking Shafi’i scholar
+                    to hold the high office of Qazi,
+                    overseeing more than 150 localities.
                 </p>
             </AboutSection>
 
+
             <AboutSection
-                name="Muhammad Umar Ibrahim Nada Bavu"
-                meta="Chief Editor of Al Ansar Newspaper"
+                name="Tajul Umara Ibrahim Bava Haji"
+                meta="Founder of Al Ansar (1991)"
+                image="/legacy/bava-haji.jpeg"
             >
                 <p>
-                    Born in 1949 in Kodlipade near Bantwal, Mangalore district, he served in religious and social fields.
+                    A BSc graduate and committed social worker,
+                    Ibrahim Bava Haji founded Al Ansar in 1991
+                    during a time when authentic Sunni publications
+                    were scarce.
                 </p>
 
                 <p>
-                    Under his leadership, the newspaper progressed significantly.
+                    He personally reviewed every article before
+                    publication, ensuring doctrinal integrity
+                    and preventing social discord.
                 </p>
 
                 <p>
-                    His contributions to religious and social fields are immense.
+                    His vigilance preserved unity and ensured
+                    that Al Ansar remained a trusted source
+                    of correct guidance.
+                </p>
+            </AboutSection>
+
+
+            <AboutSection
+                name="Unni Haji"
+                meta="The Silent Backbone of Al Ansar"
+                image="/legacy/unni-haji.jpeg"
+            >
+                <p>
+                    The continued survival of Al Ansar was made
+                    possible by the unwavering support of Unni Haji,
+                    the brother-in-law and closest companion of
+                    Ibrahim Bava Haji.
+                </p>
+
+                <p>
+                    Though never officially listed, he handled
+                    fundraising and resolved operational challenges
+                    during times of financial hardship.
+                </p>
+
+                <p>
+                    He believed that as long as the magazine survived,
+                    the mission was fulfilled — placing purpose above recognition.
                 </p>
             </AboutSection>
         </>
     );
 }
 
-
-/* ============================
-   KANNADA
-============================ */
-
 function KannadaContent() {
     return (
         <>
             <AboutSection
-                name="ತಾಜುಲ್ ಉಲಮಾ ಶೈಖುನಾ ಅಬ್ದುಯ್ಯಿದ್ ಅಲು ರಹ್ಮಾ ನಾ ಅಲ್ ಬುಖಾರಿ ಉಸ್ತಾದ್ ತಂಜೀಫ್"
-                meta="ಹಿಜರಿ 1341–1435"
+                name="ತಾಜುಲ್ ಉಲಮಾ ಶೈಖುನಾ ಅಸ್ಸಯ್ಯಿದ್ ಅಬ್ದುರ್ರಹ್ಮಾನ್ ಅಲ್ ಬುಖಾರಿ"
+                meta="ಹಿಜ್ರಿ 1341–1435 | ‘ಉಳ್ಳಾಲ್ ತಂಗಳ್’ ಎಂದು ಪ್ರಸಿದ್ಧ"
+                image="/legacy/tajul-ulama.jpeg"
             >
                 <p>
-                    ಸಮುದಾಯದ ಮುನ್ನೋಟಿ ರಹೀಬ ಅಲಿಗದೇ ವಿದ್ವಾನ್, ಆಲಿಮ್ಸಜ್ಜದ ಅಮೀರ್ ನಾಯಬ್, ಉಲಮಾ ಲೀಡರ್, ಕಿರಿದ ಪಾಂಡಿತ ಅಗ್ಗಗಳ ನೇತಾರ, ಆಧ್ಯಾತ್ಮಿಕ ಸಂಯೋಜನದ ವಿದ್ವಾನ್ ತಾಜುಲ್ ಉಲಮಾ ತಂಜೀಫ್ ಉಸ್ತಾದ್ ತಂಜೀಫ್.
+                    ಸಮಕಾಲೀನ ಮುಸ್ಲಿಂ ಲೋಕದ ಪ್ರಖ್ಯಾತ ಪಂಡಿತರಾಗಿದ್ದು,
+                    ಅಹ್ಲುಸ್ಸುನ್ನತ್‌ನ ಮಹಾನ್ ನಾಯಕರಾಗಿ 95 ವರ್ಷಗಳ ಕಾಲ
+                    ಇಸ್ಲಾಮಿನ ಸೇವೆಗೆ ತಮ್ಮ ಜೀವನವನ್ನು ಅರ್ಪಿಸಿದರು.
                 </p>
 
                 <p>
-                    ಹಿಜರಿ 1341ರ ರಬೀಉಲ್ ಅವ್ವಲ್ 25ರಂದು ಭಾನುವಾರ ಹುಟ್ಟಿದ ಅವರು, 1435ರ ರಬೀಉಲ್ ಅವ್ವಲ್ 30ರಂದು 95ನೇ ಪ್ರಾಯದಲ್ಲಿ ತಮ್ಮ ಬದುಕಿನ ವಿದಾಯ ಹೇಳಿದರು.
+                    ಅವರು ಪ್ರಸಿದ್ಧ ಬುಖಾರಿ ವಂಶಕ್ಕೆ ಸೇರಿದವರು.
+                    ಸಯ್ಯಿದ್ ಅಹ್ಮದ್ ಜಲಾಲುದ್ದೀನ್ ತಂಗಳ್ ಅವರ ಮೂಲಕ
+                    ದಕ್ಷಿಣ ಭಾರತಕ್ಕೆ ಪ್ರವಾದಿ ವಂಶ ಪರಂಪರೆ ಬಂದಿತು.
                 </p>
 
                 <p>
-                    ಇಸ್ಲಾಮಿನ ಜ್ಞಾನವನ್ನು ಉಳಿಸುವ ಮತ್ತು ಪ್ರಚಾರ ಮಾಡುವ ಉದ್ದೇಶದಿಂದ ಅನೇಕ ಮದ್ರಸಾಗಳ ಸ್ಥಾಪನೆ, ಶಿಕ್ಷಣ ವ್ಯವಸ್ಥೆಯ ನಿರ್ಮಾಣ, ಇಮಾಮ್ ಮತ್ತು ಮೌಲ್ವಿಗಳ ತರಬೇತಿ ಕಾರ್ಯಕ್ರಮಗಳನ್ನು ನಡೆಸಲಾಯಿತು.
+                    ಕನ್ನಡಿಯತ್ ಅಹ್ಮದ್ ಮುಸ್ಲಿಯಾರ್ ಸೇರಿದಂತೆ ಮಹಾನ್ ಪಂಡಿತರ
+                    ಅಧೀನದಲ್ಲಿ ವಿದ್ಯಾಭ್ಯಾಸ ಮಾಡಿ, ವೆಲ್ಲೂರಿನ ಬಾಕಿಯಾತ್
+                    ಸಂಸ್ಥೆಯಿಂದ ‘ಬಾಖವಿ’ (MFB) ಪದವಿಯಲ್ಲಿ ಪ್ರಥಮ ರ್ಯಾಂಕ್ ಪಡೆದರು.
                 </p>
 
                 <p>
-                    ಶಿಸ್ತು, ಪ್ರಾಮಾಣಿಕತೆ, ವಿನಯ, ಧರ್ಮನಿಷ್ಠೆ ಮತ್ತು ತ್ಯಾಗಭಾವ ಅವರ ಜೀವನದಲ್ಲಿ ಸ್ಪಷ್ಟವಾಗಿ ಕಾಣಿಸಿಕೊಂಡವು.
+                    1951ರಲ್ಲಿ ಉಳ್ಳಾಲಿಗೆ ಆಗಮಿಸಿ 20 ವರ್ಷಗಳ ಕಾಲ ಮುದರ್ರಿಸ್ ಆಗಿ
+                    ಸೇವೆ ಸಲ್ಲಿಸಿದರು. 1972ರಲ್ಲಿ ಪ್ರಾಂಶುಪಾಲರಾದರು,
+                    1978ರಲ್ಲಿ ಖಾಜಿ ಸ್ಥಾನವನ್ನು ಸ್ವೀಕರಿಸಿದರು.
+                    1989ರಿಂದ ಸಮಸ್ತದ ಅಧ್ಯಕ್ಷರಾಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದರು.
                 </p>
             </AboutSection>
 
+
             <AboutSection
-                name="ತಾಜುಲ್ ಮುಹಮ್ಮದ್ ಬೇಕಲ್ ಉಸ್ತಾದ್"
-                meta="ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯ ಪ್ರಧಾನ ಸಂಪಾದಕರು (1949–2020)"
+                name="ತಾಜುಲ್ ಫುಖಹಾ ಬೆಕಲ್ ಉಸ್ತಾದ್"
+                meta="1949–2020 | ಅಲ್ ಅನ್ಸಾರ್ ಮುಖ್ಯ ಸಂಪಾದಕರು (26 ವರ್ಷ)"
+                image="/legacy/bekal-ustad.jpeg"
             >
                 <p>
-                    1949ರಲ್ಲಿ ಮಂಗಳೂರು ಬಳಿಯ ಅಡ್ಯಾರ್ ಸಮೀಪದ ಕೊಡ್ಲಿಪಾದೆಯಲ್ಲಿ ಹುಟ್ಟಿದ ಅವರು ಧಾರ್ಮಿಕ ಶಿಕ್ಷಣವನ್ನು ಸಂಪೂರ್ಣವಾಗಿ ಮುಗಿಸಿದ್ದರು.
+                    1949ರಲ್ಲಿ ಪಿ.ಎಂ. ಇಬ್ರಾಹಿಂ ಎಂಬ ಹೆಸರಿನಲ್ಲಿ ಜನಿಸಿದ ಅವರು,
+                    ಬೆಕಲ್ ಜುಮಾ ಮಸೀದಿಯಲ್ಲಿ 40 ವರ್ಷಗಳ ಕಾಲ ಗುರುಗಳಾಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದರು.
+                    ನಂತರ ಜಾಮಿಯಾ ಸಾದಿಯಾ ಶರಿಯಾ ಕಾಲೇಜಿನ ಪ್ರಾಂಶುಪಾಲರಾದರು.
                 </p>
 
                 <p>
-                    1976ರಲ್ಲಿ ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯ ಕಾರ್ಯದಲ್ಲಿ ತೊಡಗಿಸಿಕೊಂಡು ನಂತರ ಪ್ರಧಾನ ಸಂಪಾದಕರಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸಿದರು.
+                    26 ವರ್ಷಗಳ ಕಾಲ ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯ ಮುಖ್ಯ ಸಂಪಾದಕರಾಗಿ
+                    ಕಾರ್ಯನಿರ್ವಹಿಸಿ “ಕೆಳಿ ನೋಡಿ” ಪ್ರಶ್ನೋತ್ತರ ವಿಭಾಗವನ್ನು
+                    ಸ್ವತಃ ನಿರ್ವಹಿಸಿದರು.
                 </p>
 
                 <p>
-                    ಅವರ ಹೆಸರು ಸದಾಕಾಲವೂ ಸ್ಮರಣೀಯವಾಗಿರುತ್ತದೆ.
+                    150ಕ್ಕೂ ಹೆಚ್ಚು ಪ್ರದೇಶಗಳ ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡುತ್ತಿದ್ದ
+                    ಮೊದಲ ಬೀಯರಿ ಭಾಷಿಕ ಶಾಫಿಈ ಖಾಜಿಯಾಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದರು.
                 </p>
             </AboutSection>
 
+
             <AboutSection
-                name="ಮುಹಮ್ಮದ್ ಉಮರ್ ಇಬ್ರಾಹೀಂ ನಾದಾ ಬಾವು"
-                meta="ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯ ಪ್ರಧಾನ ಸಂಪಾದಕರು"
+                name="ತಾಜುಲ್ ಉಮರಾ ಇಬ್ರಾಹಿಂ ಬಾವಾ ಹಾಜಿ"
+                meta="ಅಲ್ ಅನ್ಸಾರ್ ಸ್ಥಾಪಕರು (1991)"
+                image="/legacy/bava-haji.jpeg"
             >
                 <p>
-                    1949ರಲ್ಲಿ ಮಂಗಳೂರು ಜಿಲ್ಲೆಯ ಬಂಟ್ವಾಳ ಸಮೀಪದ ಕೊಡ್ಲಿಪಾದೆಯಲ್ಲಿ ಜನಿಸಿದರು.
+                    ಬಿಎಸ್ಸಿ ಪದವೀಧರ ಮತ್ತು ಸಮರ್ಪಿತ ಸಮಾಜಸೇವಕರಾದ ಇಬ್ರಾಹಿಂ ಬಾವಾ ಹಾಜಿ,
+                    1991ರಲ್ಲಿ ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯನ್ನು ಸ್ಥಾಪಿಸಿದರು.
                 </p>
 
                 <p>
-                    ಅವರ ನಾಯಕತ್ವದಲ್ಲಿ ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆ ದೃಢವಾಗಿ ನಿಂತಿತು.
+                    ಸುನ್ನಿ ಸಿದ್ಧಾಂತಕ್ಕೆ ವಿರುದ್ಧವಾದ ಪ್ರಕಟಣೆಗಳು ಹರಡುತ್ತಿದ್ದ ಸಮಯದಲ್ಲಿ,
+                    ಸರಿಯಾದ ಮಾಹಿತಿಯನ್ನು ನೀಡುವ ಪರ್ಯಾಯವಾಗಿ ಈ ಪತ್ರಿಕೆಯನ್ನು ಆರಂಭಿಸಿದರು.
                 </p>
 
                 <p>
-                    ಅವರ ಸೇವೆ ಸದಾ ಸ್ಮರಣೀಯವಾಗಿರುತ್ತದೆ.
+                    ಪ್ರತಿಯೊಂದು ಲೇಖನವನ್ನು ಸ್ವತಃ ಪರಿಶೀಲಿಸಿ,
+                    ಸಮಾಜದಲ್ಲಿ ಭಿನ್ನಾಭಿಪ್ರಾಯ ಉಂಟುಮಾಡುವ ವಿಷಯಗಳನ್ನು ತಕ್ಷಣವೇ ರದ್ದುಪಡಿಸುತ್ತಿದ್ದರು.
+                </p>
+            </AboutSection>
+
+
+            <AboutSection
+                name="ಉನ್ನಿ ಹಾಜಿ"
+                meta="ಅಲ್ ಅನ್ಸಾರ್‌ನ ನಿಶ್ಶಬ್ದ ಬೆನ್ನೆಲುಬು"
+            >
+                <p>
+                    ಇಬ್ರಾಹಿಂ ಬಾವಾ ಹಾಜಿಯವರ ಆಪ್ತ ಸ್ನೇಹಿತ ಹಾಗೂ ಮಾವನಾಗಿ,
+                    ಅಲ್ ಅನ್ಸಾರ್ ಮುಂದುವರಿಯಲು ಪ್ರಮುಖ ಬೆಂಬಲ ನೀಡಿದವರು ಉನ್ನಿ ಹಾಜಿ.
+                </p>
+
+                <p>
+                    ಆರ್ಥಿಕ ಸಂಕಷ್ಟಗಳ ಸಂದರ್ಭದಲ್ಲಿ ನಿಧಿ ಸಂಗ್ರಹಿಸಿ,
+                    ಕಚೇರಿಯ ದೈನಂದಿನ ಸಮಸ್ಯೆಗಳನ್ನು ಪರಿಹರಿಸುತ್ತಿದ್ದರು.
+                </p>
+
+                <p>
+                    ತಮ್ಮ ಹೆಸರಿಗಿಂತ ಪತ್ರಿಕೆಯ ಉಳಿವು ಮುಖ್ಯವೆಂದು ನಂಬಿ,
+                    ಮಿಷನ್‌ಗಾಗಿ ಮೌನವಾಗಿ ಸೇವೆ ಸಲ್ಲಿಸಿದರು.
                 </p>
             </AboutSection>
         </>
@@ -152,21 +276,42 @@ function KannadaContent() {
    REUSABLE SECTION
 ============================ */
 
-function AboutSection({ name, meta, children }) {
+function AboutSection({ name, meta, image, children }) {
     return (
-        <div className="bg-white shadow-lg rounded-xl border border-gray-100 p-10">
+        <div className="bg-white hover:shadow-xl shadow-sm rounded-2xl border border-gray-100 p-10">
 
-            <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-[#1D3F9A] leading-snug">
-                    {name}
-                </h2>
-                <p className="text-gray-500 mt-2 text-sm tracking-wide">
-                    {meta}
-                </p>
-            </div>
+            <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
 
-            <div className="border-l-4 border-[#1D3F9A]/70 pl-6 space-y-4 text-gray-700 leading-relaxed text-[15px]">
-                {children}
+                <div className="relative w-48 h-56 flex-shrink-0">
+
+                    {image && (
+                        <div className="relative w-48 h-56 flex-shrink-0">
+                            <Image
+                                src={image}
+                                alt={name}
+                                fill
+                                className="object-cover rounded-xl shadow-md"
+                            />
+                        </div>)}
+                </div>
+
+                <div className="flex-1">
+
+                    <div className="mb-6">
+                        <h2 className="text-2xl md:text-3xl font-bold text-[#1D3F9A] leading-snug">
+                            {name}
+                        </h2>
+                        <p className="text-blue-500 mt-2 text-sm tracking-wide">
+                            {meta}
+                        </p>
+                    </div>
+
+                    <div className="border-l-4 border-[#1D3F9A]/70 pl-6 space-y-4 text-gray-700 leading-relaxed text-[15px]">
+                        {children}
+                    </div>
+
+                </div>
+
             </div>
 
         </div>

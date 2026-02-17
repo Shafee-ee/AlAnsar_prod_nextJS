@@ -21,6 +21,30 @@
   --foreground: #171717;
 }
 
+@keyframes langSlide {
+  0% {
+    transform: translateX(-40%);
+  }
+
+  50% {
+    transform: translateX(40%);
+  }
+
+  100% {
+    transform: translateX(-40%);
+  }
+}
+
+.lang-underline {
+  position: absolute;
+  bottom: -7px;
+  left: 40%;
+  height: 3px;
+  width: 40%;
+  background: #ffffff;
+  animation: langSlide 1.2s ease-in-out infinite;
+}
+
 
 
 @theme inline {

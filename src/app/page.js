@@ -1,20 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { Suspense } from "react";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import ChatbotSection from "@/components/ChatbotSection";
 // import ArticleCarousel from "@/components/ArticleCarousel";
 // import { CATEGORIES_DATA } from "@/components/ArticleComponents";
-import { useSearchParams } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
 
-  const searchParams = useSearchParams();
+  const { lang } = useLanguage();
 
-  const lang =
-    searchParams.get("lang") === "en" ? "en" : "kn";
 
 
   if (loading) {
@@ -52,10 +50,12 @@ rounded-sm shadow-lg">
         </section>
 
 
+        <Suspense fallback={null}>
 
-        <div className="bg-white rounded-xl shadow-md p-6 md:p-10">
-          <ChatbotSection />
-        </div>
+          <div className="bg-white rounded-xl shadow-md p-6 md:p-10">
+            <ChatbotSection />
+          </div>
+        </Suspense>
 
 
       </div>

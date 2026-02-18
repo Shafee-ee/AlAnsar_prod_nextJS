@@ -79,7 +79,7 @@ export default function AskQuestionBox({
                             onClick={() => setMode("input")}
                             className="px-6 py-3 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
                         >
-                            Submit another question
+                            Submit your question
                         </button>
                     </div>
                 )}
@@ -90,7 +90,7 @@ export default function AskQuestionBox({
                             placeholder="Type your question... to submit"
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
-                            className="w-full border border-gray-300 rounded-xl p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full border border-gray-300 rounded-xl p-4 text-gray-900 placeholder-gray-400 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                             rows={4}
                         />
 

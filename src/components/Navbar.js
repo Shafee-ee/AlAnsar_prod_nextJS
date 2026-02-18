@@ -140,7 +140,14 @@ const Navbar = () => {
                         onClick={() => setIsMenuOpen(false)}
                         className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
                     >
-                        About
+                        Pioneers
+                    </Link>
+                    <Link
+                        href="/about"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
+                    >
+                        Digital Paper
                     </Link>
                 </div>
             )}

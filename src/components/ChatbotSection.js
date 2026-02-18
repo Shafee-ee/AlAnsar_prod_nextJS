@@ -127,6 +127,8 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
                 </div>
             )}
 
+
+
             {!isSystem && isClose && (
                 <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
                     Close match
@@ -153,16 +155,43 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
                 </div>
             )}
 
-            <div className="flex justify-center gap-3 mb-3 text-xs">
+
+            <div className='flex justify-center mb-3 text-xs'>
+                <button
+                    onClick={() => onShare(best.id)}
+                    className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                >
+                    <Share2 className="w-3 h-3" /> Share
+                </button>
+
+
+            </div>
+
+            <div className="flex flex-col items-center gap-2 mb-3 text-xs">
+
+                {!isSystem && isHigh && (
+                    <div className="text-green-500">
+                        Not what you were looking for?
+                    </div>
+                )}
+
                 {!isSystem && isClose && (
-                    <>
+                    <div className="text-amber-600">
+                        This may not fully answer your question.
+                    </div>
+                )}
+
+                <div className="flex gap-3">
+                    {!isSystem && (
                         <button
                             onClick={onRephrase}
                             className="px-3 py-1 rounded-md bg-green-300 text-gray-700 hover:bg-gray-200"
                         >
                             Rephrase query
                         </button>
+                    )}
 
+                    {!isSystem && (
                         <button
                             onClick={() =>
                                 window.dispatchEvent(
@@ -175,41 +204,35 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
                         >
                             Submit Question
                         </button>
-                    </>
-                )}
-
-
-                <button
-                    onClick={() => onShare(best.id)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-                >
-                    <Share2 className="w-3 h-3" /> Share
-                </button>
+                    )}
+                </div>
             </div>
 
 
-            {result.relatedQuestions?.length > 0 && (
-                <div className="pt-3 border-t border-gray-100">
-                    <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
-                        <Search className="w-4 h-4 mr-2" />
-                        Related questions
-                    </div>
+            {
+                result.relatedQuestions?.length > 0 && (
+                    <div className="pt-3 border-t border-gray-100">
+                        <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
+                            <Search className="w-4 h-4 mr-2" />
+                            Related questions
+                        </div>
 
-                    <div className="space-y-2">
-                        {result.relatedQuestions.map((r, i) => (
-                            <button
-                                key={i}
-                                onClick={() => onRelatedClick(r.displayText)}
-                                className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
-                            >
-                                <MessageCircle className="w-3 h-3 inline mr-1" />
-                                {r.displayText}
-                            </button>
-                        ))}
+                        <div className="space-y-2">
+                            {result.relatedQuestions.map((r, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => onRelatedClick(r.displayText)}
+                                    className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
+                                >
+                                    <MessageCircle className="w-3 h-3 inline mr-1" />
+                                    {r.displayText}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 
@@ -446,7 +469,7 @@ const ChatbotSection = () => {
     };
 
     return (
-        <section className="min-h-[70vh] flex flex-col items-center px-2">
+        <section className="min-h-[70vh] flex flex-col items-center bg-blue-50 rounded-lg p-4">
 
             {toast && (
                 <div className="fixed top-20 left-1/2 -translate-x-1/2 
@@ -456,10 +479,10 @@ const ChatbotSection = () => {
                 </div>
             )}
             <header className="text-center mb-4">
-                <h1 className="text-3xl font-extrabold">
+                <h1 className="text-3xl text-blue-900 font-extrabold">
                     {headings[selectedLang].title}
                 </h1>
-                <p className="text-gray-500">
+                <p className="text-blue-500">
                     {headings[selectedLang].subtitle}
                 </p>
             </header>

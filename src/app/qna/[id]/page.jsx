@@ -1,5 +1,7 @@
 import { adminDB } from "@/lib/firebaseAdmin";
 import { notFound } from "next/navigation";
+import QnaShareButton from "@/components/QnaShareButton";
+
 
 /* ---------- METADATA FUNCTION ---------- */
 export async function generateMetadata(props) {
@@ -83,6 +85,11 @@ export default async function QnAPage({ params, searchParams }) {
                             {editorNote}
                         </div>
                     )}
+
+                    <div className="mt-8 flex justify-center">
+                        <QnaShareButton id={id} lang={lang} />
+                    </div>
+
 
                     <div className="mt-10 pt-6 border-t">
                         <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 text-center">

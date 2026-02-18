@@ -469,7 +469,7 @@ const ChatbotSection = () => {
     };
 
     return (
-        <section className="min-h-[70vh] flex flex-col items-center bg-blue-50 rounded-lg p-4">
+        <section className="min-h-[70vh] flex flex-col items-center bg-blue-0 rounded-lg p-4">
 
             {toast && (
                 <div className="fixed top-20 left-1/2 -translate-x-1/2 
@@ -489,7 +489,7 @@ const ChatbotSection = () => {
 
 
 
-            <div className="bg-gray-100 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
+            <div className="bg-gray-50 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
                 <div
                     ref={chatRef}
                     className="flex-grow px-4 py-6 overflow-y-auto flex flex-col"

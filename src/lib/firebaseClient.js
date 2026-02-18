@@ -1,5 +1,5 @@
-// src/lib/firebaseClient.js
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -7,8 +7,9 @@ const firebaseConfig = {
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
 };
 
-// named export (used in some places)
-export const app = initializeApp(firebaseConfig);
+const app = !getApps().length
+    ? initializeApp(firebaseConfig)
+    : getApps()[0];
 
-// default export (used by the AuthProvider below)
+export const db = getFirestore(app);
 export default app;

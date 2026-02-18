@@ -46,6 +46,9 @@ export default function AdminLayout({ children }) {
                     <a href="/admin/articles" className="block text-gray-700 hover:text-black">
                         Articles
                     </a>
+                    <a href="/admin/qna/qna-submissions" className="block text-gray-700 hover:text-black">
+                        Submitted Questions
+                    </a>
                 </nav>
             </aside>
 

@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function AskQuestionBox() {
+export default function AskQuestionBox({
+    initialQuestion = "",
+    forceOpen = false,
+    onClose
+}) {
     const [mode, setMode] = useState("collapsed");
     const [question, setQuestion] = useState("");
     const [email, setEmail] = useState("");
@@ -11,7 +15,21 @@ export default function AskQuestionBox() {
         setQuestion("");
         setEmail("");
 
+        if (onClose) {
+            onClose();
+        }
+
     };
+
+    useEffect(() => {
+        if (forceOpen) {
+            setMode("input");
+            if (initialQuestion) {
+                setQuestion(initialQuestion);
+            }
+        }
+    }, [forceOpen, initialQuestion]);
+
 
     const submitQuestion = async (isAnonymousChoice) => {
         try {
@@ -61,7 +79,7 @@ export default function AskQuestionBox() {
                             onClick={() => setMode("input")}
                             className="px-6 py-3 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition"
                         >
-                            Ask Us / Keli Nodi
+                            Submit another question
                         </button>
                     </div>
                 )}
@@ -103,20 +121,19 @@ export default function AskQuestionBox() {
                         <button
                             disabled={loading}
                             onClick={() => submitQuestion(true)}
-                            className="w-full py-3 rounded-lg border border-gray-300 hover:bg-gray-50 transition"
+                            className="w-full py-3 rounded-lg border border-gray-300 hover:bg-red-400 bg-red-300 transition"
                         >
                             {loading ? "Submitting..." : "Submit anonymously"}
                         </button>
-
-                        <p className=" text-sm text-gray-500">
-                            Your question will be reviewed and, if approved, added to our database.
-                            Please check the chatbot in 3–5 business days.
+                        <p className=" text-sm text-gray-500 ">
+                            ** Your question will be reviewed and, if approved, added to our database.
+                            Please check the Page in 3–5 business days.
                         </p>
 
                         <div className="space-y-3">
                             <input
                                 type="email"
-                                placeholder="Email ID here. we will get in touch with you"
+                                placeholder="Enter your email address if you would like us to respond to you directly."
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -143,12 +160,12 @@ export default function AskQuestionBox() {
                             Your question has been submitted for review.
                         </p>
 
-                        <button
+                        {/* <button
                             onClick={reset}
                             className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition"
                         >
                             Ask another question
-                        </button>
+                        </button> */}
                     </div>
                 )}
 

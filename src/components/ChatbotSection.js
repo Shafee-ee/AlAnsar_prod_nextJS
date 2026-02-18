@@ -77,16 +77,42 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
         "";
 
 
-    if (!best) {
+    if (result?.noMatch) {
         return (
             <div className="bg-gray-50 text-gray-700 p-4 rounded-xl border">
-                <p className="font-semibold mb-1">No confident answer found</p>
-                <p className="text-sm">
+                <p className="font-semibold mb-2">
+                    No confident answer found
+                </p>
+
+                <p className="text-sm mb-4">
                     We couldn’t find a reliable answer for <b>"{query}"</b>.
                 </p>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={() => onRephrase(query)}
+                        className="px-3 py-1 rounded-md bg-green-400 hover:bg-green-500 text-sm"
+                    >
+                        Rephrase query
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            window.dispatchEvent(
+                                new CustomEvent("trigger-ask-question", {
+                                    detail: { question: query }
+                                })
+                            )
+                        }
+                        className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm"
+                    >
+                        Submit Question
+                    </button>
+                </div>
             </div>
         );
     }
+
 
     const score = best.score ?? 0;
     const isHigh = score >= CONFIDENCE.HIGH;
@@ -129,14 +155,29 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
 
             <div className="flex justify-center gap-3 mb-3 text-xs">
                 {!isSystem && isClose && (
-                    <button
-                        onClick={onRephrase}
-                        className="px-3 py-1 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200"
-                        title="Rephrase your question"
-                    >
-                        ✏️ Rephrase
-                    </button>
+                    <>
+                        <button
+                            onClick={onRephrase}
+                            className="px-3 py-1 rounded-md bg-green-300 text-gray-700 hover:bg-gray-200"
+                        >
+                            Rephrase query
+                        </button>
+
+                        <button
+                            onClick={() =>
+                                window.dispatchEvent(
+                                    new CustomEvent("trigger-ask-question", {
+                                        detail: { question: query }
+                                    })
+                                )
+                            }
+                            className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                        >
+                            Submit Question
+                        </button>
+                    </>
                 )}
+
 
                 <button
                     onClick={() => onShare(best.id)}
@@ -327,6 +368,23 @@ const ChatbotSection = () => {
 
             //console remove
             const data = await res.json();
+
+            if (data.noMatch) {
+                setMessages(prev => [
+                    ...prev,
+                    {
+                        type: "bot",
+                        result: {
+                            noMatch: true
+                        },
+                        query: queryText,
+                    }
+                ]);
+
+                setIsLoading(false);
+                return;
+            }
+
             console.log("Best match ID:", data.bestMatch?.id);
 
 

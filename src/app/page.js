@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect, useRef } from "react";
 import { Loader } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import ChatbotSection from "@/components/ChatbotSection";
@@ -11,9 +11,25 @@ import AskQuestionBox from "@/components/AskQuestionBox";
 
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
-
+  const [showAskBox, setShowAskBox] = useState(false);
+  const [prefillQuestion, setPrefillQuestion] = useState("");
+  const askRef = useRef(null);
   const { lang } = useLanguage();
 
+  useEffect(() => {
+    function handler(e) {
+      setPrefillQuestion(e.detail.question);
+      setShowAskBox(true);
+
+      requestAnimationFrame(() => {
+        askRef.current?.scrollIntoView({ behavior: "smooth" });
+      });
+    }
+
+    window.addEventListener("trigger-ask-question", handler);
+    return () =>
+      window.removeEventListener("trigger-ask-question", handler);
+  }, []);
 
 
   if (loading) {
@@ -57,9 +73,16 @@ rounded-sm shadow-lg">
             <ChatbotSection />
           </div>
         </Suspense>
-        <div className="ask-wrapper">
-          <AskQuestionBox />
+        <div ref={askRef} className="ask-wrapper">
+          {showAskBox && (
+            <AskQuestionBox
+              initialQuestion={prefillQuestion}
+              forceOpen={true}
+              onClose={() => setShowAskBox(false)}
+            />
+          )}
         </div>
+
 
 
 

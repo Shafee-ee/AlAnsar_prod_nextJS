@@ -10,18 +10,18 @@ import Footer from "./Footer";
 
 export default function ClientAppWrapper({ children }) {
     return (
-        <LanguageProvider>
-
-            <AuthProviderWrapper>
-                <div className="flex flex-col min-h-screen">
-                    <Suspense fallback={null}>
+        <Suspense fallback={null}>
+            <LanguageProvider>
+                <AuthProviderWrapper>
+                    <div className="flex flex-col min-h-screen">
                         <Navbar />
-                    </Suspense>
-                    <main className="flex-grow">{children}</main>
-                    <Footer />
-                </div>
-            </AuthProviderWrapper>
-        </LanguageProvider>
+                        <main className="flex-grow">{children}</main>
+                        <Footer />
+                    </div>
+                </AuthProviderWrapper>
+            </LanguageProvider>
+        </Suspense>
+
 
     );
 }

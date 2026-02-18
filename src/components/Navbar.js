@@ -109,7 +109,7 @@ const Navbar = () => {
                         </Link>
 
                         <Link
-                            href="/about"
+                            href="/digipaper"
                             className="text-blue-100 hover:text-white text-lg font-medium transition"
                         >
                             Digital paper
@@ -117,9 +117,23 @@ const Navbar = () => {
                     </div>
 
                     {/* Right Side */}
-                    <Suspense fallback={null}>
-                        <LanguageSwitcher highlight={highlight} />
-                    </Suspense>
+                    <div className="flex items-center gap-3">
+
+                        <Suspense fallback={null}>
+                            <LanguageSwitcher highlight={highlight} />
+                        </Suspense>
+
+                        {/* Mobile Burger */}
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="md:hidden text-white"
+                            aria-label="Toggle menu"
+                        >
+                            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
+
+                    </div>
+
 
                 </div>
             </div>
@@ -143,7 +157,7 @@ const Navbar = () => {
                         Pioneers
                     </Link>
                     <Link
-                        href="/about"
+                        href="/digipaper"
                         onClick={() => setIsMenuOpen(false)}
                         className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
                     >

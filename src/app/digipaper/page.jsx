@@ -26,7 +26,7 @@ export default async function DigiPaperListing() {
                                 alt={issue.title}
                                 className="w-full h-auto"
                             />
-                            <h3 className="mt-3 font-semibold text-center">
+                            <h3 className="mt-3 font-semibold text-gray-800 text-center">
                                 {issue.title}
                             </h3>
                         </div>

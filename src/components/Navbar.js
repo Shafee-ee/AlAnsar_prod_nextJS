@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
@@ -7,10 +7,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 const primaryBlue = 'bg-[#0B4C8C]';
 
-const Navbar = () => {
-    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-    const [highlight, setHighlight] = React.useState(true);
-
+function LanguageSwitcher({ highlight }) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -20,6 +17,44 @@ const Navbar = () => {
         const lang = searchParams.get("lang");
         return lang === "en" ? "en" : "kn";
     }, [searchParams]);
+
+    return (
+        <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
+            <button
+                onClick={() => router.push(`${pathname}?lang=en`)}
+                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'en'
+                    ? 'bg-white text-[#0B4C8C]'
+                    : 'text-white'
+                    }`}
+            >
+                EN
+                {highlight && currentLang === 'en' && (
+                    <span className="lang-underline" />
+                )}
+            </button>
+
+            <button
+                onClick={() => router.push(`${pathname}?lang=kn`)}
+                className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'kn'
+                    ? 'bg-white text-[#0B4C8C]'
+                    : 'text-white'
+                    }`}
+            >
+                KN
+                {highlight && currentLang === 'kn' && (
+                    <span className="lang-underline" />
+                )}
+            </button>
+        </div>
+    );
+}
+
+
+const Navbar = () => {
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+    const [highlight, setHighlight] = React.useState(true);
+
+
 
 
     React.useEffect(() => {
@@ -82,34 +117,9 @@ const Navbar = () => {
                     </div>
 
                     {/* Right Side */}
-                    <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
-                        <button
-                            onClick={() => router.push(`${pathname}?lang=en`)}
-                            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'en'
-                                ? 'bg-white text-[#0B4C8C]'
-                                : 'text-white'
-                                }`}
-                        >
-                            EN
-
-                            {highlight && currentLang === 'en' && (
-                                <span className="lang-underline" />
-                            )}
-                        </button>
-
-                        <button
-                            onClick={() => router.push(`${pathname}?lang=kn`)}
-                            className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${currentLang === 'kn'
-                                ? 'bg-white text-[#0B4C8C]'
-                                : 'text-white'
-                                }`}
-                        >
-                            KN
-                            {highlight && currentLang === 'kn' && (
-                                <span className="lang-underline" />
-                            )}
-                        </button>
-                    </div>
+                    <Suspense fallback={null}>
+                        <LanguageSwitcher highlight={highlight} />
+                    </Suspense>
 
                 </div>
             </div>

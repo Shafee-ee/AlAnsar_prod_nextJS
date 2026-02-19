@@ -21,6 +21,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
+
         {/* ClientAppWrapper is a client component that includes AuthProvider, Navbar, Footer */}
         <ClientAppWrapper>{children}</ClientAppWrapper>
       </body>

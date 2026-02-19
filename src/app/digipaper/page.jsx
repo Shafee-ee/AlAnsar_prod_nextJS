@@ -1,8 +1,13 @@
 import { adminDB } from "@/lib/firebaseAdmin"; // adjust path if needed
+
 import Link from "next/link";
 
 export default async function DigiPaperListing() {
-    const snapshot = await adminDB.collection("digipaper_issues").get();
+    const snapshot = await adminDB
+        .collection("digipaper_issues")
+        .where("status", "==", "published")
+        .orderBy("publishDate", "desc")
+        .get();
 
     const issues = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -20,9 +25,7 @@ export default async function DigiPaperListing() {
                     >
                         <div className="p-4">
                             <img
-                                src={`https://firebasestorage.googleapis.com/v0/b/${process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}/o/${encodeURIComponent(
-                                    `${issue.basePath}/AlAnsarRamzan Special-1.webp`
-                                )}?alt=media`}
+                                src={issue.coverImageUrl}
                                 alt={issue.title}
                                 className="w-full h-auto"
                             />

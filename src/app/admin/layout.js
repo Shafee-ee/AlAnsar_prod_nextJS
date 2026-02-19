@@ -49,6 +49,9 @@ export default function AdminLayout({ children }) {
                     <a href="/admin/qna/qna-submissions" className="block text-gray-700 hover:text-black">
                         Submitted Questions
                     </a>
+                    <a href="/admin/digipaper" className="block text-gray-700 hover:text-black">
+                        Manage Digipaper
+                    </a>
                 </nav>
             </aside>
 

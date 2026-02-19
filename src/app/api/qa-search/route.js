@@ -61,12 +61,7 @@ export async function POST(req) {
 
     if (isKannada(query)) {
         const cleanedQuery = query.replace(/[“”‘’]/g, "").trim();
-
-        console.log("Original query:", query);
-        console.log("Cleaned query:", cleanedQuery);
-
         const translated = await geminiTranslate(cleanedQuery, "en");
-        console.log("Translated text:", translated);
 
 
         if (translated) {
@@ -74,7 +69,6 @@ export async function POST(req) {
         } else {
             embeddingText = cleanedQuery; // fallback
         }
-        console.log("Final embeddingText used for embedding:", embeddingText);
 
     }
 
@@ -179,9 +173,10 @@ export async function POST(req) {
 
     const semanticGap = secondBest ? best.confidenceScore - secondBest.confidenceScore : 0;
 
-    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.23 : 0.28;
+    const CONFIDENCE_THRESHOLD = isLongQuery ? 0.23 : 0.25;
 
     const intentWords = ["how", "when", "who", "what", "where", "why"];
+
 
 
     //intent words for stricter search
@@ -194,7 +189,14 @@ export async function POST(req) {
     const userIntent = extractIntent(intentSource);
     const bestIntent = extractIntent(normalize(best?.question_en || ""));
 
-    if (userIntent && bestIntent && userIntent !== bestIntent) {
+
+
+    if (
+        !isKannada(query) &&
+        userIntent &&
+        bestIntent &&
+        userIntent !== bestIntent
+    ) {
         return NextResponse.json({
             success: true,
             noMatch: true,
@@ -202,13 +204,15 @@ export async function POST(req) {
         });
     }
 
+
     if (
         !isKeywordQuery &&
         (
             !best ||
             best.confidenceScore < CONFIDENCE_THRESHOLD ||
-            semanticGap < 0.03
+            (best.confidenceScore < 0.32 && semanticGap < 0.03)
         )
+
     ) {
         // ----- FUZZY FALLBACK -----
         const fuzzyMatchItem = items.find(item => {
@@ -248,7 +252,6 @@ export async function POST(req) {
             reason: "low_confidence",
         });
     }
-
 
 
     const seen = new Set();

@@ -19,41 +19,44 @@ function cosine(a = [], b = []) {
 
 
 /* ---------- METADATA FUNCTION ---------- */
-export async function generateMetadata(props) {
-
-    const params = await props.params;
+export async function generateMetadata({ params }) {
     const { id } = params;
 
-    const docRef = adminDB.collection("qna_items").doc(id);
-    const snap = await docRef.get();
-    const data = snap.data();
+    const doc = await adminDB.collection("qna_items").doc(id).get();
+    const data = doc.data();
 
+    if (!data) return {};
 
-    if (!snap.exists) {
-        return {};
-    }
+    const title = `${data.question_en} | Al Ansar Weekly`;
+    const description = data.answer_en.slice(0, 155);
 
+    const url = `https://www.alansarweekly.com/qna/${id}`;
 
     return {
-        title: data.question_en,
-        description: data.answer_en.slice(0, 155),
+        title,
+        description,
         openGraph: {
-            title: `${data.question_en} | Al Ansar Weekly`,
-            description: data.answer_en.slice(0, 155),
-            url: `https://www.alansarweekly.com/qna/${id}`,
+            title,
+            description,
+            url,
             siteName: "Al Ansar Weekly",
-            type: "article",
             images: [
                 {
-                    url: `https://www.alansarweekly.com/qna/${id}/opengraph-image`,
+                    url: `${url}/opengraph-image`,
                     width: 1200,
                     height: 630,
                 },
             ],
+            type: "article",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title,
+            description,
+            images: [`${url}/opengraph-image`],
         },
     };
 }
-
 
 
 export default async function QnAPage({ params, searchParams }) {

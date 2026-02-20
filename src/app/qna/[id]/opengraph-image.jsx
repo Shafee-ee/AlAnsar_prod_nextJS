@@ -38,8 +38,8 @@ export default async function Image({ params }) {
                     style={{
                         position: "absolute",
                         inset: 0,
-                        width: "100%",
-                        height: "100%",
+                        width: 1200,
+                        height: 680,
                         objectFit: "cover",
                     }}
                 />

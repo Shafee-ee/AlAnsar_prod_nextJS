@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
 
 export const size = {
-    width: 1100,
-    height: 578,
+    width: 1200,
+    height: 630,
 };
 
 export const contentType = "image/jpeg";
@@ -42,7 +42,9 @@ export default async function Image({ params }) {
                     style={{
                         position: "absolute",
                         inset: 0,
-                        background: "rgba(0,0,0,0.25)"
+                        width: 1200,
+                        height: 630,
+                        objectFit: "cover",
                     }}
                 />
 

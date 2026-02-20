@@ -36,10 +36,10 @@ export async function generateMetadata(props) {
 
     return {
         title: data.question_en,
-        description: data.answer_en.slice(0, 200),
+        description: data.answer_en.slice(0, 155),
         openGraph: {
-            title: data.question_en,
-            description: data.answer_en.slice(0, 160),
+            title: `${data.question_en} | Al Ansar Weekly`,
+            description: data.answer_en.slice(0, 155),
             url: `https://www.alansarweekly.com/qna/${id}`,
             siteName: "Al Ansar Weekly",
             type: "article",

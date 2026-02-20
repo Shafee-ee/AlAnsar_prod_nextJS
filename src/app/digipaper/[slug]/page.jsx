@@ -14,7 +14,13 @@ export default function EpaperViewer({ params }) {
         const fetchIssue = async () => {
             const snap = await getDoc(doc(db, "digipaper_issues", slug));
             if (snap.exists()) {
-                setIssue(snap.data());
+                const data = snap.data();
+
+                if (data.status !== "published") {
+                    return;
+                }
+
+                setIssue(data);
             }
         };
 
@@ -35,11 +41,19 @@ export default function EpaperViewer({ params }) {
                 </Link>
             </div>
 
-            <div className="w-full max-w-5xl h-[90vh]">
-                <iframe
-                    src={issue.pdfUrl}
-                    className="w-full h-full"
-                />
+            <div className="w-full max-w-5xl px-4 py-10 space-y-4">
+
+                <a
+                    href={issue.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center bg-blue-600 text-white py-4 rounded text-lg"
+                >
+                    Open PDF
+                </a>
+
+
+
             </div>
 
         </div>

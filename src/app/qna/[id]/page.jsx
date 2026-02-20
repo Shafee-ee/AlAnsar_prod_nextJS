@@ -11,12 +11,13 @@ export async function generateMetadata(props) {
 
     const docRef = adminDB.collection("qna_items").doc(id);
     const snap = await docRef.get();
+    const data = snap.data();
+
 
     if (!snap.exists) {
         return {};
     }
 
-    const data = snap.data();
 
     return {
         title: data.question_en,
@@ -53,6 +54,18 @@ export default async function QnAPage({ params, searchParams }) {
 
     const data = snap.data();
 
+
+    const defaultImages = [
+        "/default-image/default-qna1.jpg",
+        "/default-image/default-qna2.jpg",
+        "/default-image/default-qna3.jpg",
+    ];
+
+    const randomDefault =
+        defaultImages[Math.floor(Math.random() * defaultImages.length)];
+
+    const imageUrl = data.imageUrl || randomDefault;
+
     const lang =
         sp?.lang === "en" || sp?.lang === "kn"
             ? sp.lang
@@ -68,7 +81,26 @@ export default async function QnAPage({ params, searchParams }) {
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
             <div className="max-w-3xl mx-auto">
                 <div className="bg-white shadow-xl rounded-2xl border border-gray-100 p-8">
+                    <div className="w-full mb-8">
+                        <div className="w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow">
+                            <img
+                                src={imageUrl}
+                                alt={question}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    </div>
 
+                    <div className="mb-6 text-sm text-gray-600 border-l-4 border-blue-200 pl-4">
+                        <p className="font-medium text-gray-800 mb-1">
+                            Archive Source
+                        </p>
+                        <p>
+                            These answers are sourced from Al Ansar Weekly’s archive. Some English
+                            responses are translations of questions previously asked in the Keli
+                            Nodi section.
+                        </p>
+                    </div>
                     <h1 className="text-2xl font-semibold mb-6 leading-snug text-gray-900">
                         {question}
                     </h1>

@@ -40,9 +40,8 @@ export async function generateMetadata(props) {
         openGraph: {
             title: data.question_en,
             description: data.answer_en.slice(0, 200),
-            url: `https://alansarweekly.com/qna/${id}`,
+            url: `https://alansarweekly.com/qna/${id}/openGraph-image`,
             siteName: "Al Ansar Weekly",
-
             type: "article",
         },
     };

@@ -6,12 +6,14 @@ export const size = {
 };
 
 export const contentType = "image/png";
-
-// Force Node runtime instead of Edge
 export const runtime = "nodejs";
 
 export default async function Image({ params }) {
-    const question = "Al Ansar Weekly";
+    const question = "Is it better to break the fast as soon as the adhan starts or after the adhan finishes?";
+
+    const bg = await fetch(
+        new URL("/default-image/default-image-qna", process.env.NEXT_PUBLIC_SITE_URL)
+    ).then((res) => res.arrayBuffer());
 
     return new ImageResponse(
         (
@@ -19,18 +21,31 @@ export default async function Image({ params }) {
                 style={{
                     width: "100%",
                     height: "100%",
-                    background: "#0B3D91",
+                    position: "relative",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    padding: "80px",
-                    color: "white",
-                    fontSize: 48,
-                    fontWeight: 600,
+                    padding: "120px 120px 80px 120px",
                     textAlign: "center",
+                    color: "white",
+                    fontSize: 52,
+                    fontWeight: 500,
                 }}
             >
-                {question}
+                <img
+                    src={bg}
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                    }}
+                />
+
+                <div style={{ position: "relative", zIndex: 1 }}>
+                    {question}
+                </div>
             </div>
         ),
         { ...size }

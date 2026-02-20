@@ -39,10 +39,17 @@ export async function generateMetadata(props) {
         description: data.answer_en.slice(0, 200),
         openGraph: {
             title: data.question_en,
-            description: data.answer_en.slice(0, 200),
-            url: `https://alansarweekly.com/qna/${id}/openGraph-image`,
+            description: data.answer_en.slice(0, 160),
+            url: `https://www.alansarweekly.com/qna/${id}`,
             siteName: "Al Ansar Weekly",
             type: "article",
+            images: [
+                {
+                    url: `https://www.alansarweekly.com/qna/${id}/opengraph-image`,
+                    width: 1200,
+                    height: 630,
+                },
+            ],
         },
     };
 }

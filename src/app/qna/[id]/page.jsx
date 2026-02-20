@@ -27,9 +27,19 @@ export async function generateMetadata({ params }) {
 
     if (!data) return {};
 
-    const title = `${data.question_en} | Al Ansar Weekly`;
-    const description = data.answer_en.slice(0, 155);
+    const rawQuestion = data.question_en || "Al Ansar Weekly";
 
+    const shortenedQuestion =
+        rawQuestion.length > 60
+            ? rawQuestion.slice(0, 57) + "..."
+            : rawQuestion;
+
+
+    const title = `${shortenedQuestion} | Al Ansar Weekly`;
+    const description = (data.answer_en || "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 155);
     const url = `https://www.alansarweekly.com/qna/${id}`;
 
     return {

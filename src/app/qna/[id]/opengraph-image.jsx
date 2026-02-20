@@ -10,9 +10,10 @@ export const runtime = "nodejs";
 
 export default async function Image({ params }) {
     const question = "Is it better to break the fast as soon as the adhan starts or after the adhan finishes?";
+    const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.alansarweekly.com';
 
     const bg = await fetch(
-        new URL("/default-image/default-image-qna", process.env.NEXT_PUBLIC_SITE_URL)
+        new URL('/default-image/default-image-qna.jpg', base)
     ).then((res) => res.arrayBuffer());
 
     return new ImageResponse(

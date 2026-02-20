@@ -73,7 +73,7 @@ const Footer = () => {
 
                             <div>
                                 <p className="font-medium text-white">
-                                    Services for the Needy
+                                    Fund the cause
                                 </p>
                                 <p>733 857 8560</p>
                             </div>

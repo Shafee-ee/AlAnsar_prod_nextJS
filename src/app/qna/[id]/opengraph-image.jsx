@@ -13,7 +13,7 @@ export default async function Image({ params }) {
     const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.alansarweekly.com';
 
     const bg = await fetch(
-        new URL('/default-image/default-image-qna.jpg', base)
+        new URL('/default-image/og-image.jpg', base)
     ).then((res) => res.arrayBuffer());
 
     return new ImageResponse(

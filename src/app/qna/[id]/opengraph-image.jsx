@@ -59,7 +59,6 @@ export default async function Image({ params }) {
                     }}
                 />
 
-                {/* Blue overlay for compression */}
                 <div
                     style={{
                         position: "absolute",

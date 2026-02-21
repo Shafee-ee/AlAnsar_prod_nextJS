@@ -19,7 +19,8 @@ function cosine(a = [], b = []) {
 
 
 /* ---------- METADATA FUNCTION ---------- */
-export async function generateMetadata({ params }) {
+export async function generateMetadata(props) {
+    const params = await props.params;
     const { id } = params;
 
     const doc = await adminDB.collection("qna_items").doc(id).get();
@@ -176,13 +177,40 @@ export default async function QnAPage({ params, searchParams }) {
 
                     <div className="mb-6 text-sm text-gray-600 border-l-4 border-blue-200 pl-4">
                         <p className="font-medium text-gray-800 mb-1">
-                            Answer Source
+                            <span className="text-1xl text-blue-600">  {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}</span>
                         </p>
-                        <p>
-                            These answers are sourced from Al Ansar Weekly’s archive. Some English
-                            responses are translations of questions previously asked in the Keli
-                            Nodi section.
-                        </p>
+
+                        {lang === "en" ? (
+                            <>
+                                <p>
+                                    The answers published on this platform are sourced from the official archives of Al Ansar Weekly, an Islamic weekly in continuous publication since 1991.
+                                </p>
+                                <p>
+                                    These responses were originally issued in print under the editorial supervision of Tajul Fuqah Bekal Ibrahim Musliyar and S.P. Hamza Saqafi, and are now being presented in digital format to ensure wider accessibility while preserving their scholarly authenticity.
+                                </p>
+                                <p>
+                                    Some English answers are translated from Keli Nodi section of Alansar Weekly
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p>
+                                    ಈ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಪ್ರಕಟವಾಗುವ ಉತ್ತರಗಳು Al Ansar Weekly ಪತ್ರಿಕೆಯ ಅಧಿಕೃತ ಆರ್ಕೈವ್‌ಗಳಿಂದ ಸಂಗ್ರಹಿಸಲ್ಪಟ್ಟಿವೆ. 1991ರಿಂದ ನಿರಂತರವಾಗಿ ಪ್ರಕಟವಾಗುತ್ತಿರುವ ಈ ಇಸ್ಲಾಮಿಕ್ ವಾರಪತ್ರಿಕೆಯಲ್ಲಿ ಪ್ರಕಟವಾದ ಉತ್ತರಗಳೇ ಇವು.
+                                </p>
+                                <p>
+                                    ಈ ಉತ್ತರಗಳು ಮೂಲತಃ ಮುದ್ರಿತ ಆವೃತ್ತಿಯಲ್ಲಿ Tajul Fuqah Bekal Ibrahim Musliyar ಹಾಗೂ S.P. Hamza Saqafi ಅವರ ಸಂಪಾದಕೀಯ ಮೇಲ್ವಿಚಾರಣೆಯಡಿ ಪ್ರಕಟಗೊಂಡವು. ಈಗ ಅವುಗಳನ್ನು ಅವರ ಶಾಸ್ತ್ರೀಯ ಪ್ರಾಮಾಣಿಕತೆ ಮತ್ತು ನೈತಿಕತೆಯನ್ನು ಉಳಿಸಿಕೊಂಡು, ಹೆಚ್ಚಿನ ಓದುಗರಿಗೆ ತಲುಪುವಂತೆ ಡಿಜಿಟಲ್ ರೂಪದಲ್ಲಿ ಪ್ರಕಟಿಸಲಾಗುತ್ತಿದೆ.
+                                </p>
+                                <p>
+                                    ಕೆಲವು ಇಂಗ್ಲಿಷ್ ಉತ್ತರಗಳು Al Ansar Weekly ಪತ್ರಿಕೆಯ Keli Nodi ವಿಭಾಗದಲ್ಲಿ ಹಿಂದಿನಿಂದ ಪ್ರಕಟವಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದಗಳಾಗಿವೆ.
+                                </p>
+                            </>
+                        )}
+                    </div>
+
+                    <div className="mb-3">
+                        <span className="inline-block border border-[#0B4C8C] text-[#0B4C8C] text-xs font-semibold px-3 py-1 rounded-full tracking-wide">
+                            Shafi‘i Fiqh
+                        </span>
                     </div>
                     <div className="text-base leading-relaxed text--800 text-lg whitespace-pre-line">
                         Answer:

@@ -1,5 +1,5 @@
 import { adminDB } from "@/lib/firebaseAdmin"; // adjust path if needed
-
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 export default async function DigiPaperListing() {

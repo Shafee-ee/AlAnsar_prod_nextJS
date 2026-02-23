@@ -1,5 +1,5 @@
 "use client";
-
+import { convertNudiToUnicode } from "@/lib/nudiConverter";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -55,6 +55,11 @@ export default function SingleUpload() {
         }
     }
 
+    function handleFixEncoding() {
+        setQuestion(prev => convertNudiToUnicode(prev));
+        setAnswer(prev => convertNudiToUnicode(prev));
+    }
+
     return (
         <div className="space-y-4 relative">
 
@@ -81,6 +86,14 @@ export default function SingleUpload() {
                     placeholder="Enter answer..."
                 ></textarea>
             </div>
+
+            {/* <button
+                type="button"
+                onClick={handleFixEncoding}
+                className="bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-900 transition"
+            >
+                Fix Kannada Encoding
+            </button> */}
 
             {/* Keywords */}
             <div className="space-y-2">

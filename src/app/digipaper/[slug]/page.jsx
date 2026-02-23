@@ -1,19 +1,25 @@
 "use client";
 
-import { use } from "react";
 import { useEffect, useState } from "react";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebaseClient";
 import Link from "next/link";
 
 export default function EpaperViewer({ params }) {
-    const { slug } = use(params);
+    const { slug } = params;
     const [issue, setIssue] = useState(null);
 
     useEffect(() => {
         const fetchIssue = async () => {
+            console.log("Slug param:", slug);
             const snap = await getDoc(doc(db, "digipaper_issues", slug));
+
+            console.log("Document exists:", snap.exists());
             if (snap.exists()) {
+
+
+                console.log("Document ID:", snap.id);
+                console.log("Document data:", snap.data());
                 const data = snap.data();
 
                 if (data.status !== "published") {

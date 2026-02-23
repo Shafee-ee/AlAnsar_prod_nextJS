@@ -1,7 +1,7 @@
 import { adminDB } from "@/lib/firebaseAdmin"; // adjust path if needed
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-
+import Image from "next/image";
 export default async function DigiPaperListing() {
     const snapshot = await adminDB
         .collection("digipaper_issues")
@@ -24,10 +24,12 @@ export default async function DigiPaperListing() {
                         className="bg-white shadow hover:shadow-lg transition"
                     >
                         <div className="p-4">
-                            <img
+                            <Image
                                 src={issue.coverImageUrl}
                                 alt={issue.title}
-                                className="w-full h-auto"
+                                width={500}
+                                height={500}
+                                unoptimized
                             />
                             <h3 className="mt-3 font-semibold text-gray-800 text-center">
                                 {issue.title}

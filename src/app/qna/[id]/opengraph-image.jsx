@@ -8,8 +8,12 @@ export const size = {
 
 export const contentType = "image/jpeg";
 export const runtime = "nodejs";
-export default async function Image({ params }) {
+export default async function Image(props) {
+    const params = await props.params;
+    const searchParams = await props.searchParams;
+
     const { id } = params;
+    const lang = searchParams?.lang || "en";
 
     const doc = await adminDB.collection("qna_items").doc(id).get();
 
@@ -37,8 +41,10 @@ export default async function Image({ params }) {
 
     const data = doc.data();
 
-    const question = data.question_en || "Al Ansar Weekly";
-
+    const question =
+        lang === "kn"
+            ? data.question_kn || data.question_en
+            : data.question_en || data.question_kn || "Al Ansar Weekly";
     const base =
         process.env.NEXT_PUBLIC_SITE_URL ||
         "https://www.alansarweekly.com";

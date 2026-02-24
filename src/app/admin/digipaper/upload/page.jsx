@@ -14,6 +14,7 @@ export default function AdminDigiPaper() {
     const [coverFile, setCoverFile] = useState(null);
     const [loading, setLoading] = useState(false);
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -43,18 +44,29 @@ export default function AdminDigiPaper() {
             const coverRef = ref(storage, `digipaper/${slug}/cover.webp`);
             await uploadBytes(coverRef, coverFile);
             const coverImageUrl = await getDownloadURL(coverRef);
+            const dateObj = new Date(publishDate);
+
+            console.log("Publish Date:", publishDate);
+            console.log("Year being saved:", dateObj.getFullYear());
+
+            if (isNaN(dateObj.getTime())) {
+                toast.error("Invalid publish date.");
+                setLoading(false);
+                return;
+            }
 
             await setDoc(issueRef, {
                 title,
                 slug,
-                publishDate: new Date(publishDate),
+                publishDate: dateObj,
+                year: dateObj.getFullYear(),
                 pdfUrl,
                 coverImageUrl,
                 status: "published",
                 createdAt: serverTimestamp(),
             });
 
-            toast.error("Issue published successfully.");
+            toast.success("Issue published successfully.");
 
             setTitle("");
             setSlug("");

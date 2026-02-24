@@ -177,7 +177,7 @@ export default async function QnAPage({ params, searchParams }) {
 
                     <div className="mb-6 text-sm text-gray-600 border-l-4 border-blue-200 pl-4">
                         <p className="font-medium text-gray-800 mb-1">
-                            <span className="text-1xl text-blue-600">  {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}</span>
+                            <span className="text-1xl text-blue-6*00">  {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}</span>
                         </p>
 
                         {lang === "en" ? (

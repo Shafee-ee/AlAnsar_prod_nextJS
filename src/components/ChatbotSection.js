@@ -177,7 +177,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
 
                 {!isSystem && isClose && (
                     <div className="text-amber-600">
-                        This may not fully answer your question.
+                        Not the question you wanted to ask ?
                     </div>
                 )}
 

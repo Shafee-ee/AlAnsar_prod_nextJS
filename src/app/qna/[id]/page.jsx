@@ -13,47 +13,55 @@ function cosine(a = [], b = []) {
     return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
 
-
-
-
-
-
-/* ---------- METADATA FUNCTION ---------- */
 export async function generateMetadata(props) {
     const params = await props.params;
+    const searchParams = await props.searchParams;
+
     const { id } = params;
+    const lang = searchParams?.lang || "en";
 
     const doc = await adminDB.collection("qna_items").doc(id).get();
     const data = doc.data();
 
     if (!data) return {};
 
-    const rawQuestion = data.question_en || "Al Ansar Weekly";
+    const rawQuestion =
+        lang === "kn"
+            ? data.question_kn || data.question_en
+            : data.question_en || data.question_kn || "Al Ansar Weekly";
 
     const shortenedQuestion =
         rawQuestion.length > 60
             ? rawQuestion.slice(0, 57) + "..."
             : rawQuestion;
 
+    const rawAnswer =
+        lang === "kn"
+            ? data.answer_kn || data.answer_en
+            : data.answer_en || data.answer_kn || "";
 
-    const title = `${shortenedQuestion} | Al Ansar Weekly`;
-    const description = (data.answer_en || "")
+    const description = rawAnswer
         .replace(/\s+/g, " ")
         .trim()
         .slice(0, 155);
-    const url = `https://www.alansarweekly.com/qna/${id}`;
+
+    const base =
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        "https://www.alansarweekly.com";
+
+    const url = `${base}/qna/${id}/opengraph-image/${lang}`;
 
     return {
-        title,
+        title: `${shortenedQuestion} | Al Ansar Weekly`,
         description,
         openGraph: {
-            title,
+            title: `${shortenedQuestion} | Al Ansar Weekly`,
             description,
             url,
             siteName: "Al Ansar Weekly",
             images: [
                 {
-                    url: `${url}/opengraph-image`,
+                    url: `${base}/qna/${id}/opengraph-image/${lang}`,
                     width: 1200,
                     height: 630,
                 },
@@ -62,13 +70,12 @@ export async function generateMetadata(props) {
         },
         twitter: {
             card: "summary_large_image",
-            title,
+            title: `${shortenedQuestion} | Al Ansar Weekly`,
             description,
-            images: [`${url}/opengraph-image`],
+            images: [`${base}/qna/${id}/opengraph-image?lang=${lang}`],
         },
     };
 }
-
 
 export default async function QnAPage({ params, searchParams }) {
 
@@ -175,9 +182,9 @@ export default async function QnAPage({ params, searchParams }) {
                     </div>
 
 
-                    <div className="mb-6 text-sm text-gray-600 border-l-4 border-blue-200 pl-4">
+                    <div className="mb-6 text-sm text-gray-600 border-l-4 border-green-200 pl-4">
                         <p className="font-medium text-gray-800 mb-1">
-                            <span className="text-1xl text-blue-6*00">  {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}</span>
+                            <span className="text-1xl text-green-600">  {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}</span>
                         </p>
 
                         {lang === "en" ? (
@@ -212,7 +219,7 @@ export default async function QnAPage({ params, searchParams }) {
                             Shafi‘i Fiqh
                         </span>
                     </div>
-                    <div className="text-base leading-relaxed text--800 text-lg whitespace-pre-line">
+                    <div className="text-base leading-relaxed text-gray-800 text-lg whitespace-pre-line">
                         Answer:
                     </div>
                     <div className="text-base leading-relaxed text-blue-800 text-lg whitespace-pre-line">
@@ -234,7 +241,7 @@ export default async function QnAPage({ params, searchParams }) {
 
                     {relatedQuestions.length > 0 && (
                         <div className="mt-16">
-                            <h3 className="text-xl font-semibold mb-6">
+                            <h3 className="text-xl text-gray-800 font-semibold mb-6">
                                 {lang === "en" ? "Related Questions" : "ಸಂಬಂಧಿತ ಪ್ರಶ್ನೆಗಳು"}
                             </h3>
 

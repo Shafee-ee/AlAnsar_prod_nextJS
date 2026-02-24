@@ -1,5 +1,7 @@
 import { ImageResponse } from "next/og";
 import { adminDB } from "@/lib/firebaseAdmin";
+import { readFile } from "fs/promises";
+import path from "path";
 
 export const size = {
     width: 1200,
@@ -8,6 +10,7 @@ export const size = {
 
 export const contentType = "image/jpeg";
 export const runtime = "nodejs";
+
 export default async function Image(props) {
     const params = await props.params;
     const searchParams = await props.searchParams;
@@ -15,8 +18,13 @@ export default async function Image(props) {
     const { id } = params;
     const lang = searchParams?.lang || "en";
 
+    // Load Kannada font
+    const fontData = await readFile(
+        path.join(process.cwd(), "public/fonts/DOES_NOT_EXIST.ttf"));
+
     const doc = await adminDB.collection("qna_items").doc(id).get();
 
+    // Fallback if doc missing
     if (!doc.exists) {
         return new ImageResponse(
             (
@@ -30,12 +38,23 @@ export default async function Image(props) {
                         background: "#0B4C8C",
                         color: "white",
                         fontSize: 48,
+                        fontFamily: "NotoKannada",
                     }}
                 >
                     Al Ansar Weekly
                 </div>
             ),
-            size
+            {
+                ...size,
+                fonts: [
+                    {
+                        name: "NotoKannada",
+                        data: fontData,
+                        style: "normal",
+                        weight: 400,
+                    },
+                ],
+            }
         );
     }
 
@@ -45,6 +64,7 @@ export default async function Image(props) {
         lang === "kn"
             ? data.question_kn || data.question_en
             : data.question_en || data.question_kn || "Al Ansar Weekly";
+
     const base =
         process.env.NEXT_PUBLIC_SITE_URL ||
         "https://www.alansarweekly.com";
@@ -64,6 +84,7 @@ export default async function Image(props) {
                     color: "white",
                     fontSize: 44,
                     fontWeight: 500,
+                    fontFamily: "NotoKannada",
                 }}
             >
                 <img
@@ -91,6 +112,7 @@ export default async function Image(props) {
                         bottom: 40,
                         fontSize: 28,
                         opacity: 0.9,
+                        fontFamily: "NotoKannada",
                     }}
                 >
                     Read the full answer at AlAnsarWeekly.com
@@ -102,6 +124,7 @@ export default async function Image(props) {
                         zIndex: 1,
                         maxWidth: "900px",
                         lineHeight: 1.3,
+                        fontFamily: "NotoKannada",
                     }}
                 >
                     {question.length > 140
@@ -110,6 +133,16 @@ export default async function Image(props) {
                 </div>
             </div>
         ),
-        size
+        {
+            ...size,
+            fonts: [
+                {
+                    name: "NotoKannada",
+                    data: fontData,
+                    style: "normal",
+                    weight: 400,
+                },
+            ],
+        }
     );
 }

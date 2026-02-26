@@ -3,6 +3,32 @@ import { adminDB } from "@/lib/firebaseAdmin";
 import { generateEmbedding } from "@/lib/vertexEmbedding";
 import { geminiTranslate } from "@/lib/geminiTranslate";
 
+let cachedItems = null;
+let lastLoadTime = 0;
+
+async function loadEmbeddingsIfNeeded() {
+    const now = Date.now();
+
+    //Reload every 10 minutes
+    if (cachedItems && now - lastLoadTime < 10 * 60 * 1000) {
+        return cachedItems;
+    }
+
+    const snap = await adminDB
+        .collection("qna_items")
+        .select("embedding", "question_en", "question_kn")
+        .get();
+
+    cachedItems = snap.docs.map(d => ({
+        id: d.id,
+        ...d.data(),
+    }));
+
+    lastLoadTime = now;
+    return cachedItems;
+
+}
+
 function normalize(s = "") {
     return s.toLowerCase().replace(/\s+/g, " ").trim();
 }
@@ -76,11 +102,7 @@ export async function POST(req) {
     const qNorm = normalize(embeddingText);
     const isKeywordQuery = qNorm.split(" ").length === 1;
     const isLongQuery = qNorm.length > 80;
-
-    const snap = await adminDB.collection("qna_items").get();
-    const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-
+    const items = await loadEmbeddingsIfNeeded();
 
     const exactMatchItem = items.find(item => {
         const qEN = normalize(item.question_en || "");
@@ -89,28 +111,33 @@ export async function POST(req) {
     });
 
 
-
     if (exactMatchItem) {
+        const fullDoc = await adminDB
+            .collection("qna_items")
+            .doc(exactMatchItem.id)
+            .get();
+
+        const data = fullDoc.data();
+
         return NextResponse.json({
             success: true,
             bestMatch: {
                 id: exactMatchItem.id,
                 question:
                     lang === "kn"
-                        ? exactMatchItem.question_kn
-                        : exactMatchItem.question_en,
+                        ? data.question_kn
+                        : data.question_en,
                 answer:
                     lang === "kn"
-                        ? exactMatchItem.answer_kn
-                        : exactMatchItem.answer_en,
+                        ? data.answer_kn
+                        : data.answer_en,
                 score: 1,
-                editorNote_en: exactMatchItem.editorNote_en || "",
-                editorNote_kn: exactMatchItem.editorNote_kn || "",
+                editorNote_en: data.editorNote_en || "",
+                editorNote_kn: data.editorNote_kn || "",
             },
             related: [],
         });
     }
-
 
 
 
@@ -226,21 +253,28 @@ export async function POST(req) {
         });
 
         if (fuzzyMatchItem) {
+            const fullDoc = await adminDB
+                .collection("qna_items")
+                .doc(fuzzyMatchItem.id)
+                .get();
+
+            const data = fullDoc.data();
+
             return NextResponse.json({
                 success: true,
                 bestMatch: {
                     id: fuzzyMatchItem.id,
                     question:
                         lang === "kn"
-                            ? fuzzyMatchItem.question_kn
-                            : fuzzyMatchItem.question_en,
+                            ? data.question_kn
+                            : data.question_en,
                     answer:
                         lang === "kn"
-                            ? fuzzyMatchItem.answer_kn
-                            : fuzzyMatchItem.answer_en,
+                            ? data.answer_kn
+                            : data.answer_en,
                     score: 0.75,
-                    editorNote_en: fuzzyMatchItem.editorNote_en || "",
-                    editorNote_kn: fuzzyMatchItem.editorNote_kn || "",
+                    editorNote_en: data.editorNote_en || "",
+                    editorNote_kn: data.editorNote_kn || "",
                 },
                 related: [],
             });
@@ -297,17 +331,28 @@ export async function POST(req) {
     }
 
 
+    const bestDoc = await adminDB
+        .collection("qna_items")
+        .doc(best.id)
+        .get();
+
+    const bestData = bestDoc.data();
+
     return NextResponse.json({
         success: true,
         bestMatch: {
             id: best.id,
             question:
-                lang === "kn" ? best.question_kn : best.question_en,
+                lang === "kn"
+                    ? bestData.question_kn
+                    : bestData.question_en,
             answer:
-                lang === "kn" ? best.answer_kn : best.answer_en,
+                lang === "kn"
+                    ? bestData.answer_kn
+                    : bestData.answer_en,
             score: best.confidenceScore,
-            editorNote_en: best.editorNote_en || "",
-            editorNote_kn: best.editorNote_kn || "",
+            editorNote_en: bestData.editorNote_en || "",
+            editorNote_kn: bestData.editorNote_kn || "",
         },
         related,
     });

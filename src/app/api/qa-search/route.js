@@ -132,8 +132,8 @@ export async function POST(req) {
                         ? data.answer_kn
                         : data.answer_en,
                 score: 1,
-                editorNote_en: data.editorNote_en || "",
-                editorNote_kn: data.editorNote_kn || "",
+                editor_note_en: data.editor_note_en || "",
+                editor_note_kn: data.editor_note_kn || "",
             },
             related: [],
         });
@@ -273,8 +273,8 @@ export async function POST(req) {
                             ? data.answer_kn
                             : data.answer_en,
                     score: 0.75,
-                    editorNote_en: data.editorNote_en || "",
-                    editorNote_kn: data.editorNote_kn || "",
+                    editor_note_en: data.editor_note_en || "",
+                    editor_note_kn: data.editor_note_kn || "",
                 },
                 related: [],
             });
@@ -351,8 +351,8 @@ export async function POST(req) {
                     ? bestData.answer_kn
                     : bestData.answer_en,
             score: best.confidenceScore,
-            editorNote_en: bestData.editorNote_en || "",
-            editorNote_kn: bestData.editorNote_kn || "",
+            editor_note_en: bestData.editor_note_en || "",
+            editor_note_kn: bestData.editor_note_kn || "",
         },
         related,
     });

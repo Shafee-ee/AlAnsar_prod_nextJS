@@ -64,7 +64,19 @@ ${text}
 ------------------------------------------------------- */
 export async function POST(req) {
     try {
-        const { question, answer, lang: userLang, keywords = [], editor_note_en = "", editor_note_kn } = await req.json();
+        const {
+            question,
+            answer,
+            lang: userLang,
+            keywords = [],
+            editor_note_en = "",
+            editor_note_kn = "",
+            imam_name = null,
+            source_title = null,
+            samputa = null,
+            sanchike = null,
+            image_urls = []
+        } = await req.json();
 
         if (!question || !answer || !userLang) {
             return NextResponse.json({ success: false, reason: "missing-fields" });
@@ -122,6 +134,26 @@ export async function POST(req) {
             return NextResponse.json({ success: false, reason: "embedding-failed" });
         }
 
+        //new fields added here
+        const normalizedImam =
+            imam_name && imam_name.trim() !== "" ? imam_name.trim() : null;
+
+        const normalizedSource =
+            source_title && source_title.trim() !== "" ? source_title.trim() : null;
+
+        const normalizedSamputa =
+            samputa !== null && samputa !== "" && !isNaN(Number(samputa))
+                ? Number(samputa)
+                : null;
+
+        const normalizedSanchike =
+            sanchike !== null && sanchike !== "" && !isNaN(Number(sanchike))
+                ? Number(sanchike)
+                : null;
+
+        const normalizedImages =
+            Array.isArray(image_urls) ? image_urls : [];
+
         /* -------------------------------------------------------
            SAVE IN CLEAN FORMAT
         ------------------------------------------------------- */
@@ -135,7 +167,13 @@ export async function POST(req) {
             lang_original: finalLang,
             keywords,
             embedding,
-            createdAt: new Date().toISOString()
+            imam_name: normalizedImam,
+            source_title: normalizedSource,
+            samputa: normalizedSamputa,
+            sanchike: normalizedSanchike,
+            image_urls: normalizedImages,
+            createdAt: new Date().toISOString(),
+            updatedAt: null
         });
 
         return NextResponse.json({ success: true });

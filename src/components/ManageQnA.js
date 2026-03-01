@@ -195,8 +195,12 @@ export default function ManageQnA() {
                     answer_en: selectedItem.answer_en || "",
                     question_kn: selectedItem.question_kn || "",
                     answer_kn: selectedItem.answer_kn || "",
-                    editorNote_en: selectedItem.editorNote_en || "",
-                    editorNote_kn: selectedItem.editorNote_kn || ""
+                    editor_note_en: selectedItem.editor_note_en || "",
+                    editor_note_kn: selectedItem.editor_note_kn || "",
+                    imam_name: selectedItem.imam_name || "",
+                    source_title: selectedItem.source_title || "",
+                    samputa: selectedItem.samputa ?? null,
+                    sanchike: selectedItem.sanchike ?? null
                 }
             })
         });
@@ -209,7 +213,21 @@ export default function ManageQnA() {
 
         setItems(prev =>
             prev.map(i =>
-                i.id === selectedItem.id ? { ...i, ...selectedItem } : i
+                i.id === selectedItem.id
+                    ? {
+                        ...i,
+                        question_en: selectedItem.question_en,
+                        answer_en: selectedItem.answer_en,
+                        question_kn: selectedItem.question_kn,
+                        answer_kn: selectedItem.answer_kn,
+                        editor_note_en: selectedItem.editor_note_en,
+                        editor_note_kn: selectedItem.editor_note_kn,
+                        imam_name: selectedItem.imam_name,
+                        source_title: selectedItem.source_title,
+                        samputa: selectedItem.samputa,
+                        sanchike: selectedItem.sanchike
+                    }
+                    : i
             )
         );
 
@@ -465,11 +483,67 @@ export default function ManageQnA() {
                             <textarea
                                 className="w-full p-2 border rounded h-20 text-xs"
                                 placeholder="Optional. Clarifications, usage notes, sources, etc."
-                                value={selectedItem.editorNote_en || ""}
+                                value={selectedItem.editor_note_en || ""}
                                 onChange={e =>
                                     setSelectedItem({
                                         ...selectedItem,
-                                        editorNote_en: e.target.value
+                                        editor_note_en: e.target.value
+                                    })
+                                }
+                            />
+                        </div>
+
+                        {/*New fields added here  */}
+                        <div>
+                            <h3 className="text-xs font-semibold mb-1">Imam Name</h3>
+                            <input
+                                className="w-full p-2 border rounded"
+                                value={selectedItem.imam_name || ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        imam_name: e.target.value
+                                    })
+                                }
+                            />
+                        </div>
+
+                        <div>
+                            <h3 className="text-xs font-semibold mb-1">Source Title</h3>
+                            <input
+                                className="w-full p-2 border rounded"
+                                value={selectedItem.source_title || ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        source_title: e.target.value
+                                    })
+                                }
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <input
+                                type="number"
+                                placeholder="Samputa"
+                                className="p-2 border rounded"
+                                value={selectedItem.samputa ?? ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        samputa: e.target.value === "" ? null : Number(e.target.value)
+                                    })
+                                }
+                            />
+                            <input
+                                type="number"
+                                placeholder="Sanchike"
+                                className="p-2 border rounded"
+                                value={selectedItem.sanchike ?? ""}
+                                onChange={e =>
+                                    setSelectedItem({
+                                        ...selectedItem,
+                                        sanchike: e.target.value === "" ? null : Number(e.target.value)
                                     })
                                 }
                             />
@@ -482,11 +556,11 @@ export default function ManageQnA() {
                             <textarea
                                 className="w-full p-2 border rounded h-20 text-xs"
                                 placeholder="ಐಚ್ಛಿಕ. ವಿವರಣೆ, ಬಳಕೆಯ ಮಾಹಿತಿ, ಮೂಲಗಳು ಇತ್ಯಾದಿ."
-                                value={selectedItem.editorNote_kn || ""}
+                                value={selectedItem.editor_note_kn || ""}
                                 onChange={e =>
                                     setSelectedItem({
                                         ...selectedItem,
-                                        editorNote_kn: e.target.value
+                                        editor_note_kn: e.target.value
                                     })
                                 }
                             />

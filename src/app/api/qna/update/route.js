@@ -62,11 +62,30 @@ export async function POST(req) {
         let embedding = oldData.embedding || [];
 
         // regenerate embedding ONLY if English question changed
+        let shouldRegenerate = false;
+
+        const newQuestion =
+            updates.question_en !== undefined
+                ? updates.question_en
+                : oldData.question_en || "";
+
+        const newAnswer =
+            updates.answer_en !== undefined
+                ? updates.answer_en
+                : oldData.answer_en || "";
+
         if (
-            updates.question_en &&
-            updates.question_en !== oldData.question_en
+            newQuestion !== (oldData.question_en || "") ||
+            newAnswer !== (oldData.answer_en || "")
         ) {
-            embedding = await generateEmbedding(updates.question_en);
+            shouldRegenerate = true;
+        }
+
+        if (shouldRegenerate) {
+            const combinedText = `${newQuestion} ${newAnswer}`.trim();
+            embedding = combinedText
+                ? await generateEmbedding(combinedText)
+                : [];
         }
 
         await docRef.update({

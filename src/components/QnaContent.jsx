@@ -11,7 +11,13 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
         lang === "en" ? data.editor_note_en : data.editor_note_kn;
 
     const fallbackImage = "/default-image/default-image-qna.jpg";
-    const imageUrl = data.imageUrl || fallbackImage;
+    const hasImage = data.image_urls?.length > 0;
+    const imageUrl = hasImage ? data.image_urls[0] : fallbackImage;
+    const hasAttribution =
+        Boolean(data.imam_name) ||
+        Boolean(data.source_title) ||
+        data.samputa !== null ||
+        data.sanchike !== null;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
@@ -20,75 +26,31 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
 
                     {/* IMAGE SECTION */}
                     <div className="w-full mb-8">
-                        <div className="w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow">
-                            {!data.imageUrl ? (
-                                <div className="relative w-full h-[280px] md:h-[380px] rounded-xl overflow-hidden shadow">
+                        <div className="relative w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow">
 
-                                    <img
-                                        src={imageUrl}
-                                        alt="Seek and Discover"
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
+                            <img
+                                src={imageUrl}
+                                alt={question}
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
 
-                                    {/* DARK OVERLAY */}
-                                    <div className="absolute inset-0 bg-black/40" />
+                            {/* Dark overlay */}
+                            <div className="absolute inset-0 bg-black/40" />
 
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
-                                        <h2 className="text-lg md:text-3xl font-semibold max-w-3xl leading-snug">
-                                            Question
-                                        </h2>
-                                        <p className="text-lg md:text-2xl font-semibold max-w-3xl leading-snug">
-                                            {question}
-                                        </p>
-                                    </div>
+                            {/* Question overlay */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
+                                <h2 className="text-lg md:text-3xl font-semibold max-w-3xl leading-snug">
+                                    {lang === "en" ? "Question:" : "ಪ್ರಶ್ನೆ:"}
+                                </h2>
+                                <p className="text-lg md:text-2xl font-semibold max-w-3xl leading-snug">
+                                    {question}
+                                </p>
+                            </div>
 
-                                </div>
-                            ) : (
-                                <div className="w-full h-[300px] md:h-[400px] rounded-xl overflow-hidden shadow">
-                                    <img
-                                        src={data.imageUrl}
-                                        alt={question}
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                            )}
                         </div>
                     </div>
 
-                    {/* ANSWER SOURCE FULL VERSION */}
-                    <div className="mb-6 text-sm text-gray-600 border-l-4 border-green-200 pl-4">
-                        <p className="font-medium text-gray-800 mb-1">
-                            <span className="text-1xl text-green-600">
-                                {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}
-                            </span>
-                        </p>
 
-                        {lang === "en" ? (
-                            <>
-                                <p>
-                                    The answers published on this platform are sourced from the official archives of Al Ansar Weekly, an Islamic weekly in continuous publication since 1991.
-                                </p>
-                                <p>
-                                    These responses were originally issued in print under the editorial supervision of Tajul Fuqah Bekal Ibrahim Musliyar and S.P. Hamza Saqafi, and are now being presented in digital format to ensure wider accessibility while preserving their scholarly authenticity.
-                                </p>
-                                <p>
-                                    Some English answers are translated from Keli Nodi section of Alansar Weekly.
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <p>
-                                    ಈ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಪ್ರಕಟವಾಗುವ ಉತ್ತರಗಳು Al Ansar Weekly ಪತ್ರಿಕೆಯ ಅಧಿಕೃತ ಆರ್ಕೈವ್‌ಗಳಿಂದ ಸಂಗ್ರಹಿಸಲ್ಪಟ್ಟಿವೆ. 1991ರಿಂದ ನಿರಂತರವಾಗಿ ಪ್ರಕಟವಾಗುತ್ತಿರುವ ಈ ಇಸ್ಲಾಮಿಕ್ ವಾರಪತ್ರಿಕೆಯಲ್ಲಿ ಪ್ರಕಟವಾದ ಉತ್ತರಗಳೇ ಇವು.
-                                </p>
-                                <p>
-                                    ಈ ಉತ್ತರಗಳು ಮೂಲತಃ ಮುದ್ರಿತ ಆವೃತ್ತಿಯಲ್ಲಿ Tajul Fuqah Bekal Ibrahim Musliyar ಹಾಗೂ S.P. Hamza Saqafi ಅವರ ಸಂಪಾದಕೀಯ ಮೇಲ್ವಿಚಾರಣೆಯಡಿ ಪ್ರಕಟಗೊಂಡವು. ಈಗ ಅವುಗಳನ್ನು ಅವರ ಶಾಸ್ತ್ರೀಯ ಪ್ರಾಮಾಣಿಕತೆ ಮತ್ತು ನೈತಿಕತೆಯನ್ನು ಉಳಿಸಿಕೊಂಡು, ಹೆಚ್ಚಿನ ಓದುಗರಿಗೆ ತಲುಪುವಂತೆ ಡಿಜಿಟಲ್ ರೂಪದಲ್ಲಿ ಪ್ರಕಟಿಸಲಾಗುತ್ತಿದೆ.
-                                </p>
-                                <p>
-                                    ಕೆಲವು ಇಂಗ್ಲಿಷ್ ಉತ್ತರಗಳು Al Ansar Weekly ಪತ್ರಿಕೆಯ Keli Nodi ವಿಭಾಗದಲ್ಲಿ ಹಿಂದಿನಿಂದ ಪ್ರಕಟವಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದಗಳಾಗಿವೆ.
-                                </p>
-                            </>
-                        )}
-                    </div>
 
                     {/* FIqh Badge */}
                     <div className="mb-3">
@@ -116,6 +78,77 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                         </div>
                     )}
 
+                    {/* ANSWER SOURCE */}
+                    <div className="mt-8 text-sm text-gray-600 border-l-4 border-green-200 pl-4">
+
+                        <p className="font-medium text-gray-800 mb-2">
+                            <span className="text-green-600">
+                                {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}
+                            </span>
+                        </p>
+
+                        {hasAttribution ? (
+                            <>
+                                {data.imam_name && (
+                                    <p>
+                                        {lang === "en" ? "Answered by: " : "ಉತ್ತರಿಸಿದವರು: "}
+                                        <strong>{data.imam_name}</strong>
+                                    </p>
+                                )}
+
+                                {data.source_title && (
+                                    <p>
+                                        {lang === "en" ? "Source: " : "ಮೂಲ: "}
+                                        <strong>{data.source_title}</strong>
+                                    </p>
+                                )}
+
+                                {(data.samputa !== null || data.sanchike !== null) && (
+                                    <p>
+                                        {data.samputa !== null && (
+                                            <span>
+                                                {lang === "en" ? "Samputa " : "ಸಂಪುಟ "}
+                                                {data.samputa}
+                                            </span>
+                                        )}
+                                        {data.samputa !== null && data.sanchike !== null && " · "}
+                                        {data.sanchike !== null && (
+                                            <span>
+                                                {lang === "en" ? "Sanchike " : "ಸಂಚಿಕೆ "}
+                                                {data.sanchike}
+                                            </span>
+                                        )}
+                                    </p>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                {lang === "en" ? (
+                                    <>
+                                        <p>
+                                            The answers published on this platform are sourced from the official archives of Al Ansar Weekly, an Islamic weekly in continuous publication since 1991.
+                                        </p>
+                                        <p>
+                                            These responses were originally issued in print under the editorial supervision of Tajul Fuqah Bekal Ibrahim Musliyar and S.P. Hamza Saqafi, and are now being presented in digital format to ensure wider accessibility while preserving their scholarly authenticity.
+                                        </p>
+                                        <p>
+                                            Some English answers are translated from Keli Nodi section of Alansar Weekly.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p>
+                                            ಈ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ಪ್ರಕಟವಾಗುವ ಉತ್ತರಗಳು Al Ansar Weekly ಪತ್ರಿಕೆಯ ಅಧಿಕೃತ ಆರ್ಕೈವ್‌ಗಳಿಂದ ಸಂಗ್ರಹಿಸಲ್ಪಟ್ಟಿವೆ.
+                                        </p>
+                                        <p>
+                                            ಮೂಲತಃ ಮುದ್ರಿತ ಆವೃತ್ತಿಯಲ್ಲಿ Tajul Fuqah Bekal Ibrahim Musliyar ಹಾಗೂ S.P. Hamza Saqafi ಅವರ ಸಂಪಾದಕೀಯ ಮೇಲ್ವಿಚಾರಣೆಯಡಿ ಪ್ರಕಟಗೊಂಡವು.
+                                        </p>
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </div>
+
                     {/* SHARE */}
                     <div className="mt-8 flex justify-center">
                         <QnaShareButton id={id} lang={lang} />
@@ -137,7 +170,9 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                                                 : item.question_en;
 
                                         const cardImage =
-                                            item.imageUrl || fallbackImage;
+                                            item.image_urls?.length > 0
+                                                ? item.image_urls[0]
+                                                : fallbackImage;
 
                                         return (
                                             <a
@@ -167,6 +202,8 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                     )}
 
                     {/* KELI NODI CTA */}
+
+                    {/* KELI NODI CTA */}
                     <div className="mt-10 pt-6 border-t">
                         <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 text-center">
                             <p className="font-semibold text-indigo-900 mb-2">
@@ -189,7 +226,6 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                             </a>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

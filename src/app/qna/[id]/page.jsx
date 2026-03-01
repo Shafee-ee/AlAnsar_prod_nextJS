@@ -16,7 +16,7 @@ async function loadQnaEmbeddingsIfNeeded() {
 
     const snap = await adminDB
         .collection("qna_items")
-        .select("embedding", "question_en", "question_kn")
+        .select("embedding", "question_en", "question_kn", "image_urls")
         .get();
 
     cachedQnaEmbeddings = snap.docs.map(doc => ({
@@ -135,7 +135,7 @@ export default async function QnAPage(props) {
                     id: item.id,
                     question_en: item.question_en,
                     question_kn: item.question_kn,
-                    imageUrl: item.imageUrl || null,
+                    image_urls: item.image_urls || [],
                     score: cosine(currentEmbedding, item.embedding),
                 };
             })

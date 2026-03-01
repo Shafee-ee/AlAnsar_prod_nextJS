@@ -59,25 +59,6 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                         </span>
                     </div>
 
-                    {/* ANSWER LABEL */}
-                    <div className="text-base leading-relaxed text-gray-800 text-lg whitespace-pre-line">
-                        Answer:
-                    </div>
-
-                    <div className="text-base leading-relaxed text-blue-800 text-lg whitespace-pre-line">
-                        {answer}
-                    </div>
-
-                    {/* EDITOR NOTE */}
-                    {editorNote && (
-                        <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm text-gray-700 whitespace-pre-line">
-                            <div className="font-semibold text-yellow-800 mb-1">
-                                Editor’s Note
-                            </div>
-                            {editorNote}
-                        </div>
-                    )}
-
                     {/* ANSWER SOURCE */}
                     <div className="mt-8 text-sm text-gray-600 border-l-4 border-green-200 pl-4">
 
@@ -148,6 +129,27 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                             </>
                         )}
                     </div>
+
+                    {/* ANSWER LABEL */}
+                    <div className="text-base leading-relaxed text-gray-800 text-lg whitespace-pre-line">
+                        Answer:
+                    </div>
+
+                    <div className="text-base leading-relaxed text-blue-800 text-lg whitespace-pre-line">
+                        {answer}
+                    </div>
+
+                    {/* EDITOR NOTE */}
+                    {editorNote && (
+                        <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm text-gray-700 whitespace-pre-line">
+                            <div className="font-semibold text-yellow-800 mb-1">
+                                Editor’s Note
+                            </div>
+                            {editorNote}
+                        </div>
+                    )}
+
+
 
                     {/* SHARE */}
                     <div className="mt-8 flex justify-center">

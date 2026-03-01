@@ -16,8 +16,8 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
     const hasAttribution =
         Boolean(data.imam_name) ||
         Boolean(data.source_title) ||
-        data.samputa !== null ||
-        data.sanchike !== null;
+        Number(data.samputa) > 0 ||
+        Number(data.sanchike) > 0;
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">

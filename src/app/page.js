@@ -9,6 +9,8 @@ import ChatbotSection from "@/components/ChatbotSection";
 import { useLanguage } from "@/context/LanguageContext";
 import AskQuestionBox from "@/components/AskQuestionBox";
 
+//banner QnA count
+import HomeCarousel from "@/components/HomeCarousel";
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
   const [showAskBox, setShowAskBox] = useState(false);
@@ -47,24 +49,8 @@ export default function Home() {
     <div className="min-h-screen bg-[#F0F8FF] flex flex-col font-sans p-4 md:p-8">
       <div className="w-full max-w-7xl mx-auto py-8 space-y-10">
 
-        {/* Chatbot Section */}
 
-        <section className="w-full text-center py-12 sm:py-16 px-4 
-bg-gradient-to-r from-blue-500 via-blue-400 to-blue-700 
-rounded-sm shadow-lg">
-
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white drop-shadow-md mb-4">
-            {lang === "en" ? "Al Ansar Weekly" : "ಅಲ್ ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆ"}
-          </h1>
-
-          <p className="text-lg sm:text-xl md:text-2xl text-blue-100 font-medium max-w-2xl mx-auto leading-relaxed">
-            {lang === "en"
-              ? "Your trusted source for Islamic knowledge, insights, and contemporary analysis"
-              : "ಇಸ್ಲಾಮಿಕ್ ಜ್ಞಾನ, ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ಸಮಕಾಲೀನ ಅಧ್ಯಯನಗಳ ವಿಶ್ವಾಸಾರ್ಹ ಮೂಲ"
-            }
-          </p>
-
-        </section>
+        <HomeCarousel lang={lang} />
 
 
         <Suspense fallback={null}>

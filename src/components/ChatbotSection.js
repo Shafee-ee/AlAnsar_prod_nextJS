@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Send, Zap, MessageCircle, Share2 } from 'lucide-react';
+import { Search, Send, Zap, MessageCircle, Share2, ExternalLink } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 /* ----------------------------------
@@ -40,7 +40,7 @@ const TypingDots = () => (
 /* ---------------------------------------------------------
    BOT RESPONSE CARD
 --------------------------------------------------------- */
-const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase }) => {
+const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase, selectedLang }) => {
     const best = result?.bestMatch;
     const isSystem = result?.isSystem;
 
@@ -157,12 +157,26 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
 
 
             <div className='flex justify-center mb-3 text-xs'>
-                <button
-                    onClick={() => onShare(best.id)}
-                    className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
-                >
-                    <Share2 className="w-3 h-3" /> Share
-                </button>
+
+
+                <div className='flex justify-center gap-3 mb-3 text-xs'>
+                    <button
+                        onClick={() => onShare(best.id)}
+                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+                    >
+                        <Share2 className="w-3 h-3" /> Share
+                    </button>
+
+                    <a
+                        href={`/qna/${best.id}?lang=${selectedLang}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-3 py-1 rounded-md bg-gray-700 text-white hover:bg-gray-800"
+                    >
+                        <ExternalLink className="w-3 h-3" />
+                        Open
+                    </a>
+                </div>
 
 
             </div>
@@ -239,7 +253,7 @@ const BotResponseCard = ({ result, query, onRelatedClick, onShare, onRephrase })
 /* ---------------------------------------------------------
    MESSAGE BUBBLE
 --------------------------------------------------------- */
-const MessageBubble = ({ message, onRelatedClick, onShare, onRephrase }) => {
+const MessageBubble = ({ message, onRelatedClick, onShare, selectedLang, onRephrase }) => {
     if (message.type === "user") {
         return (
             <div className="flex justify-end mb-3">
@@ -257,6 +271,7 @@ const MessageBubble = ({ message, onRelatedClick, onShare, onRephrase }) => {
             <div className="max-w-[75%]">
                 <BotResponseCard
                     result={message.result}
+                    selectedLang={selectedLang}
                     query={message.query}
                     onRelatedClick={onRelatedClick}
                     onShare={onShare}
@@ -507,6 +522,7 @@ const ChatbotSection = () => {
                                 <MessageBubble
                                     key={i}
                                     message={m}
+                                    selectedLang={selectedLang}
                                     onRelatedClick={handleSend}
                                     onShare={shareQA}
                                     onRephrase={handleRephrase}

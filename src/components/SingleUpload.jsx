@@ -2,8 +2,9 @@
 import { convertNudiToUnicode } from "@/lib/nudiConverter";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebaseClient";
-import { useState } from "react";
+import { use, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
 
 export default function SingleUpload() {
     const [question, setQuestion] = useState("");
@@ -19,6 +20,12 @@ export default function SingleUpload() {
     const [sanchike, setSanchike] = useState("");
     const [imageUrl, setImageUrl] = useState(null);
     const [uploadingImage, setUploadingImage] = useState(false);
+
+    //prefill QnA from submissions
+    const searchParams = useSearchParams();
+    const fromSubmission = searchParams.get("fromSubmission");
+    const submissionId = searchParams.get("submissionId");
+    const questionFromUrl = searchParams.get("question");
 
 
     // for image upload
@@ -117,10 +124,19 @@ export default function SingleUpload() {
 
         img.src = objectUrl;
     }
+    //prefill
+    useEffect(() => {
+        if (fromSubmission === "true" && questionFromUrl) {
+            setQuestion(decodeURIComponent(questionFromUrl));
+            setLang("en"); // since submissions standardized to English
+        }
+    }, [fromSubmission, questionFromUrl]);
 
     // handle submit function
     async function handleSubmit(e) {
         e.preventDefault();
+
+
         if (uploadingImage) {
             toast.error("Please wait for image upload to finish");
             return;
@@ -166,6 +182,17 @@ export default function SingleUpload() {
         setLoading(false);
 
         if (data.success) {
+
+            if (fromSubmission === "true" && submissionId) {
+                await fetch("/api/qna/link-submission", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        submissionId,
+                        qnaId: data.id, // your single route must return new ID
+                    }),
+                });
+            }
             toast.success("QnA uploaded successfully!");
             setQuestion("");
             setAnswer("");

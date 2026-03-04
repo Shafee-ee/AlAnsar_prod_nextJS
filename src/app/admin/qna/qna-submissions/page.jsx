@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function QnaSubmissionsPage() {
     const [submissions, setSubmissions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeStatus, setActiveStatus] = useState("pending");
+
+    const router = useRouter();
 
     useEffect(() => {
         fetchSubmissions(activeStatus);
@@ -55,6 +58,17 @@ export default function QnaSubmissionsPage() {
             console.error(err);
         }
     };
+
+
+    const handlePromote = (item) => {
+        const encodedQuestion = encodeURIComponent(
+            item.translated_question_en || item.question_original
+        );
+
+        router.push(
+            `/admin/qna?fromSubmission=true&submissionId=${item.id}&question=${encodedQuestion}`
+        )
+    }
 
     if (loading) return <div className="p-8">Loading...</div>;
 
@@ -124,6 +138,7 @@ export default function QnaSubmissionsPage() {
 
                         {/* Update */}
                         <div className="flex gap-2 justify-center">
+
                             {item.status === "pending" && (
                                 <>
                                     <button
@@ -142,12 +157,22 @@ export default function QnaSubmissionsPage() {
                                 </>
                             )}
 
+                            {item.status === "approved" && !item.promoted_qna_id && (
+                                <button
+                                    onClick={() => handlePromote(item)}
+                                    className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
+                                >
+                                    Promote
+                                </button>
+                            )}
+
                             <button
                                 onClick={() => deleteSubmission(item.id)}
                                 className="text-red-600 hover:text-red-800 text-lg"
                             >
                                 🗑
                             </button>
+
                         </div>
                     </div>
                 ))}

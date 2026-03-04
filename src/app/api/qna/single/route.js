@@ -146,7 +146,7 @@ export async function POST(req) {
         /* -------------------------------------------------------
            SAVE IN CLEAN FORMAT
         ------------------------------------------------------- */
-        await adminDB.collection("qna_items").add({
+        const docRef = await adminDB.collection("qna_items").add({
             question_en,
             answer_en,
             question_kn,
@@ -165,7 +165,7 @@ export async function POST(req) {
             updatedAt: null
         });
 
-        return NextResponse.json({ success: true });
+        return NextResponse.json({ success: true, id: docRef.id });
 
     } catch (err) {
         console.error("Upload error:", err);

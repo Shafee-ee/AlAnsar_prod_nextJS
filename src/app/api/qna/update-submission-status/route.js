@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { sendEmailToImam } from "@/lib/email";
 
 export async function POST(req) {
     try {
@@ -14,10 +15,26 @@ export async function POST(req) {
             );
         }
 
-        await adminDB.collection("qna_submissions").doc(id).update({
+        const docRef = adminDB.collection("qna_submissions").doc(id);
+
+        await docRef.update({
             status,
             answeredAt: FieldValue.serverTimestamp(),
         });
+
+        // Send email only if approved
+        if (status === "approved") {
+            const doc = await docRef.get();
+
+            if (doc.exists) {
+                const data = doc.data();
+
+                await sendEmailToImam(
+                    data.question_original,
+                    id
+                );
+            }
+        }
 
         return NextResponse.json({ success: true });
 

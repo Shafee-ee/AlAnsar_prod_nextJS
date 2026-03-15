@@ -3,8 +3,7 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
-  "imam@email.com",
-  "owner@email.com"
+  "shafeeazeemag@gmail.com",
 ];
 
 export async function sendEmailToImam(question, submissionId) {

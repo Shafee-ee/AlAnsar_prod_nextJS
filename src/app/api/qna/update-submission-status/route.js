@@ -14,7 +14,6 @@ export async function POST(req) {
                 { status: 400 }
             );
         }
-
         const docRef = adminDB.collection("qna_submissions").doc(id);
 
         await docRef.update({
@@ -24,6 +23,10 @@ export async function POST(req) {
 
         // Send email only if approved
         if (status === "approved") {
+
+            //debugging 
+            console.log("Approval detected, sending email...");
+
             const doc = await docRef.get();
 
             if (doc.exists) {

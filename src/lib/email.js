@@ -4,6 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
   "shafeeazeemag@gmail.com",
+   "muyeen@technopulse.in"
 ];
 
 export async function sendEmailToImam(question, submissionId) {

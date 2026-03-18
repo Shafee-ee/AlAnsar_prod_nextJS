@@ -2,11 +2,22 @@
 
 import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 
 export default function AdminLayout({ children }) {
     const { loading, authReady, isAdmin, user } = useAuth();
     const router = useRouter();
+    const [pendingCount, setPendingCount]=useState(0);
+
+    useEffect(()=>{
+        async function fetchCount(){
+            const res=await fetch("/api/qna/submissions-count");
+            const data=await res.json();
+            console.log("Count:",data)
+            setPendingCount(data.count)
+        }
+        fetchCount();
+    },[])
 
     useEffect(() => {
         // Wait until authReady — means provider finished admin check
@@ -46,8 +57,17 @@ export default function AdminLayout({ children }) {
                     <a href="/admin/articles" className="block text-gray-700 hover:text-black">
                         Articles
                     </a>
-                    <a href="/admin/qna/qna-submissions" className="block text-gray-700 hover:text-black">
-                        Submitted Questions
+              <a
+                 href="/admin/qna/qna-submissions"
+                  className="flex items-center justify-between text-gray-700 hover:text-black"
+                    >
+                <span>Submitted Questions</span>
+
+                {pendingCount > 0 && (
+                 <span className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+                 {pendingCount}
+                </span>
+                    )}
                     </a>
                     <a href="/admin/digipaper" className="block text-gray-700 hover:text-black">
                         Manage Digipaper

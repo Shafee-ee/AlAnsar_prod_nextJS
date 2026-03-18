@@ -51,7 +51,7 @@ export async function POST(req) {
         }
 
         const body = await req.json();
-        const { question, isAnonymous, email } = body;
+        const { question, isAnonymous, email,name } = body;
 
         // Basic validation
         if (!question || question.trim().length < 10) {
@@ -68,6 +68,13 @@ export async function POST(req) {
             );
         }
 
+        if(!isAnonymous &&(!name || name.trim().length<2)){
+            return NextResponse.json(
+                {error:"Name is required"},
+                {status:400}
+            )
+        }
+
         const trimmedQuestion = question.trim();
 
         const isKannada = /[\u0C80-\u0CFF]/.test(trimmedQuestion);
@@ -79,6 +86,7 @@ export async function POST(req) {
             language,
             isAnonymous,
             email: isAnonymous ? null : email,
+            name:isAnonymous ? null: name.trim(),
             status: "pending",
             createdAt: FieldValue.serverTimestamp(),
             answeredAt: null,

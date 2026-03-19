@@ -100,7 +100,7 @@ const Footer = () => {
                         </div>
 
                         <a
-                            href="intent://pay?pa=7338578560@okbizaxis&pn=AL%20ANSAR%20KANNADA%20WEEKLY&cu=INR#Intent;scheme=upi;end"
+                            href="upi://pay?pa=7338578560@okbizaxis&pn=AL%20ANSAR%20KANNADA%20WEEKLY&mc=0000&tid=TXN123456&tr=TXN123456&tn=Donation&am=50&cu=INR"
                             className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
                         >
                             Tap to Pay via UPI

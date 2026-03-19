@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
   "shafeeazeemag@gmail.com",
-   "muyeen@technopulse.in"
+  
 ];
 
 export async function sendEmailToImam(question, submissionId) {
@@ -35,7 +35,7 @@ export async function sendEmailToImam(question, submissionId) {
             font-size:16px;
           ">
             <strong>Question:</strong><br/>
-            ${question}
+            ${question} 
           </div>
 
           <p style="font-size:14px; color:#555;">

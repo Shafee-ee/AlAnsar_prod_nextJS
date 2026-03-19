@@ -184,7 +184,7 @@ export default function SingleUpload() {
         if (data.success) {
 
             if (fromSubmission === "true" && submissionId) {
-                await fetch("/api/qna/link-submission", {
+                await fetch("/api/qna/link-submissions", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({

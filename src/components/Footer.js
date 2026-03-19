@@ -90,7 +90,7 @@ const [showQR, setShowQR] = useState(false);
                         </h4>
 
                         <p className="text-sm text-blue-200 mb-4">
-                            Scan or tap to donate.
+                            Scan to donate.
                         </p>
 
                         <div className="bg-white rounded-xl inline-block p-2">
@@ -105,7 +105,7 @@ const [showQR, setShowQR] = useState(false);
     onClick={() => setShowQR(true)}
     className="mt-4 px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
 >
-    Tap to Pay
+    scan to Pay
 </button>
 
 <QRModal isOpen={showQR} onClose={() => setShowQR(false)} />

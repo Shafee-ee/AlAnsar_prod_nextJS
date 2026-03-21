@@ -12,15 +12,16 @@ export default function AskQuestionBox({
   const [name, setName] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
+  const isFormValid =
+    question.trim().length >= 10 &&
+    (isAnonymous ||
+      (name.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email.trim())));
+
   const reset = () => {
     setMode("collapsed");
     setQuestion("");
     setEmail("");
     setName("");
-
-    if (onClose) {
-      onClose();
-    }
   };
 
   useEffect(() => {
@@ -58,6 +59,10 @@ export default function AskQuestionBox({
       }
 
       setMode("success");
+      setQuestion("");
+      setEmail("");
+      setName("");
+      setIsAnonymous(false);
     } catch (err) {
       console.error(err);
       alert("Something went wrong");
@@ -104,7 +109,7 @@ export default function AskQuestionBox({
             </label>
             <input
               type="text"
-              placeholder="Your name (optional)"
+              placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isAnonymous}
@@ -115,7 +120,7 @@ export default function AskQuestionBox({
 
             <input
               type="email"
-              placeholder="Your email (optional, for response)"
+              placeholder="Your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isAnonymous}
@@ -133,17 +138,11 @@ export default function AskQuestionBox({
               </button>
 
               <button
-                disabled={
-                  loading ||
-                  question.trim().length < 10 ||
-                  (!isAnonymous &&
-                    (!/^\S+@\S+\.\S+$/.test(email.trim()) ||
-                      name.trim().length < 2))
-                }
+                disabled={loading || !isFormValid}
                 onClick={() => submitQuestion(isAnonymous)}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
               >
-                Submit & Get Response
+                Submit your question
               </button>
             </div>
           </div>
@@ -151,9 +150,30 @@ export default function AskQuestionBox({
 
         {mode === "success" && (
           <div className="text-center space-y-6">
-            <p className="text-green-600 font-medium">
-              Your question has been submitted for review.
-            </p>
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Question submitted
+              </h3>
+
+              <p className="text-sm text-gray-600">
+                Your question has been sent to our scholars for review. If
+                approved, it will be answered and published.
+              </p>
+
+              {!isAnonymous && email && (
+                <p className="text-sm text-gray-500">
+                  You will be notified at{" "}
+                  <span className="font-medium">{email}</span>
+                </p>
+              )}
+
+              <button
+                onClick={reset}
+                className="mt-4 px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              >
+                Ask another question
+              </button>
+            </div>
 
             {/* <button
                             onClick={reset}

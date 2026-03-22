@@ -64,7 +64,8 @@ export async function POST(req) {
             source_title = null,
             samputa = null,
             sanchike = null,
-            image_urls = []
+            image_urls = [],
+            submissionId=null
         } = await req.json();
 
         if (!question || !answer || !userLang) {
@@ -165,8 +166,37 @@ export async function POST(req) {
             updatedAt: null
         });
 
-        return NextResponse.json({ success: true, id: docRef.id });
+        const newQnaId=docRef.id;
 
+        //if promoted send email to user if email exists 
+        
+if (submissionId) {
+    try {
+        const submissionRef = adminDB
+            .collection("qna_submissions")
+            .doc(submissionId);
+
+        const snap = await submissionRef.get();
+
+        if (snap.exists) {
+            const submission = snap.data();
+
+            if (submission.email && !submission.isAnonymous) {
+                // for now just log instead of email (we’ll plug email next)
+                console.log("SEND EMAIL TO:", submission.email);
+            }
+
+            await submissionRef.update({
+                promoted_qna_id: newQnaId,
+                email_sent: true
+            });
+        }
+    } catch (err) {
+        console.error("Submission linkage failed:", err);
+    }
+}
+
+return NextResponse.json({ success: true, id: newQnaId });
     } catch (err) {
         console.error("Upload error:", err);
         return NextResponse.json(

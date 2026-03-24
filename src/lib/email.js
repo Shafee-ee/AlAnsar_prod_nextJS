@@ -69,3 +69,22 @@ export async function sendEmailToImam(question, submissionId) {
     console.error("Email to imam failed:", err);
   }
 }
+
+
+export async function sendEmailToUser({ email, question, answer }) {
+  return resend.emails.send({
+    from: "Al Ansar Weekly <editor@alansarweekly.com>",
+    reply_to: "alansarweekly786@gmail.com",
+    to: email,
+    subject: "Your question has been answered",
+    html: `
+      <p>Your question:</p>
+      <p><strong>${question}</strong></p>
+
+      <p>Answer:</p>
+      <p>${answer}</p>
+
+      <p>Thank you for reaching out.</p>
+    `,
+  });
+}

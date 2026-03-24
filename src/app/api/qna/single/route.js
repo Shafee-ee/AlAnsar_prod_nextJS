@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { generateEmbedding } from "@/lib/vertexEmbedding";
+import { sendEmailToUser } from "@/lib/email";
 
 /* -------------------------------------------------------
    Detect Kannada (simple + reliable for our use case)
@@ -166,6 +167,7 @@ export async function POST(req) {
             updatedAt: null
         });
 
+    console.log("submissionId:", submissionId);
         const newQnaId=docRef.id;
 
         //if promoted send email to user if email exists 
@@ -177,14 +179,21 @@ if (submissionId) {
             .doc(submissionId);
 
         const snap = await submissionRef.get();
+        console.log("Submission exists?", snap.exists);
 
         if (snap.exists) {
             const submission = snap.data();
+            console.log("Submission data:", submission);
 
             if (submission.email && !submission.isAnonymous) {
-                // for now just log instead of email (we’ll plug email next)
-                console.log("SEND EMAIL TO:", submission.email);
-            }
+             await sendEmailToUser({
+                 email: submission.email,
+                 question: submission.question_original,
+                    answer: answer_en // IMPORTANT: use translated English
+                 });
+} else {
+    console.log("No email sent (anonymous or missing email)");
+}
 
             await submissionRef.update({
                 promoted_qna_id: newQnaId,

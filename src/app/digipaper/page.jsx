@@ -78,15 +78,15 @@ export default async function DigiPaperListing(props) {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       {/*Type filter*/}
-      <div className="max-w-6xl mx-auto mb-6 flex gap-4">
+      <div className="max-w-6xl mx-auto  mb-6 flex gap-4">
         {["weekly", "monthly", "special"].map((type) => (
           <Link
             key={type}
             href={`/digipaper?type=${type}${selectedYear ? `&year=${selectedYear}` : ""}`}
             className={`px-4 py-2 rounded ${
               selectedType === type
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
+                ? "bg-green-200 border-2 border-green-600 text-green-800"
+                : "bg-gray-100 border-2 border-gray-500 text-gray-700"
             }`}
           >
             {type === "weekly" && "Weekly"}

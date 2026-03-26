@@ -122,8 +122,8 @@ export default async function DigiPaperListing(props) {
         {Math.min(offset + PER_PAGE, total)} of {total}
       </div>
 
-      {/* Grid */}
-      <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-6">
+      {/* Content Grid*/}
+      <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {issues.map((issue) => (
           <a
             key={issue.id}

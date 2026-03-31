@@ -3,394 +3,130 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-export default function ArticleEditorPage() {
-    const { id } = useParams();
+export default function ArticlePage() {
+  const { slug } = useParams();
 
-    const [article, setArticle] = useState(null);
-    // added 
-    const [articleStatus, setArticleStatus] = useState("draft");
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  const [article, setArticle] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [lang, setLang] = useState("en");
 
-    //language editor form
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const [excerpt, setExcerpt] = useState("");
-    const [visibility, setVisibility] = useState(true);
-    const [saving, setSaving] = useState(false);
-    // language tabs
-    const LANGUAGES = ["kn", "en"];
-    const [translations, setTranslations] = useState([]); // existing saved languages
-    const [activeLang, setActiveLang] = useState("kn");
-    //image States
-    const [imageUploading, setImageUploading] = useState(false);
+  useEffect(() => {
+    async function load() {
+      const res = await fetch(`/api/articles/by-slug?slug=${slug}`);
+      const data = await res.json();
 
-    const existingTranslation = translations.find(
-        (t) => t.language === activeLang
-    );
-    const isEditMode = Boolean(existingTranslation);
+      setArticle(data);
 
-    useEffect(() => {
-        const t = translations.find(tr => tr.language === activeLang);
+      // fetch related
+      const relRes = await fetch(
+        `/api/articles/related?category=${data.category}&exclude=${data.id}`,
+      );
+      const relData = await relRes.json();
 
-        if (t) {
-            setTitle(t.title || "");
-            setExcerpt(t.excerpt || "");
-            setContent(t.content || "");
-            setVisibility(t.visibility !== false);
-        } else {
-            setTitle("");
-            setExcerpt("");
-            setContent("");
-            setVisibility(true);
-        }
-    }, [activeLang, translations]);
-
-
-    useEffect(
-        () => {
-            async function loadArticle() {
-                try {
-                    setLoading(true);
-                    const res = await fetch(`/api/articles/by-id?id=${id}`);
-
-                    if (!res.ok) {
-                        const data = await res.json();
-                        throw new Error(data.error || "failed to load article")
-                    }
-
-                    const data = await res.json();
-                    setArticle(data);
-                    setArticleStatus(data.status || "draft");
-                } catch (err) {
-                    setError(err.message)
-                } finally {
-                    setLoading(false);
-                }
-            }
-            if (id) loadArticle();
-        }, [id]);
-
-    useEffect(() => {
-        async function loadTranslations() {
-            try {
-                const res = await fetch(
-                    `/api/articles/translations/list?articleId=${id}`
-                );
-                if (!res.ok) return;
-
-                const data = await res.json();
-                setTranslations(data.translations || []);
-
-                if (data.translations?.length > 0) {
-                    setActiveLang(data.translations[0].language);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        if (id) loadTranslations();
-    }, [id]);
-
-    async function handleImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("articleId", id);
-
-        setImageUploading(true);
-
-        try {
-            const res = await fetch("/api/articles/upload-image", {
-                method: "POST",
-                body: formData,
-            })
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-
-            setArticle(prev => ({ ...prev, coverImage: data.imageUrl }));
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setImageUploading(false)
-        }
-
+      setRelated(relData.articles || []);
+      setLoading(false);
     }
 
-    async function handleSaveTranslation() {
-        if (!title || !content) {
-            alert("Title and content are required");
-            return;
-        }
+    if (slug) load();
+  }, [slug]);
 
-        setSaving(true);
+  if (loading) return <div className="p-6">Loading...</div>;
+  if (!article) return <div className="p-6">Not found</div>;
 
-        try {
+  const t = article.translations?.[lang] || article.translations?.["kn"];
 
-            const endpoint = isEditMode
-                ? "/api/articles/translations/update"
-                : "/api/articles/translations/create";
+  return (
+    <div className="max-w-6xl mx-auto px-6 space-y-8">
+      {/* HERO */}
+      {article.coverImage && (
+        <img
+          src={article.coverImage}
+          className="w-full h-72 object-cover rounded"
+        />
+      )}
 
-            const res = await fetch(endpoint, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    articleId: id,
-                    language: activeLang,
-                    title,
-                    excerpt,
-                    content,
-                    visibility,
-                }),
-            });
+      {/* HEADER */}
+      <div className="space-y-2">
+        <p className="text-sm text-gray-500 uppercase">{article.category}</p>
 
-            const data = await res.json();
+        <h1 className="text-3xl font-bold">{t.title}</h1>
 
-            if (!res.ok) {
-                throw new Error(data.error || "Failed to save translation");
-            }
+        <div className="flex items-center gap-4 text-sm text-gray-500">
+          <span>By {t.author || "Unknown"}</span>
 
-            // 🔄 Always refresh translations after save
-            const refresh = await fetch(
-                `/api/articles/translations/list?articleId=${id}`
-            );
-            const refreshed = await refresh.json();
-            setTranslations(refreshed.translations || []);
-
-            // 🌐 If KN was saved, auto-translate into EN (populate only)
-            if (activeLang === "kn") {
-                const translateRes = await fetch("/api/translate", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        sourceLang: "kn",
-                        targetLang: "en",
-                        title,
-                        excerpt,
-                        content,
-                    }),
-                });
-
-                const translated = await translateRes.json();
-
-                setTitle(translated.title || "");
-                setExcerpt(translated.excerpt || "");
-                setContent(translated.content || "");
-                setActiveLang("en");
-            }
-
-        } catch (err) {
-            alert(err.message);
-        } finally {
-            setSaving(false);
-        }
-    }
-
-    async function handleArticleStatusChange(newStatus) {
-        setArticleStatus(newStatus);
-        try {
-            const res = await fetch("/api/articles/update-status", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(
-                    {
-                        articleId: id,
-                        status: newStatus,
-                    }
-                )
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.error || "Failed to update article status"
-                )
-            }
-        } catch (err) {
-            alert(err.message)
-        }
-    }
-
-
-
-    if (loading) {
-        return <div className="p-6">Loading Article....</div>
-    }
-
-    if (error) {
-        return <div className="p-6 text-red-600">{error}</div>
-    }
-
-    if (!article) {
-        return <div className="p-6">Article not found</div>
-    }
-
-
-
-    return (
-        <div className="max-w-4xl space-y-6">
-            {/*Header*/}
-            <div className="border-b pb-4">
-                <h1 className="text-2xl font-bold">Edit Article</h1>
-                <div className="space-y-1">
-                    <p className="text-sm text-gray-600">
-                        slug: <span className="font-mono">{article.slug}</span>
-                    </p>
-
-
-                    {/* Slug is intentionally read-only after creation */}
-
-                    {articleStatus === "published" && (
-                        <p className="text-xs text-red-600">
-                            ⚠️ Slug is locked after publishing. Changing it will break links.
-                        </p>
-                    )}
-                </div>
-
-
-                <div className="flex items-center gap-4 mt-2">
-                    <span className="text-sm font-medium">Article status:</span>
-
-                    <select
-                        value={articleStatus}
-                        onChange={(e) =>
-                            handleArticleStatusChange(e.target.value)
-                        }
-                        className="p-1 border rounded"
-                    >
-                        <option value="draft">Draft</option>
-                        <option value="published">Published</option>
-                    </select>
-
-                    {articleStatus === "published" && (
-                        <span className="text-xs text-green-700">
-                            Article is live
-                        </span>
-                    )}
-                </div>
-
-
-            </div>
-
-            {/*image upload*/}
-
-            <div className="space-y-2">
-                <label className="text-sm font-medium">Cover Image</label>
-                {article.coverImage && (
-                    <img
-                        src={article.coverImage}
-                        alt="cover"
-                        className="w-full max-h-64 object-cover rounded border" />
-                )}
-
-                <label className="inline-block">
-                    <span className="px-4 py-2 bg-gray-800 text-white rounded cursor-pointer">
-                        {imageUploading ? "Uploading..." : "Upload Cover Image"}
-                    </span>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        disabled={imageUploading}
-                        className="hidden"
-                    />
-                </label>
-
-                {imageUploading && (
-                    <p className="text-xs text-gray-500">Uploading image...</p>
-                )}
-
-            </div>
-            {/* Language Tabs */}
-            <div className="flex gap-2 border-b pb-2">
-                {LANGUAGES.map((lang) => {
-                    const exists = translations.some(t => t.language === lang);
-                    const isTempActive = activeLang === lang;
-
-                    return (
-                        <button
-                            key={lang}
-                            disabled={!exists && !isTempActive}
-                            onClick={() => setActiveLang(lang)}
-                            className={`px-4 py-2 rounded-t border-b-2 text-sm
-                    ${exists
-                                    ? "border-green-600 text-green-700 font-medium"
-                                    : isTempActive
-                                        ? "border-yellow-500 text-yellow-700 font-medium"
-                                        : "border-gray-300 text-gray-400 cursor-not-allowed"
-                                }
-                    ${activeLang === lang ? "bg-gray-100" : ""}
-                `}
-                        >
-                            {lang.toUpperCase()}
-                        </button>
-                    );
-                })}
-            </div>
-
-
-
-            {/*Placeholder for language editor*/}
-            <div className="p-4 border rounded bg-gray-50 space-y-4">
-                <h3 className="font-semibold">Article Content</h3>
-
-                <div className="space-y-1">
-                    <label className="text-sm font-medium">Title</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className="w-full p-2 border rounded"
-                    />
-                </div>
-
-                <div className="space-y-1">
-                    <label className="text-sm font-medium">Excerpt</label>
-                    <textarea
-                        value={excerpt}
-                        onChange={(e) => setExcerpt(e.target.value)}
-                        className="w-full p-2 border rounded h-20"
-                    />
-                </div>
-
-                <div className="space-y-1">
-                    <label className="text-sm font-medium">Content</label>
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        className="w-full p-2 border rounded h-40"
-                    />
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={visibility}
-                        onChange={(e) => setVisibility(e.target.checked)}
-                    />
-                    <label>Visible on site</label>
-                </div>
-
-                <button
-                    onClick={handleSaveTranslation}
-                    disabled={saving}
-                    className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
-                >
-                    {saving
-                        ? "Saving..."
-                        : isEditMode
-                            ? "Update Language"
-                            : "Save Language"}
-                </button>
-            </div>
-
-
+          {/* LANG SWITCH */}
+          <div className="ml-auto flex gap-2">
+            <button
+              onClick={() => setLang("kn")}
+              className={`px-2 py-1 border ${
+                lang === "kn" ? "bg-black text-white" : ""
+              }`}
+            >
+              KN
+            </button>
+            <button
+              onClick={() => setLang("en")}
+              className={`px-2 py-1 border ${
+                lang === "en" ? "bg-black text-white" : ""
+              }`}
+            >
+              EN
+            </button>
+          </div>
         </div>
-    )
+      </div>
 
+      {/* MAIN GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {/* ARTICLE */}
+        <div className="md:col-span-2 max-w-3xl space-y-4">
+          {t.content.split("\n").map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+        </div>
+
+        {/* SIDEBAR */}
+        <div className="space-y-6">
+          {/* ADS */}
+          <div className="border p-4 rounded">
+            <h3 className="font-semibold mb-2">Sponsored</h3>
+            <p className="text-sm">Local Business Ad Space</p>
+          </div>
+
+          <div className="border p-4 rounded">
+            <p className="text-sm">
+              Promote your business here. Contact: 1234567890
+            </p>
+          </div>
+
+          {/* RELATED */}
+          <div className="border p-4 rounded space-y-3">
+            <h3 className="font-semibold">Related Articles</h3>
+
+            {related.map((r) => (
+              <a
+                key={r.id}
+                href={`/article/${r.slug}`}
+                className="block text-sm hover:underline"
+              >
+                {r.translations?.[lang]?.title || r.translations?.["kn"]?.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* NEXT / PREV */}
+      <div className="flex justify-between border-t pt-6">
+        <button className="text-sm text-gray-600 hover:underline">
+          ← Previous
+        </button>
+
+        <button className="text-sm text-gray-600 hover:underline">
+          Next →
+        </button>
+      </div>
+    </div>
+  );
 }

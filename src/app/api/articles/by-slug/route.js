@@ -39,12 +39,8 @@ export async function GET(req) {
 
         let translation = null;
 
-        if (
-            translationSnap.exists &&
-            translationSnap.data().status === "published" &&
-            translationSnap.data().visibility === true
-        ) {
-            translation = translationSnap.data();
+        if (translationSnap.exists) {
+         translation = translationSnap.data();
         }
 
         if (!translation && lang !== "kn") {

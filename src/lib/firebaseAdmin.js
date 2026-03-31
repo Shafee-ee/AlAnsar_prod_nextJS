@@ -9,6 +9,7 @@ if (!getApps().length) {
 
     app = initializeApp({
         credential: cert(parsed),
+        storageBucket: "alansarweekly-a8d84.firebasestorage.app",
     });
 } else {
     app = getApps()[0];

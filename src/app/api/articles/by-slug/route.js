@@ -75,7 +75,7 @@ export async function GET(req) {
             slug: article.slug,
             category: article.category,
             topics: article.topics,
-            image: article.image,
+            image: article.coverImage,
             isFeatured: article.isFeatured,
             language: translation.language,
             title: translation.title,

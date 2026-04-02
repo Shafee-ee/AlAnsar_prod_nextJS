@@ -11,11 +11,9 @@ import {
   Save,
 } from "lucide-react";
 
-import { useLanguage } from "@/context/LanguageContext";
-
 const ArticleView = ({ article }) => {
   const router = useRouter();
-  const { lang } = useTranslation();
+  const [lang, setLang] = useState("en"); // keeping it
   const [isSaved, setIsSaved] = useState(false);
 
   const handleNavigate = (path) => {
@@ -41,11 +39,15 @@ const ArticleView = ({ article }) => {
     return <div className="p-6 text-center">Article not found</div>;
   }
 
-  const shareUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+  const [shareUrl, setShareUrl] = useState("");
+
+    React.useEffect(() => {
+        setShareUrl(window.location.href);
+      }, []);
 
   return (
     <article className="max-w-3xl mx-auto px-4 md:px-0 py-8">
+
       {/* Back */}
       <nav className="mb-6">
         <button
@@ -53,7 +55,7 @@ const ArticleView = ({ article }) => {
           className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
-          {t ? t("back_to_home") : "Back to Home"}
+          Back to Home
         </button>
       </nav>
 
@@ -83,21 +85,24 @@ const ArticleView = ({ article }) => {
         <div className="flex items-center text-gray-600 gap-3 text-sm">
           <span className="font-medium">{article.author}</span>
           <span>•</span>
-          <time>{formatDate(article.date)}</time>
+          <time>
+            {formatDate(article.createdAt || new Date())}
+          </time>
         </div>
       </header>
 
       {/* Content */}
-      <div
-        className="text-[18px] leading-9 text-gray-800 space-y-6"
-        dangerouslySetInnerHTML={{ __html: article.content }}
-      />
+      <div className="text-[18px] leading-9 text-gray-800 space-y-6">
+        {article.content.split("\n").map((p, i) => (
+          <p key={i}>{p}</p>
+        ))}
+      </div>
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t">
         <div className="flex items-center gap-4">
           <span className="text-gray-600 font-semibold">
-            {t ? t("share article") : "Share Article"}:
+            Share Article
           </span>
 
           <a
@@ -144,9 +149,9 @@ const ArticleView = ({ article }) => {
 
       {/* Footer */}
       <footer className="mt-8 text-center text-sm text-gray-500">
-        {t ? t("published on") : "Published on"}{" "}
-        {formatDate(article.date)}{" "}
-        {t ? t("by") : "by"} {article.author}
+        Published on{" "}
+        {formatDate(article.createdAt || new Date())}{" "}
+        By {article.author}
       </footer>
     </article>
   );

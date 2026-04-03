@@ -292,7 +292,7 @@ export default function SingleUpload() {
       )}
 
       <div className="space-y-2">
-        <label className="font-medium">Imam Name (optional)</label>
+        <label className="font-medium">Answered by (optional)</label>
         <input
           type="text"
           value={imamName}

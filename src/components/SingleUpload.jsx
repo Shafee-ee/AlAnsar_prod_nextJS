@@ -338,7 +338,9 @@ export default function SingleUpload() {
       </div>
 
       <div className="space-y-2">
-        <label className="font-medium">Image (16:9 will be auto-cropped)</label>
+        <label className="font-medium">
+          Upload image (16:9 will be auto-cropped)
+        </label>
 
         <div className="flex items-center gap-4">
           <label className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg transition">

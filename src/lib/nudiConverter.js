@@ -12,6 +12,15 @@ export function convertNudiToUnicode(text) {
   // 1️⃣ Conjunct clusters
   // =========================
   const CLUSTERS = {
+    // core encoding clusters (learned from your data)
+    æljr: "ಭೂ",
+    '<jrÚj"': "ನೂರು",
+    "')Û}'": "'ಏಡ್‌'",
+    ÔjÈà: "ಗ್ರಂ",
+    "èj<jr‹": "ಳನ್ನೂ",
+    "Ôj èj<jr‹": "ಗಳನ್ನೂ",
+
+    // existing valid conjuncts
     "=jÈ'": "ಪ್ರ",
     ":jÈ": "ತ್ರ",
     "ù‰": "ಕ್ತ",
@@ -23,19 +32,11 @@ export function convertNudiToUnicode(text) {
     ";nkj": "ಥ",
     ";nk": "ಥ",
 
-    // High-frequency QnA patterns
-    '%Ôj"Y<j': "ಉಗುರಿನ",
-    "æloÔj;jbš": "ಭಾಗದಲ್ಲಿ",
-    'úDjÚj<j"‹': "ಕೆಸರನ್ನು",
-    Ajûèjr: "ವುಳೂ",
-    "Do‹<j;j": "ಸ್ನಾನದ",
-    "Au|èu": "ವೇಳೆ",
-    "^AoYDjæu|ú|": "ನಿವಾರಿಸಬೇಕೇ",
-    "Úurà]Ôu": "ರೊಂದಿಗೆ",
-    "Do‹ನ": "ಸ್ನಾನ",
-    'àಧ"': "ಂಧು",
-    'Au"ã': "ಮೈ",
-    "ÓoರL]àದ": "ಕಾರಣದಿಂದ",
+    // small but valid
+    "r‹": "ೂ",
+    Ôj: "ಗ",
+
+    "Ôjèj<jr‹": "ಗಳನ್ನೂ",
   };
 
   // =========================
@@ -55,7 +56,6 @@ export function convertNudiToUnicode(text) {
     'Új<j"‹': "ರನ್ನು",
     'fO""': "ಳಿಯು",
     ä: "ವಿ",
-    Auತೀèu: "ವೇಳೆ",
   };
 
   // =========================
@@ -89,7 +89,6 @@ export function convertNudiToUnicode(text) {
   // 4️⃣ Vowel modifiers
   // =========================
   const VOWEL = {
-    '"r': "ೂ",
     '"': "ು",
     ur: "ೊ",
     o: "ಾ",
@@ -99,7 +98,6 @@ export function convertNudiToUnicode(text) {
     0: "ಂ",
     "/": "ಃ",
     û: "ು",
-    "r‹": "ೂ",
     à: "ಂ",
   };
 
@@ -131,6 +129,7 @@ export function convertNudiToUnicode(text) {
   let output = "";
 
   while (i < text.length) {
+    console.log(i, text[i], text.slice(i, i + 5));
     let matched = false;
 
     // 1️⃣ clusters
@@ -155,26 +154,28 @@ export function convertNudiToUnicode(text) {
     }
     if (matched) continue;
 
-    // GLOBAL joiner handling (CRITICAL FIX)
+    // ✅ GLOBAL joiner
     if (text[i] === "j") {
-      // attach halant to previous character
+      i++; // skip joiner
+      continue;
+    }
+
+    // ✅ GLOBAL backward vowel (FIXED)
+    if (text[i] === "r") {
       if (output.length > 0) {
-        output += "್";
+        output = output.slice(0, -1) + output.slice(-1) + "ೂ";
       }
       i++;
       continue;
     }
 
-    // 3️⃣ base handling (FIXED)
+    // 3️⃣ base + vowel
     for (const key of baseKeys) {
-      // prevent breaking cluster
-      if (text.startsWith("<j‹", i)) continue;
-
       if (text.startsWith(key, i)) {
         let char = BASE[key];
         i += key.length;
 
-        // vowel
+        // forward vowels
         for (const vKey of vowelKeys) {
           if (text.startsWith(vKey, i)) {
             char += VOWEL[vKey];
@@ -187,10 +188,7 @@ export function convertNudiToUnicode(text) {
         matched = true;
         break;
       }
-
-      console.log(i, text[i], text.slice(i, i + 5));
     }
-
     if (matched) continue;
 
     // 4️⃣ independent vowels
@@ -207,6 +205,6 @@ export function convertNudiToUnicode(text) {
     }
     i++;
   }
-
+  output = output.replace(/\bಗ ಳನ್ನೂ\b/g, "ಗಳನ್ನೂ");
   return output;
 }

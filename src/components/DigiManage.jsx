@@ -13,6 +13,12 @@ import {
 } from "firebase/firestore";
 import toast from "react-hot-toast";
 
+const TYPE_LABELS = {
+  weekly: "Weekly",
+  monthly: "Moilanjee",
+  special: "Special",
+};
+
 export default function DigiManage() {
   const [issues, setIssues] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +112,7 @@ export default function DigiManage() {
 
         {/* Type filter */}
         <div className="flex gap-2">
-          {["all", "weekly", "moilanjee", "specials"].map((t) => (
+          {["all", "weekly", "monthly", "special"].map((t) => (
             <button
               key={t}
               onClick={() => setFilterType(t)}
@@ -139,7 +145,7 @@ export default function DigiManage() {
             </div>
 
             <div className="text-xs text-gray-400 mt-1">
-              Type: {issue.type || "weekly"}
+              Type: {TYPE_LABELS[issue.type] || "Weekly"}{" "}
             </div>
 
             <div className="mt-2">

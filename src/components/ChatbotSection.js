@@ -294,7 +294,30 @@ const ChatbotSection = () => {
 
   //language selection
   const searchParams = useSearchParams();
-  const selectedLang = searchParams.get("lang") === "en" ? "en" : "kn";
+
+  const [selectedLang, setSelectedLang] = useState(() => {
+    const urlLang = searchParams.get("lang");
+
+    if (urlLang === "en" || urlLang === "kn") {
+      return urlLang;
+    }
+
+    const savedLang = localStorage.getItem("lang");
+    if (savedLang === "en" || savedLang === "kn") {
+      return savedLang;
+    }
+
+    return "kn";
+  });
+
+  useEffect(() => {
+    const urlLang = searchParams.get("lang");
+
+    if (urlLang === "en" || urlLang === "kn") {
+      localStorage.setItem("lang", urlLang);
+      setSelectedLang(urlLang);
+    }
+  }, [searchParams]);
 
   /*handle rephrase*/
   function handleRephrase(text) {

@@ -2,14 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Printer,
-  Save,
-  FacebookIcon,
-  TwitterIcon,
-  LinkedinIcon,
-} from "lucide-react";
+import { ArrowLeft, Printer, Save } from "lucide-react";
 
 const ArticleView = ({ article }) => {
   const router = useRouter();
@@ -96,51 +89,6 @@ const ArticleView = ({ article }) => {
       </div>
 
       {/* Actions */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t">
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600 font-semibold">Share Article</span>
-
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
-            target="_blank"
-            className="p-2 bg-gray-100 rounded"
-          >
-            <FacebookIcon className="w-5 h-5" />
-          </a>
-
-          <a
-            href={`https://twitter.com/intent/tweet?url=${shareUrl}`}
-            target="_blank"
-            className="p-2 bg-gray-100 rounded"
-          >
-            <TwitterIcon className="w-5 h-5" />
-          </a>
-
-          <a
-            href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`}
-            target="_blank"
-            className="p-2 bg-gray-100 rounded"
-          >
-            <LinkedinIcon className="w-5 h-5" />
-          </a>
-
-          <button onClick={handlePrint} className="p-2 bg-gray-100 rounded">
-            <Printer className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={handleSaveArticle}
-            className={`p-2 rounded ${
-              isSaved ? "bg-red-100 text-red-700" : "bg-gray-100"
-            }`}
-          >
-            <Save
-              className="w-5 h-5"
-              fill={isSaved ? "currentColor" : "none"}
-            />
-          </button>
-        </div>
-      </div>
 
       {/* Footer */}
       <footer className="mt-8 text-center text-sm text-gray-500">

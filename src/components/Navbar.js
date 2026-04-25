@@ -14,10 +14,10 @@ function LanguageSwitcher({ highlight }) {
   const { lang: currentLang } = useLanguage();
 
   return (
-    <div className="flex items-center bg-white/20 rounded-full p-1 scale-90 md:scale-100">
+    <div className="flex items-center bg-white/10 rounded-full p-[2px] scale-90 md:scale-100">
       <button
         onClick={() => router.push(`${pathname}?lang=en`)}
-        className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${
+        className={`px-2 py-0.5 text-[11px] md:text-xs rounded-full transition ${
           currentLang === "en" ? "bg-white text-[#0B4C8C]" : "text-white"
         }`}
       >
@@ -29,7 +29,7 @@ function LanguageSwitcher({ highlight }) {
 
       <button
         onClick={() => router.push(`${pathname}?lang=kn`)}
-        className={`px-2 md:px-3 py-1 text-[10px] md:text-xs rounded-full transition ${
+        className={`px-2 py-0.5 text-[11px] md:text-xs rounded-full transition ${
           currentLang === "kn" ? "bg-white text-[#0B4C8C]" : "text-white"
         }`}
       >
@@ -66,44 +66,44 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`sticky top-0 z-50 ${primaryBlue} shadow`}>
+    <nav
+      className={`sticky top-0 z-50 ${primaryBlue} border-b border-white/10`}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link href="/" className="flex items-center">
             <img
               src="/logo.png"
               alt="ALANSARWEEKLY Logo"
-              className="h-14 md:h-16 w-auto"
+              className="h-9 md:h-11 w-auto"
             />
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <Link
               href="/"
-              className="text-blue-100 hover:text-white text-lg font-large transition"
+              className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Home
             </Link>
-
             <Link
               href="/about"
-              className="text-blue-100 hover:text-white text-lg font-medium transition"
+              className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Pioneers
             </Link>
-
             <Link
               href="/digipaper"
-              className="text-blue-100 hover:text-white text-lg font-medium transition"
+              className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Digital paper
             </Link>
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Suspense fallback={null}>
               <LanguageSwitcher highlight={highlight} />
             </Suspense>
@@ -122,11 +122,11 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden px-4 pb-4 bg-[#0A3C75] space-y-4">
+        <div className="md:hidden px-4 pb-4 bg-[#0B4C8C] space-y-4">
           <Link
             href="/"
             onClick={() => setIsMenuOpen(false)}
-            className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
+            className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             Home
           </Link>
@@ -134,14 +134,14 @@ const Navbar = () => {
           <Link
             href="/about"
             onClick={() => setIsMenuOpen(false)}
-            className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
+            className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             Pioneers
           </Link>
           <Link
             href="/digipaper"
             onClick={() => setIsMenuOpen(false)}
-            className="block text-white text-base font-medium hover:bg-blue-700 rounded px-3 py-2"
+            className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             Digital Paper
           </Link>

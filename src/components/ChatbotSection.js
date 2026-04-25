@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
+import { BookOpen } from "lucide-react";
+import { IconBubble } from "@/components/IconBubble";
 /* ----------------------------------
    CONFIG
 ---------------------------------- */
@@ -70,7 +72,7 @@ const BotResponseCard = ({
             <button
               key={i}
               onClick={() => onRelatedClick(r.question)}
-              className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
+              className="w-full text-left text-gray-700 text-xs p-2 rounded-md hover:bg-gray-100"
             >
               <MessageCircle className="w-3 h-3 inline mr-1" />
               {r.question}
@@ -96,7 +98,7 @@ const BotResponseCard = ({
         <div className="flex gap-3">
           <button
             onClick={() => onRephrase(query)}
-            className="px-3 py-1 rounded-md bg-green-400 hover:bg-green-500 text-sm"
+            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm"
           >
             Rephrase query
           </button>
@@ -123,15 +125,15 @@ const BotResponseCard = ({
   const isClose = score >= CONFIDENCE.LOW && score < CONFIDENCE.HIGH;
 
   return (
-    <div className="bg-white p-4 rounded-[16px_16px_16px_4px] border border-blue-100 shadow-sm text-sm">
+    <div className="bg-white p-4 rounded-lg border border-gray-200 text-sm">
       {!isSystem && isHigh && (
-        <div className="mb-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full inline-block">
+        <div className="mb-2 text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-sm inline-block">
           Strong match
         </div>
       )}
 
       {!isSystem && isClose && (
-        <div className="mb-2 text-xs font-semibold text-amber-700 bg-amber-50 px-3 py-1 rounded-full inline-block">
+        <div className="mb-2 text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-sm inline-block">
           Close match
         </div>
       )}
@@ -141,7 +143,7 @@ const BotResponseCard = ({
         {best.question}
       </div>
 
-      <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-blue-50 rounded-lg whitespace-pre-line">
+      <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-gray-50 rounded-lg whitespace-pre-line">
         {best.answer}
       </div>
 
@@ -158,7 +160,7 @@ const BotResponseCard = ({
         <div className="flex justify-center gap-3 mb-3 text-xs">
           <button
             onClick={() => onShare(best.id)}
-            className="flex items-center gap-1 px-3 py-1 rounded-md bg-indigo-600 text-white hover:bg-indigo-700"
+            className="flex items-center gap-1 px-3 py-1 rounded-md bg-gray-700 hover:bg-gray-800 text-white"
           >
             <Share2 className="w-3 h-3" /> Share
           </button>
@@ -177,11 +179,11 @@ const BotResponseCard = ({
 
       <div className="flex flex-col items-center gap-2 mb-3 text-xs">
         {!isSystem && isHigh && (
-          <div className="text-green-500">Not what you were looking for?</div>
+          <div className="text-gray-500">Not what you were looking for?</div>
         )}
 
         {!isSystem && isClose && (
-          <div className="text-amber-600">
+          <div className="text-gray-600">
             Not the question you wanted to ask ?
           </div>
         )}
@@ -190,7 +192,7 @@ const BotResponseCard = ({
           {!isSystem && (
             <button
               onClick={onRephrase}
-              className="px-3 py-1 rounded-md bg-green-300 text-gray-700 hover:bg-gray-200"
+              className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700"
             >
               Rephrase query
             </button>
@@ -225,7 +227,7 @@ const BotResponseCard = ({
               <button
                 key={i}
                 onClick={() => onRelatedClick(r.displayText)}
-                className="w-full text-left text-blue-600 hover:text-white text-xs p-2 rounded-lg bg-gray-50 hover:bg-blue-500 border border-gray-200"
+                className="w-full text-left text-gray-700 text-xs p-2 rounded-md hover:bg-gray-100"
               >
                 <MessageCircle className="w-3 h-3 inline mr-1" />
                 {r.displayText}
@@ -250,11 +252,11 @@ const MessageBubble = ({
 }) => {
   if (message.type === "user") {
     return (
-      <div className="flex justify-end mb-3">
+      <div className="flex justify-end mb-5">
         <div
-          className="bg-[#0B4C8C] text-white px-4 py-2.5 
+          className="bg-blue-600 text-white px-4 py-2.5 
                                 rounded-[16px_16px_4px_16px]
-                                max-w-[70%] text-sm shadow"
+                                max-w-[70%] text-sm "
         >
           {message.text}
         </div>
@@ -263,7 +265,7 @@ const MessageBubble = ({
   }
 
   return (
-    <div className="flex justify-start mb-4">
+    <div className="flex justify-start mb-6">
       <div className="max-w-[75%]">
         <BotResponseCard
           result={message.result}
@@ -528,7 +530,8 @@ const ChatbotSection = () => {
   };
 
   return (
-    <section className="min-h-[70vh] flex flex-col items-center bg-blue-0 rounded-lg p-4">
+    <section className="w-full flex flex-col items-center py-12">
+      {" "}
       {toast && (
         <div
           className="fixed top-20 left-1/2 -translate-x-1/2 
@@ -538,17 +541,28 @@ const ChatbotSection = () => {
           {toast}
         </div>
       )}
-      <header className="text-center mb-4">
-        <h1 className="text-3xl text-blue-900 font-extrabold">
-          {headings[selectedLang].title}
-        </h1>
-        <p className="text-blue-500">{headings[selectedLang].subtitle}</p>
-      </header>
+      <header className="text-center mb-6 flex flex-col items-center gap-4">
+        <IconBubble variant="primary">
+          <BookOpen className="w-6 h-6 text-white" />
+        </IconBubble>
 
-      <div className="bg-gray-50 rounded-xl w-full max-w-3xl flex flex-col h-[70vh] border">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900">
+            {headings[selectedLang].title}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            {headings[selectedLang].subtitle}
+          </p>
+        </div>
+      </header>
+      <div
+        className="w-full max-w-2xl mx-auto flex flex-col 
+bg-white border border-gray-200 rounded-lg overflow-hidden"
+      >
+        {" "}
         <div
           ref={chatRef}
-          className="flex-grow px-4 py-6 overflow-y-auto flex flex-col"
+          className="flex-grow px-4 py-6 overflow-y-auto flex flex-col h-[65vh]"
         >
           {messages.length === 0 && !isLoading ? (
             /* CENTERED EMPTY STATE */
@@ -578,8 +592,8 @@ const ChatbotSection = () => {
             </>
           )}
         </div>
-
-        <div className="p-3 border-t bg-white rounded-b-xl">
+        <div className="p-3 border-t border-gray-200 bg-white">
+          {" "}
           <div className="flex items-center gap-2">
             <input
               ref={inputRef}
@@ -592,12 +606,12 @@ const ChatbotSection = () => {
                   ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                   : "Type your question..."
               }
-              className="flex-grow px-4 py-3 rounded-full text-gray-700 border focus:ring-2 focus:ring-indigo-500"
+              className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
             />
             <button
               disabled={isLoading || !userInput.trim()}
               onClick={() => handleSend()}
-              className="bg-indigo-600 text-white p-3 rounded-full disabled:opacity-40"
+              className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
             >
               <Send className="w-5 h-5" />
             </button>

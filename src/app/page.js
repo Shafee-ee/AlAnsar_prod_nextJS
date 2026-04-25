@@ -29,10 +29,8 @@ export default function Home() {
     }
 
     window.addEventListener("trigger-ask-question", handler);
-    return () =>
-      window.removeEventListener("trigger-ask-question", handler);
+    return () => window.removeEventListener("trigger-ask-question", handler);
   }, []);
-
 
   if (loading) {
     return (
@@ -46,18 +44,11 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F0F8FF] flex flex-col font-sans p-4 md:p-8">
-      <div className="w-full max-w-7xl mx-auto py-8 space-y-10">
-
-
+    <div className="min-h-screen bg-[#f8f9fb] font-sans">
+      <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
         <HomeCarousel lang={lang} />
-
-
         <Suspense fallback={null}>
-
-          <div className="bg-white rounded-xl shadow-md p-6 md:p-10">
-            <ChatbotSection />
-          </div>
+          <ChatbotSection />
         </Suspense>
         <div ref={askRef} className="ask-wrapper">
           {showAskBox && (
@@ -68,10 +59,6 @@ export default function Home() {
             />
           )}
         </div>
-
-
-
-
       </div>
     </div>
   );

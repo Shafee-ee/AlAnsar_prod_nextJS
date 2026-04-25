@@ -39,7 +39,7 @@ export default function HomeCarousel({ lang }) {
             : "1991ರಿಂದ ಪ್ರಾಮಾಣಿಕ ಇಸ್ಲಾಮಿಕ್ ಪಂಡಿತೀಯ ಪರಂಪರೆಯನ್ನು ಸಂರಕ್ಷಿಸುತ್ತಿದೆ"}
         </p>
         <div className="pt-6 ">
-          <div className="bg-white/80 backdrop-blur rounded-2xl shadow-md px-8 py-6 flex items-center justify-center gap-4 mx-auto w-fit">
+          <div className="bg-white/40 backdrop-blur rounded-2xl shadow-md px-8 py-6 flex items-center justify-center gap-4 mx-auto w-fit">
             {/* Icon */}
             <IconBubble variant="soft">
               <MessageCircleQuestion className="w-7 h-7 text-blue-600" />

@@ -31,7 +31,7 @@ const Footer = () => {
               WhatsApp: 733 857 8560
             </div>
 
-            <div className="mt-2 text-sm flex items-center justify-center md:justify-start gap-2">
+            <div className="mt-2 text-sm flex justify-center md:justify-start gap-2">
               <Mail className="w-4 h-4" />
               <a
                 href="mailto:alansarmoilanji@gmail.com"

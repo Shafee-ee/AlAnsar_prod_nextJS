@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Printer,
-  Facebook,
-  Linkedin,
-  Twitter,
   Save,
+  FacebookIcon,
+  TwitterIcon,
+  LinkedinIcon,
 } from "lucide-react";
 
 const ArticleView = ({ article }) => {
@@ -41,13 +41,12 @@ const ArticleView = ({ article }) => {
 
   const [shareUrl, setShareUrl] = useState("");
 
-    React.useEffect(() => {
-        setShareUrl(window.location.href);
-      }, []);
+  React.useEffect(() => {
+    setShareUrl(window.location.href);
+  }, []);
 
   return (
     <article className="max-w-3xl mx-auto px-4 md:px-0 py-8">
-
       {/* Back */}
       <nav className="mb-6">
         <button
@@ -85,9 +84,7 @@ const ArticleView = ({ article }) => {
         <div className="flex items-center text-gray-600 gap-3 text-sm">
           <span className="font-medium">{article.author}</span>
           <span>•</span>
-          <time>
-            {formatDate(article.createdAt || new Date())}
-          </time>
+          <time>{formatDate(article.createdAt || new Date())}</time>
         </div>
       </header>
 
@@ -101,16 +98,14 @@ const ArticleView = ({ article }) => {
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4 mt-12 pt-6 border-t">
         <div className="flex items-center gap-4">
-          <span className="text-gray-600 font-semibold">
-            Share Article
-          </span>
+          <span className="text-gray-600 font-semibold">Share Article</span>
 
           <a
             href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`}
             target="_blank"
             className="p-2 bg-gray-100 rounded"
           >
-            <Facebook className="w-5 h-5" />
+            <FacebookIcon className="w-5 h-5" />
           </a>
 
           <a
@@ -118,7 +113,7 @@ const ArticleView = ({ article }) => {
             target="_blank"
             className="p-2 bg-gray-100 rounded"
           >
-            <Twitter className="w-5 h-5" />
+            <TwitterIcon className="w-5 h-5" />
           </a>
 
           <a
@@ -126,7 +121,7 @@ const ArticleView = ({ article }) => {
             target="_blank"
             className="p-2 bg-gray-100 rounded"
           >
-            <Linkedin className="w-5 h-5" />
+            <LinkedinIcon className="w-5 h-5" />
           </a>
 
           <button onClick={handlePrint} className="p-2 bg-gray-100 rounded">
@@ -149,9 +144,8 @@ const ArticleView = ({ article }) => {
 
       {/* Footer */}
       <footer className="mt-8 text-center text-sm text-gray-500">
-        Published on{" "}
-        {formatDate(article.createdAt || new Date())}{" "}
-        By {article.author}
+        Published on {formatDate(article.createdAt || new Date())} By{" "}
+        {article.author}
       </footer>
     </article>
   );

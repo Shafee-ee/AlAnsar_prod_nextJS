@@ -107,7 +107,7 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="pt-6 text-center text-sm text-white/50 text-xs border-t border-white/10 pt-4 mt-6">
+        <div className="pt-6 text-center text-sm text-white/50 text-xs  border-white/10 pt-4 mt-6">
           © {new Date().getFullYear()} Al Ansar Weekly. All rights reserved.
         </div>
       </div>

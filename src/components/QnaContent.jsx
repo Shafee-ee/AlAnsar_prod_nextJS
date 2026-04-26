@@ -52,13 +52,12 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
           </div>
 
           {/* ANSWER SOURCE */}
-          <div className="mt-8 text-sm text-gray-400 border-l-4 border-green-300 pl-4 leading-relaxed">
-            <p className="font-medium text-gray-800 mb-2">
+          <div className="mt-8 text-sm text-gray-600 border-l-4 border-green-300 pl-4 leading-relaxed">
+            <p className="font-semibold text-gray-800 mb-2">
               <span className="text-green-600">
                 {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}
               </span>
             </p>
-
             {hasAttribution ? (
               <>
                 {data.imam_name && (
@@ -132,7 +131,7 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
           </div>
 
           {/* ANSWER LABEL */}
-          <div className="mt-6 text-sm font-medium text-gray-500">
+          <div className="mt-8 text-sm font-medium text-gray-500">
             {lang === "en" ? "Answer" : "ಉತ್ತರ"}
           </div>
 

@@ -230,13 +230,13 @@ export default function SingleUpload() {
         ></textarea>
       </div>
 
-      <button
+      {/* <button
         type="button"
         onClick={handleFixEncoding}
         className="bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-900 transition"
       >
         Fix Kannada Encoding
-      </button>
+      </button> */}
 
       {/* Keywords */}
       <div className="space-y-2">

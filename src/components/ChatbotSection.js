@@ -333,15 +333,30 @@ const ChatbotSection = () => {
   useEffect(() => {
     const saved = localStorage.getItem("chat_history");
 
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setMessages(parsed);
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+
+      const TWO_HOURS = 2 * 60 * 60 * 1000;
+
+      // ✅ NEW FORMAT (object with timestamp)
+      if (parsed?.messages && parsed?.timestamp) {
+        if (Date.now() - parsed.timestamp > TWO_HOURS) {
+          localStorage.removeItem("chat_history");
+          return;
         }
-      } catch {
-        localStorage.removeItem("chat_history");
+
+        setMessages(parsed.messages);
+        return;
       }
+
+      // ✅ OLD FORMAT (array) — fallback support
+      if (Array.isArray(parsed)) {
+        setMessages(parsed.slice(-20)); // also cap it
+      }
+    } catch {
+      localStorage.removeItem("chat_history");
     }
   }, []);
 
@@ -357,7 +372,16 @@ const ChatbotSection = () => {
     if (messages.length === 0) {
       localStorage.removeItem("chat_history");
     } else {
-      localStorage.setItem("chat_history", JSON.stringify(messages));
+      const MAX_MESSAGES = 30;
+      const trimmedMessages = messages.slice(-MAX_MESSAGES);
+
+      localStorage.setItem(
+        "chat_history",
+        JSON.stringify({
+          messages: trimmedMessages,
+          timestamp: Date.now(),
+        }),
+      );
     }
   }, [messages]);
 

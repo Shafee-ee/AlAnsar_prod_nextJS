@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { MessageCircleQuestion } from "lucide-react";
+import { MessageCircleQuestion, MoonStar } from "lucide-react";
 import { IconBubble } from "@/components/IconBubble";
 
 export default function HomeCarousel({ lang }) {
@@ -32,14 +32,18 @@ export default function HomeCarousel({ lang }) {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900">
           {lang === "en" ? "Al Ansar Weekly" : "ಅಲ್ ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆ"}
         </h1>
-        <div className="w-16 h-[2px] bg-blue-500 mx-auto rounded-full"></div>
+        <div className="flex items-center justify-center gap-4 my-4">
+          <div className="h-[2px] w-16 bg-blue-500 rounded-full"></div>
+          <MoonStar className="text-blue-500 w-8 h-8" />
+          <div className="h-[2px] w-16 bg-blue-500 rounded-full"></div>
+        </div>{" "}
         <p className="text-base sm:text-lg text-gray-900 ">
           {lang === "en"
             ? "Preserving Authentic Islamic Scholarship Since 1991"
             : "1991ರಿಂದ ಪ್ರಾಮಾಣಿಕ ಇಸ್ಲಾಮಿಕ್ ಪಂಡಿತೀಯ ಪರಂಪರೆಯನ್ನು ಸಂರಕ್ಷಿಸುತ್ತಿದೆ"}
         </p>
         <div className="pt-6 ">
-          <div className="bg-white/40 backdrop-blur rounded-2xl shadow-md px-8 py-6 flex items-center justify-center gap-4 mx-auto w-fit">
+          <div className="bg-white/10 backdrop-blur rounded-2xl shadow-md px-8 py-6 flex items-center justify-center gap-4 mx-auto w-fit">
             {/* Icon */}
             <IconBubble variant="soft">
               <MessageCircleQuestion className="w-7 h-7 text-blue-600" />

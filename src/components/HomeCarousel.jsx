@@ -51,9 +51,18 @@ export default function HomeCarousel({ lang }) {
 
             {/* Text */}
             <div className="text-left">
-              <p className="text-3xl sm:text-4xl font-semibold text-gray-900">
-                {total !== null ? `${total}+` : "..."}
-              </p>
+              {total !== null ? (
+                <p className="text-3xl sm:text-4xl font-semibold text-gray-900">
+                  {total}+
+                </p>
+              ) : (
+                <div className="h-[36px] sm:h-[40px] w-[100px] flex items-center justify-center  gap-3">
+                  <span className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></span>
+                  <span className="w-2 h-2 bg-gray-600 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                  <span className="w-2 h-2 bg-gray-600 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+              )}
+
               <p className="text-sm text-gray-600">
                 {lang === "en" ? "Questions Answered" : "ಉತ್ತರಿಸಲಾದ ಪ್ರಶ್ನೆಗಳು"}
               </p>

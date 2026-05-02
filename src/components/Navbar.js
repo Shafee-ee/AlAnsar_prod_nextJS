@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
+import { useTransition } from "react";
 
 const primaryBlue = "bg-[#0B4C8C]";
 
@@ -13,30 +14,47 @@ function LanguageSwitcher({ highlight }) {
   const searchParams = useSearchParams();
   const { lang: currentLang } = useLanguage();
 
+  const [localLang, setLocalLang] = React.useState(currentLang);
+
+  React.useEffect(() => {
+    setLocalLang(currentLang);
+  }, [currentLang]);
+
+  const [isPending, startTransition] = useTransition();
+
+  const handleLangChange = (lang) => {
+    if (lang === currentLang) return;
+
+    setLocalLang(lang); // 🔥 THIS is the key line
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("lang", lang);
+
+    startTransition(() => {
+      router.push(`${pathname}?${params.toString()}`);
+    });
+  };
+
   return (
     <div className="flex items-center bg-white/10 rounded-full p-[2px] scale-90 md:scale-100">
       <button
-        onClick={() => router.push(`${pathname}?lang=en`)}
+        onClick={() => handleLangChange("en")}
         className={`px-2 py-0.5 text-[11px] md:text-xs rounded-full transition ${
-          currentLang === "en" ? "bg-white text-[#0B4C8C]" : "text-white"
-        }`}
+          localLang === "en" ? "bg-white text-[#0B4C8C]" : "text-white"
+        } ${isPending ? "opacity-70" : ""}`}
       >
         EN
-        {highlight && currentLang === "en" && (
-          <span className="lang-underline" />
-        )}
+        {highlight && localLang === "en" && <span className="lang-underline" />}
       </button>
 
       <button
-        onClick={() => router.push(`${pathname}?lang=kn`)}
+        onClick={() => handleLangChange("kn")}
         className={`px-2 py-0.5 text-[11px] md:text-xs rounded-full transition ${
-          currentLang === "kn" ? "bg-white text-[#0B4C8C]" : "text-white"
-        }`}
+          localLang === "kn" ? "bg-white text-[#0B4C8C]" : "text-white"
+        } ${isPending ? "opacity-70" : ""}`}
       >
         KN
-        {highlight && currentLang === "kn" && (
-          <span className="lang-underline" />
-        )}
+        {highlight && localLang === "kn" && <span className="lang-underline" />}
       </button>
     </div>
   );

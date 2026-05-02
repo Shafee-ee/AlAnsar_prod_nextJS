@@ -1,5 +1,6 @@
 import { adminDB } from "@/lib/firebaseAdmin";
 import Link from "next/link";
+import DigiFilters from "@/components/DigiFilters";
 
 export const dynamic = "force-dynamic";
 
@@ -78,42 +79,10 @@ export default async function DigiPaperListing(props) {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4">
       {/*Type filter*/}
-      <div className="max-w-6xl mx-auto  mb-6 flex gap-4">
-        {["weekly", "monthly", "special"].map((type) => (
-          <Link
-            key={type}
-            href={`/digipaper?type=${type}${selectedYear ? `&year=${selectedYear}` : ""}`}
-            className={`px-4 py-2 rounded ${
-              selectedType === type
-                ? "bg-green-200 border-2 border-green-600 text-green-800"
-                : "bg-gray-100 border-2 border-gray-500 text-gray-700"
-            }`}
-          >
-            {type === "weekly" && "Weekly"}
-            {type === "monthly" && "Moilanjee"}
-            {type === "special" && "Specials"}
-          </Link>
-        ))}
-      </div>
 
       {/* Year Filter */}
-      <div className="max-w-6xl mx-auto mb-6 flex gap-4 text-sm">
-        <Link
-          href={`/digipaper?type=${selectedType}`}
-          className={!selectedYear ? "font-bold" : ""}
-        >
-          All Years
-        </Link>
-
-        {years.map((year) => (
-          <Link
-            key={year}
-            href={`/digipaper?type=${selectedType}&year=${year}`}
-            className={selectedYear === year ? "font-bold" : ""}
-          >
-            {year}
-          </Link>
-        ))}
+      <div className="max-w-6xl mx-auto mb-6">
+        <DigiFilters selectedType={selectedType} selectedYear={selectedYear} />
       </div>
 
       {/* Showing Info */}

@@ -1,0 +1,1849 @@
+Current tree: 
+
+tree src /f
+Folder PATH listing for volume crucial drive
+Volume serial number is 7CE2-F75F
+
+Volume serial number is E2DA-00C7
+C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\SRC
+├───app
+│   │   favicon.ico
+│   │   globals.css
+│   │   layout.js
+│   │   page.js
+│   │   
+│   ├───about
+│   │       page.jsx
+│   │       
+│   ├───admin
+│   │   │   layout.js
+│   │   │   page.js
+│   │   │   
+│   │   ├───articles
+│   │   │   │   page.jsx
+│   │   │   │   
+│   │   │   ├───by-id
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───new
+│   │   │   │       page.jsx
+│   │   │   │       
+│   │   │   └───[id]
+│   │   │           page.jsx
+│   │   │           
+│   │   ├───digipaper
+│   │   │   │   loading.jsx
+│   │   │   │   page.jsx
+│   │   │   │   
+│   │   │   ├───manage
+│   │   │   │       page.jsx
+│   │   │   │       
+│   │   │   └───upload
+│   │   │           page.jsx
+│   │   │           
+│   │   └───qna
+│   │       │   page.jsx
+│   │       │   
+│   │       └───qna-submissions
+│   │               page.jsx
+│   │               
+│   ├───api
+│   │   ├───articles
+│   │   │   │   route.js
+│   │   │   │   
+│   │   │   ├───by-id
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───by-slug
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───create
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───related
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───translations
+│   │   │   │   ├───create
+│   │   │   │   │       route.js
+│   │   │   │   │       
+│   │   │   │   ├───list
+│   │   │   │   │       route.js
+│   │   │   │   │       
+│   │   │   │   └───update
+│   │   │   │           route.js
+│   │   │   │           
+│   │   │   ├───update-status
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   └───upload-image
+│   │   │           route.js
+│   │   │           
+│   │   ├───digipaper
+│   │   ├───embed
+│   │   │       route.js
+│   │   │       
+│   │   ├───is-admin
+│   │   │       route.js
+│   │   │       
+│   │   ├───qa-search
+│   │   │       route.js
+│   │   │       
+│   │   ├───qna
+│   │   │   ├───audit
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───bulk
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───by-id
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───csv
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───delete
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───delete-all
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───delete-submissions
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───export
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───fix-all
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───fix-embedding
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───link-submissions
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───list
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───paginated
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───single
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───submissions-count
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───submissions-list
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───update
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───update-submission-status
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   └───user-submission
+│   │   │           route.js
+│   │   │           
+│   │   ├───stats
+│   │   │       route.js
+│   │   │       
+│   │   └───translate
+│   │           route.js
+│   │           
+│   ├───article
+│   │   └───[slug]
+│   │           page.jsx
+│   │           
+│   ├───digipaper
+│   │   │   layout.jsx
+│   │   │   page.jsx
+│   │   │   
+│   │   └───[slug]
+│   │           page.jsx
+│   │           
+│   ├───login
+│   │       page.js
+│   │       
+│   ├───nudi-analyzer
+│   │       page.jsx
+│   │       
+│   └───qna
+│       └───[id]
+│           │   loading.jsx
+│           │   page.jsx
+│           │   
+│           └───opengraph-image
+│               └───[lang]
+│                       route.jsx
+│                       
+├───components
+│       ArticleCard.js
+│       ArticleCarousel.js
+│       ArticleComponents.js
+│       ArticleView.js
+│       AskQuestionBox.jsx
+│       AuthProvider.js
+│       BulkUpload.jsx
+│       ChatbotSection.js
+│       ClientAppWrapper.js
+│       DigiFilters.jsx
+│       DigiManage.jsx
+│       DigiUpload.jsx
+│       Footer.js
+│       HomeCarousel.jsx
+│       IconBubble.jsx
+│       ManageQnA.js
+│       Navbar.js
+│       nudiAnalyzer.jsx
+│       QnaContent.jsx
+│       QnaShareButton.jsx
+│       QRModal.jsx
+│       SingleUpload.jsx
+│       
+├───context
+│       AuthContext.js
+│       LanguageContext.js
+│       
+├───lib
+│       email.js
+│       firebaseAdmin.js
+│       firebaseClient.js
+│       geminiTranslate.js
+│       nudiAnalyzer.js
+│       nudiConverter.js
+│       vertexEmbedding.js
+│       
+└───models
+        Article.js
+        
+PS C:\Users\shafe\OneDrive\Desktop\Technopulse\AlAnsarWeekly.com\alansarweekly-app> 
+
+
+PS D:\Technopulse\AlAnsarWeekly.com\alansarweekly-app> 
+
+AL ANSAR – SYSTEM OVERVIEW
+
+CORE PURPOSE
+
+AlAnsar is an Islamic knowledge platform consisting of:
+
+Multilingual Islamic QnA semantic search system
+
+Admin-managed QnA ingestion pipeline
+
+DigiPaper publishing system
+
+(Articles system currently on hold)
+
+Current active languages:
+
+Kannada
+
+English
+Language switching handled via global toggle (LanguageContext).
+
+Articles module is temporarily ignored.
+
+TECH STACK
+
+Framework:
+
+Next.js 15 (App Router)
+
+Backend:
+
+Firebase (Firestore + Storage)
+
+Firebase Admin SDK
+
+Firebase Client SDK
+
+AI Services:
+
+Gemini Flash 2.5 (translation)
+
+Vertex AI embeddings (English embedding generation)
+
+Architecture Pattern:
+
+Admin ingestion → Translation → Embedding generation → Firestore storage
+
+User query → Embedding generation → Cosine similarity → Ranked results
+
+CORE SYSTEMS
+
+QnA INGESTION SYSTEM (Active – Production Use)
+
+Purpose:
+Daily upload of legacy Islamic QnAs.
+
+Methods:
+
+Single upload
+
+Bulk upload
+
+Workflow:
+
+Admin uploads Kannada QnA from legacy archive.
+
+Gemini Flash 2.5 translates content (Kannada ↔ English).
+
+English text is used to generate embeddings.
+
+Firestore stores:
+
+Kannada text
+
+English text
+
+Embedding vector
+
+Metadata
+
+Embeddings are stored in English only (standardization decision).
+
+Status: Stable and actively used.
+
+QnA SEMANTIC SEARCH CHATBOT
+
+Purpose:
+Allow users to ask Islamic questions and retrieve semantically relevant QnAs.
+
+Flow:
+
+User submits question.
+
+Question embedding generated (English).
+
+Cosine similarity computed against stored embeddings.
+
+Top matches returned.
+
+Related queries shown for engagement.
+
+Search logic located in:
+
+/api/qa-search
+
+vertexEmbedding.js
+
+Cosine similarity function
+
+Status: Functional.
+
+ADMIN PANEL
+
+Location:
+app/admin
+
+Modules:
+
+A) QnA Manager – COMPLETE
+
+Single upload
+
+Bulk upload
+
+Filter QnAs
+
+Edit QnAs
+
+Delete QnAs
+
+B) DigiPaper Manager – 95% COMPLETE
+
+Upload PDF
+
+Remove PDF
+
+Publish control
+
+Stored in Firebase Storage
+
+5% pending (final polish)
+
+C) Submitted Questions – 60% COMPLETE
+
+User-submitted questions stored
+
+Moderation UI incomplete
+
+Remaining: workflow finalization
+
+D) Articles – 75% COMPLETE (ON HOLD)
+
+NUDI CONVERTER SYSTEM
+
+Purpose:
+Replace OCR workflow.
+
+Context:
+Legacy Kannada PDFs use Nudi encoding.
+Copy-paste produces junk encoding.
+Client-side converter fixes encoding before upload.
+
+Strategy:
+
+Longest-key-first matching
+
+BASE + INDEPENDENT + VOWEL mapping
+
+Sequential scan pointer logic
+
+Constraint:
+Conversion happens only in textbox.
+Database stores only proper Unicode.
+
+Status:
+Structurally correct.
+Currently debugging character identity mismatches.
+
+DIGIPAPER SYSTEM
+
+Route:
+app/digipaper
+
+Function:
+
+Admin uploads Ramadan or weekly PDF editions
+
+Stored in Firebase Storage
+
+Public view page per slug
+
+Status:
+95% complete.
+
+RAMZAN PAGE (NOT STARTED – 0%)
+
+Planned Features:
+
+Namaz timings (via free public API)
+
+4 buttons in row
+
+Each button opens image (Dua of the day)
+
+Likely static images stored locally or in storage
+
+To Be Designed:
+
+API integration
+
+Caching strategy
+
+UI layout
+
+FRONTEND STATUS
+
+Base layout complete
+
+Navbar + language toggle working
+
+Core UI stable
+
+Banner requires redesign
+
+PROJECT STRUCTURE (ABBREVIATED)
+
+app/
+
+admin/
+
+api/
+
+qna/[id]
+
+digipaper/[slug]
+
+nudi-analyzer/
+
+components/
+
+AskQuestionBox
+
+ManageQnA
+
+DigiUpload
+
+QnaShareButton
+
+etc.
+
+context/
+
+AuthContext
+
+LanguageContext
+
+lib/
+
+firebaseAdmin
+
+firebaseClient
+
+geminiTranslate
+
+vertexEmbedding
+
+nudiConverter
+
+ARCHITECTURAL CONSTRAINTS
+
+Firestore read cost must remain controlled.
+
+Avoid public write abuse.
+
+Embeddings must be standardized in English.
+
+SEO important (OpenGraph implemented).
+
+Dynamic route metadata handled via generateMetadata.
+
+CURRENT PRIORITIES
+
+Stabilize Nudi converter. [on hold]
+
+Finish DigiPaper 5%.
+
+update QnA database as the client needs more fields to be added.
+
+Build Ramzan page.
+
+Complete Submitted Questions workflow. 
+
+Improve banner UI.
+
+
+nA Page Architecture Refactor
+Before
+
+QnaContent used LanguageContext
+
+LanguageContext depended on useSearchParams()
+
+Language switch caused reactive router updates
+
+Full subtree re-render
+
+Felt janky
+
+After
+
+Language is derived server-side from searchParams
+
+Passed to QnaContent as a prop
+
+QnaContent is now pure UI
+
+No useSearchParams
+
+No LanguageContext dependency
+
+Tradeoff
+
+Slightly less “instant” client switching
+
+But more stable architecture
+
+Cleaner separation of concerns
+
+Better predictability
+
+No reactive router coupling
+
+This is the correct App Router pattern.
+
+2️⃣ Server vs Client Separation
+
+We enforced:
+
+Server Component (page.jsx)
+
+Fetch Firestore document
+
+Compute related questions
+
+Compute embeddings
+
+Pass id, data, relatedQuestions, lang
+
+Client Component (QnaContent)
+
+Pure rendering
+
+No fetching
+
+No heavy logic
+
+Receives everything via props
+
+Benefit
+
+Clear responsibility boundaries
+
+Easier debugging
+
+Easier scaling
+
+Better mental model
+
+3️⃣ Embedding Cache Strategy
+
+In:
+
+/api/qa-search
+
+We implemented:
+
+let cachedItems = null;
+let lastLoadTime = 0;
+
+With 10-minute TTL.
+
+Why
+
+Avoid loading all embeddings from Firestore on every search request.
+
+Tradeoff
+
+Memory cache resets on server restart
+
+Not distributed (won’t share across instances)
+
+Good for current scale (~10k records)
+
+Redis would be next step for scale
+
+For now: correct decision.
+
+4️⃣ Semantic Search Flow
+
+Your search pipeline now does:
+
+Normalize input
+
+Detect Kannada → translate to English
+
+Exact match check
+
+Intent validation
+
+Generate embedding
+
+Cosine similarity scoring
+
+Rank score boost logic
+
+Confidence threshold filtering
+
+Fuzzy fallback using token overlap
+
+Related suggestion logic
+
+Strength
+
+Handles exact
+
+Handles semantic similarity
+
+Handles intent mismatch
+
+Handles low confidence
+
+Handles keyword explore mode
+
+That’s a robust retrieval pipeline.
+
+5️⃣ Field Name Consistency Fix
+
+We fixed mismatch:
+
+Wrong:
+
+editorNote_en
+
+Correct:
+
+editor_note_en
+
+This prevents silent UI bugs.
+
+6️⃣ Next.js 15 Breaking Change Fix
+
+Error:
+
+params should be awaited
+searchParams should be awaited
+
+Fix:
+
+export default async function QnAPage(props) {
+  const params = await props.params;
+  const searchParams = await props.searchParams;
+}
+Why
+
+Next 15 dynamic route APIs are async.
+
+7️⃣ Related Links & Language Preservation
+
+We updated:
+
+href={`/qna/${item.id}?lang=${lang}`}
+
+And CTA:
+
+href={`/?lang=${lang}`}
+
+So language context persists across navigation.
+
+8️⃣ Why First Language Switch Was Slow
+
+Because:
+
+App Router fetches RSC payload for that route variation
+
+First visit loads and caches it
+
+Subsequent switches use cache
+
+That behavior is expected, not a bug.
+
+9️⃣ Architectural Tradeoffs We Chose
+We chose:
+
+Server-driven language
+
+Prop-based rendering
+
+In-memory embedding cache
+
+Firestore as primary store
+
+No Redis yet
+
+No global language context for QnA
+
+We avoided:
+
+Client-only language switching
+
+Mixed router/context architecture
+
+Over-optimizing prematurely
+
+10️⃣ Current System State
+
+You now have:
+
+Stable QnA route
+
+Clean separation
+
+Fast search endpoint (after cache warmup)
+
+Multilingual support
+
+Semantic ranking
+
+Fallback safety
+
+Proper metadata generation
+
+No hydration warnings
+
+No schema mismatch
+
+This is production-grade for your current scale.
+
+If you want, next we can:
+
+Optimize API latency further
+
+Add Redis properly
+
+Precompute related questions
+
+Improve ranking logic
+
+Move to vector database
+
+Harden search edge cases
+
+Where do you want to go next?
+
+///
+. Image Upload UX Improvements
+
+File: SingleUpload component
+
+Replaced plain file input text with a styled “Select Image” button.
+
+Added spinner during image processing/upload.
+
+Removed success toast for image upload.
+
+Disabled QnA submit while image is uploading.
+
+Ensured 16:9 crop via canvas before upload.
+
+Compressed image to JPEG (85%) to control size.
+
+Stored single image in image_urls array format.
+
+Result: Controlled upload flow, no premature submission, cleaner UX.
+
+2. Schema Alignment Across Application
+
+Standardized Firestore fields:
+
+question_en
+
+answer_en
+
+question_kn
+
+answer_kn
+
+editor_note_en
+
+editor_note_kn
+
+imam_name
+
+source_title
+
+samputa
+
+sanchike
+
+image_urls
+
+embedding
+
+createdAt
+
+updatedAt
+
+status
+
+All frontend + backend references were aligned to this schema.
+
+3. Edit Modal Expansion
+
+File: ManageQnA
+
+Enhancements:
+
+Added editing support for:
+
+editor_note_en
+
+editor_note_kn
+
+imam_name
+
+source_title
+
+samputa
+
+sanchike
+
+Ensured numeric fields convert correctly (null handling).
+
+Fixed state merge to prevent overwriting backend-only fields.
+
+Save payload now matches Firestore schema exactly.
+
+Translation buttons properly update English/Kannada fields.
+
+Result: Full schema editing support without accidental data loss.
+
+4. Safe Embedding Regeneration Logic
+
+File: /api/qna/update
+
+Major change:
+
+Before:
+
+Embedding regenerated only if English question changed.
+
+Now:
+
+Regenerates embedding if English question OR English answer changes.
+
+Uses combined text:
+
+const combinedText = `${newQuestion} ${newAnswer}`.trim();
+
+If neither changes → old embedding preserved.
+
+If English content becomes empty → embedding cleared intentionally.
+
+Metadata updates do NOT regenerate embeddings.
+
+Result: Accurate semantic search behavior.
+
+5. QnaContent Rendering Consistency
+
+File: QnaContent
+
+Verified:
+
+Proper fallback image when image_urls missing.
+
+Overlay question display on hero image.
+
+Editor note correctly uses editor_note_en / editor_note_kn.
+
+Attribution logic works with new fields.
+
+Related questions use image_urls correctly.
+
+Result: Frontend display fully aligned with updated schema.
+
+6. Data Integrity Guarantees Achieved
+
+After this session:
+
+No accidental embedding regeneration.
+
+No accidental image wipe during edit.
+
+No state corruption in table UI.
+
+All new fields editable and persisted.
+
+Embeddings reflect full English QnA content.
+
+Metadata and OpenGraph unaffected.
+
+Firestore updates are atomic.
+
+Files Worked On
+
+SingleUpload (image upload UX)
+
+ManageQnA (edit modal + state safety)
+
+/api/qna/update (embedding regeneration logic)
+
+QnaContent (schema verification + rendering consistency)
+
+System State After Session
+
+The QnA lifecycle is now consistent end-to-end:
+
+Upload → Store → Edit → Update → Regenerate Embedding → Render → Related Search
+
+No schema mismatches remain.
+
+You are safe to deploy this version.
+
+///
+1️⃣ QnaContent Attribution Bug Fix
+
+File:
+components/QnaContent.jsx
+
+Issue
+
+samputa and sanchike were showing even when value was 0.
+This prevented the disclaimer block from appearing.
+
+Fix
+
+Changed attribution logic from:
+
+data.samputa !== null
+
+to proper truthy numeric checks so 0 does not count as valid data.
+
+Result:
+
+If samputa/sanchike are 0 or null → disclaimer shows
+
+If valid numbers → attribution block shows correctly
+
+2️⃣ QnaContent Layout Order Change
+
+File:
+components/QnaContent.jsx
+
+Change
+
+Reordered layout so:
+
+Before:
+Image → Badge → Answer → Source → Related
+
+After:
+Image → Badge → Answer Source → Answer → Related
+
+This makes scholarly attribution visible before the answer body.
+
+3️⃣ Chatbot "Open" Button
+
+File:
+components/ChatbotSection.jsx
+
+Added:
+
+New button next to Share:
+
+<ExternalLink />
+Open
+
+Opens:
+
+/qna/${best.id}?lang=${selectedLang}
+Important Fix
+
+Initially it always opened Kannada.
+
+We fixed by:
+
+Passing selectedLang into BotResponseCard
+
+Using it in the Open link
+
+Fixing missing prop in MessageBubble
+
+Now language persists correctly.
+
+4️⃣ Hero Banner Redesign
+
+File:
+app/page.jsx
+
+Replaced simple tagline:
+
+"Your trusted source..."
+
+With stronger structure:
+
+Larger headline
+
+Divider line
+
+“Preserving Authentic Islamic Scholarship Since 1991”
+
+Improved spacing and hierarchy
+
+Visual improvement without changing logic.
+
+5️⃣ Home Carousel Built
+
+New Component:
+components/HomeCarousel.jsx
+
+Built 3-slide carousel:
+
+Slide 1:
+Al Ansar Weekly branding
+
+Slide 2:
+Digital Paper with image (/public/car-image.png)
+
+Slide 3:
+Total Questions Answered (fetched from /api/stats)
+
+Behavior:
+
+Tap to cycle (mobile friendly)
+
+No arrows
+
+Dot indicators
+
+Fetches total dynamically
+
+Clean gradient background
+
+6️⃣ DigiPaper Slide Layout Optimization
+Issue:
+
+Too much vertical whitespace.
+
+Fixes:
+
+Reduced section padding
+
+Reduced image max-height
+
+Added negative margin (-mt-*)
+
+Tightened title spacing
+
+Removed unnecessary wrapper box
+
+Final result:
+Title sits closer to image.
+Layout feels compact and intentional.
+
+7️⃣ Firestore Investigation
+
+We investigated:
+
+Count increased from 779 → 1084
+
+createdAt still showing Feb 26
+
+Concern about lost 300 records
+
+What We Confirmed:
+
+New test QnA saves correctly
+
+ManageQnA sorting works
+
+Count increments properly
+
+Oldest records are 2025
+
+No records missing
+
+System not broken
+
+Most likely:
+Bulk upload happened with historical createdAt values.
+
+No cache corruption.
+No search corruption.
+
+8️⃣ Verified Semantic Search Behavior
+
+Tested Kannada query:
+
+Translation works
+Embedding works
+Similarity works
+Threshold logic working
+
+The example question did not exist in DB, so semantic system behaved correctly.
+
+9️⃣ Deployment Readiness
+
+You are ready to push:
+
+Updated banner
+
+Carousel
+
+Open button
+
+Attribution fix
+
+Backend is stable.
+
+That is everything we built and verified today.
+
+Update your source file with this log.
+
+When you're ready, we move to Submit QnA flow.
+
+//
+1. Q&A Submission Moderation System
+
+You completed the full moderation pipeline for user-submitted questions.
+
+Flow implemented:
+
+User submits question
+→ stored in qna_submissions
+→ admin reviews submissions
+→ approve / reject
+→ approved questions can be promoted to QnA database
+→ Imam receives notification email
+Files Created
+1. Email service
+src/lib/email.js
+
+Purpose: Send notification email when a question is approved.
+
+Main function:
+
+sendEmailToImam(question, submissionId)
+
+Uses:
+
+resend
+
+Email contains:
+
+Question text
+
+Submission ID
+
+Admin panel link
+
+Sender configuration:
+
+From: editor@alansarweekly.com
+Reply-To: alansarweekly786@gmail.com
+
+Recipients list:
+
+IMAM_NOTIFICATION_LIST
+2. Update submission status API
+src/app/api/qna/update-submission-status/route.js
+
+Purpose:
+
+Approve or reject user submitted questions
+
+Workflow:
+
+1 receive id + status
+2 update Firestore document
+3 if status === approved
+4 fetch question
+5 trigger sendEmailToImam()
+
+Firestore update:
+
+status
+answeredAt
+Files Modified
+1. Admin submissions page
+src/app/admin/qna/qna-submissions/page.jsx
+
+New capability added:
+
+Approve
+Reject
+Promote
+Delete
+
+Approve button calls:
+
+/api/qna/update-submission-status
+
+Promote button sends admin to:
+
+/admin/qna
+
+With query params:
+
+fromSubmission=true
+submissionId
+question
+2. Single upload QnA page
+src/components/SingleUpload.jsx
+
+Now supports prefilled question when coming from submissions.
+
+Used:
+
+router.query
+
+Effect:
+
+Approve → Promote → Question automatically filled
+
+Admin only pastes answer.
+
+3. User question submission API
+src/app/api/qna/user-submission/route.js
+
+Added features:
+
+validation
+language detection
+anonymous submission support
+email storage
+rate limiting
+
+Stored fields:
+
+question_original
+translated_question_en
+language
+isAnonymous
+email
+status
+createdAt
+answeredAt
+promoted_qna_id
+email_sent
+
+Default:
+
+status: pending
+Rate Limiting Added
+
+Limit:
+
+3 submissions per IP
+per 10 minutes
+
+Response when exceeded:
+
+429 Too Many Requests
+Resend Email System Setup
+
+New dependency installed:
+
+resend
+
+Environment variable added:
+
+RESEND_API_KEY
+DNS configuration completed
+
+Domain verified:
+
+alansarweekly.com
+
+DNS records added in Hostinger:
+
+TXT resend._domainkey
+TXT send
+MX send
+TXT _dmarc
+
+Resend status:
+
+Domain verified
+Ready to send emails
+Admin Authentication System
+
+Admin route protection already existed:
+
+src/app/api/is-admin/route.js
+
+Verification:
+
+Firebase ID token
++ ADMIN_UIDS fallback
+
+Admin layout redirect logic:
+
+src/app/admin/layout.js
+Working Features After Today
+
+Working correctly:
+
+User submits question
+Admin sees submissions
+Admin approves or rejects
+Admin promotes to QnA
+Prefilled question in upload
+Rate limiting active
+Email infrastructure configured
+Domain verified
+Current Issue Remaining
+
+Emails are not appearing yet.
+
+Possible causes to check next session:
+
+Resend response not logged
+
+Email function execution verification
+
+Recipient validation
+
+Resend dashboard filtering
+
+Next step tomorrow:
+
+log resend response in email.js
+approve submission
+inspect terminal output
+
+This will immediately show the failure reason.
+
+Project Size
+
+Your project currently contains approximately:
+
+~110 files
+
+This is not a small project anymore.
+
+Architecture includes:
+
+Next.js App Router
+Admin dashboard
+Firebase admin
+Firestore database
+AI embeddings
+Search system
+QnA knowledge base
+Article system
+Digipaper system
+Email infrastructure
+Moderation system
+Rate limiting
+
+This is already a production-grade platform foundation.
+
+Tomorrow's plan (recommended order)
+
+Fix email send visibility
+
+Add user notification email after answer
+
+Link promoted QnA → submission record
+
+Mark submission email_sent
+
+Final moderation workflow polish
+
+Then the entire Ask Imam pipeline will be complete.
+
+//
+1. Initial issue
+
+“Tap to Pay” UPI link in Footer was failing
+
+Error: invalid link / payment not working
+
+2. First diagnosis
+
+Checked UPI link format
+
+Corrected parameters (pa, pn, cu)
+
+Verified UPI ID: 7338578560@okbizaxis → valid
+
+3. Observed conflicting behavior
+
+QR scan → payment works ✅
+
+WhatsApp QR → payment works ✅
+
+Website link → fails ❌
+
+4. Identified root cause
+
+Two different UPI flows:
+
+QR scan → Push payment (allowed)
+
+upi:// link → Collect request (blocked)
+
+Error confirmed:
+
+“receiver is not allowing payments on this UPI ID”
+
+→ This is bank-level restriction, not code issue
+
+5. Attempted fixes (validated and ruled out)
+
+Added/removing params (am, tn, etc.) → no effect
+
+Used intent:// → no effect
+
+Simplified link → still rejected
+
+Conclusion:
+→ Collect requests are disabled for this UPI ID
+
+6. Implemented fallback UX (temporary)
+
+Built Tap → Fullscreen QR modal
+
+Ensures:
+
+consistent experience
+
+works across devices
+
+mimics WhatsApp behavior
+
+Files involved:
+
+Footer.js (button + state)
+
+QRModal.jsx (new component)
+
+7. Final decision
+
+Client instructed to contact Axis / UPI provider
+
+Requested action:
+
+Enable UPI collect requests for
+7338578560@okbizaxis
+
+8. Current system state
+
+QR payments → fully working
+
+Tap-to-pay link → blocked by bank
+
+Frontend → correct, no issues
+
+9. Next step
+
+Wait for bank response:
+
+If enabled → original upi://pay link will work
+
+If not → move to payment gateway (Razorpay / PhonePe)
+
+///SESSION SUMMARY — DIGIPAPER SYSTEM (END-TO-END)
+
+1. STRUCTURE UPGRADE
+   Reworked DigiPaper into a structured system with 3 clear types:
+
+* weekly (Al Ansar Weekly)
+* monthly (Moilanjee)
+* special (festival editions)
+
+Added `type` field to all new uploads and ensured consistent data shape in Firestore.
+
+---
+
+2. ADMIN UPLOAD FIXES
+
+* Identified correct component (`DigiUpload`) instead of unused route file
+* Added type dropdown to upload form
+* Ensured `type` is saved in Firestore
+* Established strict naming conventions for:
+
+  * Specials → "Ramzan 2026"
+  * Monthly → "March 2026"
+  * Weekly → "Samputa/Volume – Full Date"
+
+---
+
+3. STORAGE & SECURITY
+
+* Fixed Firebase Storage permission issue (403 error)
+* Updated rules to restrict uploads to admin email
+* Verified upload pipeline (PDF + cover image)
+
+---
+
+4. PUBLIC DIGIPAPER PAGE
+
+* Implemented server-side filtering using query params:
+
+  * `type` (weekly / monthly / special)
+  * `year`
+* Updated Firestore query with proper filtering + ordering
+* Fixed pagination to preserve filters
+* Resolved Firestore index error by creating composite index
+
+---
+
+5. UI IMPROVEMENTS
+
+* Added tab-based filtering (Weekly / Moilanjee / Specials)
+* Improved button styling (pill-style UI)
+* Added year filter with correct state persistence
+* Updated grid to 4-column layout on desktop
+
+---
+
+6. PAGINATION LOGIC
+
+* Confirmed 8 items per page
+* Ensured correct behavior:
+
+  * filters apply first
+  * pagination splits results after filtering
+
+---
+
+7. ADMIN MANAGE PAGE IMPROVEMENT
+
+* Identified correct component (`DigiManage`)
+* Added:
+
+  * type filter (all / weekly / monthly / special)
+  * search by title
+* Kept sorting by `createdAt` for admin usability
+
+---
+
+8. SYSTEM BEHAVIOR FINALIZED
+
+* Admin panel → sorted by creation time
+* Public page → sorted by publish date
+* Filtering + pagination + UI all consistent
+
+---
+
+FINAL STATUS
+DigiPaper system is now:
+
+* structured
+* scalable
+* admin-friendly
+* production-ready
+
+---
+
+NEXT STEP
+Move to Articles page + Nudi decoder integration.
+
+
+Here’s a clean summary you can drop into your source file.
+
+Articles System — Current State
+Architecture
+
+Collection:
+
+articles/{id}
+
+Fields:
+
+slug
+category
+isFeatured
+status
+coverImage
+createdAt
+
+Subcollection:
+
+articles/{id}/translations/{lang}
+
+Fields:
+
+title
+content
+author
+updatedAt
+Admin Flow
+1. Create Article
+
+Route:
+
+/admin/articles/new
+
+Inputs:
+
+slug
+category
+isFeatured
+
+➡️ Creates empty article container
+➡️ Redirects to editor page
+
+2. Article Editor
+
+Route:
+
+/admin/articles/[id]
+Write title, content, author
+Save in selected language
+Translation handled automatically
+3. Translation System
+Save original language (KN or EN)
+Auto-translate to other language via /api/translate
+Store both in subcollection
+
+✔ No manual switching logic
+✔ No duplicate checks blocking flow
+✔ Always upsert
+
+APIs
+Create Article
+/api/articles/create
+Create / Update Translation
+/api/articles/translations/create
+Upserts current language
+Calls /api/translate
+Saves translated version
+Translate API
+/api/translate
+Uses Gemini
+Returns:
+{ title, content }
+Get Article by Slug
+/api/articles/by-slug
+Fetch article by slug
+Fetch translation by lang
+Fallback → Kannada (kn)
+Returns flattened response:
+{
+  slug,
+  category,
+  image,
+  title,
+  content,
+  author
+}
+Related Articles
+/api/articles/related
+Same category
+Excludes current article
+Language-aware
+Fallback to KN
+Public Article Page
+
+Route:
+
+/article/[slug]
+Layout
+Max width: max-w-6xl
+Grid:
+Left → Article
+Right → Sidebar
+Article (ArticleView)
+Title
+Category
+Author
+Date (fallback handled)
+Image (coverImage)
+Content (split by paragraphs)
+Share buttons
+Save button (UI only)
+Sidebar
+Ad (dynamic placeholder ready)
+Related Articles (live)
+Clean vertical stack
+Key Fixes Done
+Removed translation status dependency
+Fixed hydration error (share URL)
+Fixed image mapping (coverImage)
+Fixed content rendering (no HTML injection)
+Fixed server/client mismatch
+Fixed params misuse (await params)
+Fixed API fallback logic
+Current Status
+
+✔ Article creation works
+✔ Translation works (KN ↔ EN)
+✔ Article renders correctly
+✔ Sidebar layout implemented
+✔ Related articles working
+✔ Image upload working
+
+Next Phase
+
+👉 Ads system
+
+Planned:
+
+ads collection
+Image + link
+Random ad per load
+Simple admin upload
+
+Start next chat with:
+
+👉 “build ads system (admin + display)”
+=====
+## Project Summary & Key Decisions
+
+### Current State
+
+* Built a production-ready QnA platform with:
+
+  * QnA submission → moderation → publish workflow
+  * Admin system with Firebase Auth
+  * DigiPaper (PDF-based publication system)
+  * Multilingual support (EN / KN)
+  * Related questions using embeddings + cosine similarity
+* System is actively used by client (real data, not demo)
+
+---
+
+### UX Improvements Implemented
+
+* Fixed “dead click” issues using:
+
+  * `useTransition` for non-blocking navigation
+  * Optimistic UI (local state for language switch)
+* Added route-level loading using Next.js `loading.jsx`
+
+  * Improves perceived performance
+  * Uses Suspense fallback pattern
+
+---
+
+### Architecture Decisions
+
+* Server-driven data fetching (Next.js App Router)
+* Firebase (Blaze plan) for:
+
+  * Firestore (data)
+  * Storage (PDFs, images)
+  * Auth (admin access)
+* Resend for transactional email (low-volume, event-driven)
+
+---
+
+### Infrastructure Reality
+
+* Running on low-cost stack:
+
+  * Firebase Blaze (pay-as-you-go)
+  * Vercel Hobby
+  * Resend free tier
+* Monthly cost currently very low (~₹50–150)
+* System is scalable; no immediate need to upgrade infra
+
+---
+
+### Constraints & Considerations
+
+* PDF storage is main storage consumer (not a concern on Blaze)
+* Bandwidth (downloads) is the only cost that can scale with users
+* Email volume is low; Resend limits not a concern currently
+
+---
+
+### Admin & Auth
+
+* Using Firebase Auth (single admin user)
+* Password reset handled via Firebase (no custom user management needed)
+* Server-side verification required for admin routes
+
+---
+
+### Articles (Next Step)
+
+* Articles are a supporting feature (not core product)
+* Goal:
+
+  * Display latest articles on homepage
+  * Use existing `ArticleCard` component
+  * Keep implementation minimal (no over-engineering)
+
+---
+
+### Project Value
+
+* Equivalent build cost (market): ₹1.5L – ₹5L
+* Demonstrates:
+
+  * Full-stack development
+  * Product thinking
+  * Real-world system design
+  * Async UX handling (optimistic UI + Suspense)
+
+---
+
+### Personal Development Notes
+
+* Current gap: deep understanding of entire codebase
+* Strength: ability to build and ship working systems
+* Next focus:
+
+  * Understand core parts (QnA, data flow, UI decisions)
+  * Prepare for MNC roles (fundamentals + explanation skills)
+
+---
+
+### Final Direction
+
+* Complete Articles (basic implementation)
+* Wrap current project (avoid over-polishing)
+* Move to next project
+* Later: refine understanding for interviews
+
+---

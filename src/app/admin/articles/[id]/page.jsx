@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 export default function ArticlePage() {
-  const { slug } = useParams();
+  const { id } = useParams();
 
   const [article, setArticle] = useState(null);
   const [related, setRelated] = useState([]);
@@ -13,7 +13,7 @@ export default function ArticlePage() {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch(`/api/articles/by-slug?slug=${slug}`);
+      const res = await fetch(`/api/articles/by-id?id=${id}`);
       const data = await res.json();
 
       setArticle(data);
@@ -28,14 +28,18 @@ export default function ArticlePage() {
       setLoading(false);
     }
 
-    if (slug) load();
-  }, [slug]);
+    if (id) load();
+  }, [id]);
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (!article) return <div className="p-6">Not found</div>;
 
-  const t = article.translations?.[lang] || article.translations?.["kn"];
-
+  const t = article?.translations?.[lang] ||
+    article?.translations?.["kn"] || {
+      title: "No title",
+      content: "",
+      author: "Unknown",
+    };
   return (
     <div className="max-w-6xl mx-auto px-6 space-y-8">
       {/* HERO */}

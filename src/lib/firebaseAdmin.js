@@ -1,18 +1,20 @@
 import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage"; // ✅ ADD THIS
 
 let app;
 
 if (!getApps().length) {
-    const raw = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
-    const parsed = JSON.parse(raw);
+  const raw = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+  const parsed = JSON.parse(raw);
 
-    app = initializeApp({
-        credential: cert(parsed),
-        storageBucket: "alansarweekly-a8d84.firebasestorage.app",
-    });
+  app = initializeApp({
+    credential: cert(parsed),
+    storageBucket: "alansarweekly-a8d84.firebasestorage.app",
+  });
 } else {
-    app = getApps()[0];
+  app = getApps()[0];
 }
 
 export const adminDB = getFirestore(app);
+export const adminStorage = getStorage(app); // ✅ ADD THIS

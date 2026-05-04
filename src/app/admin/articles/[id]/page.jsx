@@ -2,135 +2,184 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 export default function ArticlePage() {
   const { id } = useParams();
+  const router = useRouter();
 
   const [article, setArticle] = useState(null);
-  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState("en");
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [author, setAuthor] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [image, setImage] = useState("");
+
+  useEffect(() => {
+    if (article) {
+      setImage(article.coverImage || "");
+    }
+  }, [article]);
 
   useEffect(() => {
     async function load() {
       const res = await fetch(`/api/articles/by-id?id=${id}`);
       const data = await res.json();
-
       setArticle(data);
-
-      // fetch related
-      const relRes = await fetch(
-        `/api/articles/related?category=${data.category}&exclude=${data.id}`,
-      );
-      const relData = await relRes.json();
-
-      setRelated(relData.articles || []);
       setLoading(false);
     }
 
     if (id) load();
   }, [id]);
 
-  if (loading) return <div className="p-6">Loading...</div>;
-  if (!article) return <div className="p-6">Not found</div>;
+  useEffect(() => {
+    if (article?.translations?.[lang]) {
+      const t = article.translations[lang];
+      setTitle(t.title || "");
+      setContent(t.content || "");
+      setAuthor(t.author || "");
+    } else {
+      setTitle("");
+      setContent("");
+      setAuthor("");
+    }
+  }, [article, lang]);
 
-  const t = article?.translations?.[lang] ||
-    article?.translations?.["kn"] || {
-      title: "No title",
-      content: "",
-      author: "Unknown",
-    };
+  async function handleSave() {
+    if (!title.trim() || !content.trim()) {
+      toast.error("Title and content required");
+      return;
+    }
+
+    setSaving(true);
+    const loadingToast = toast.loading("Saving article...");
+
+    try {
+      const res = await fetch("/api/articles/translations/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          articleId: id,
+          language: lang,
+          title,
+          content,
+          author,
+          image,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error);
+      }
+
+      toast.success("Saved successfully", { id: loadingToast });
+      setTimeout(() => {
+        router.push("/admin/articles");
+      }, 800);
+    } catch (err) {
+      toast.error(err.message, { id: loadingToast });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const toastId = toast.loading("Uploading image...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("articleId", id);
+
+      const res = await fetch("/api/articles/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error);
+      }
+
+      setImage(data.url);
+
+      toast.success("Image uploaded", { id: toastId });
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    }
+  }
+
+  if (loading) return <div className="p-6">Loading...</div>;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 space-y-8">
-      {/* HERO */}
-      {article.coverImage && (
-        <img
-          src={article.coverImage}
-          className="w-full h-72 object-cover rounded"
-        />
+    <div className="max-w-3xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Edit Article</h1>
+
+      <div className="flex gap-2">
+        <button onClick={() => setLang("en")}>EN</button>
+        <button onClick={() => setLang("kn")}>KN</button>
+      </div>
+
+      <input
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        className="w-full border p-2"
+      />
+
+      <textarea
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Content"
+        className="w-full border p-2 h-40"
+      />
+
+      <input
+        value={author}
+        onChange={(e) => setAuthor(e.target.value)}
+        placeholder="Author"
+        className="w-full border p-2"
+      />
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Cover Image</label>
+
+        <div className="flex items-center gap-3">
+          <label className="cursor-pointer bg-gray-900 text-white px-4 py-2 text-sm">
+            Upload Image
+            <input
+              type="file"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
+
+          <span className="text-sm text-gray-500">
+            {image ? "Image selected" : "No file chosen"}
+          </span>
+        </div>
+      </div>
+      {image && (
+        <img src={image} className="w-full h-48 object-cover rounded border" />
       )}
 
-      {/* HEADER */}
-      <div className="space-y-2">
-        <p className="text-sm text-gray-500 uppercase">{article.category}</p>
-
-        <h1 className="text-3xl font-bold">{t.title}</h1>
-
-        <div className="flex items-center gap-4 text-sm text-gray-500">
-          <span>By {t.author || "Unknown"}</span>
-
-          {/* LANG SWITCH */}
-          <div className="ml-auto flex gap-2">
-            <button
-              onClick={() => setLang("kn")}
-              className={`px-2 py-1 border ${
-                lang === "kn" ? "bg-black text-white" : ""
-              }`}
-            >
-              KN
-            </button>
-            <button
-              onClick={() => setLang("en")}
-              className={`px-2 py-1 border ${
-                lang === "en" ? "bg-black text-white" : ""
-              }`}
-            >
-              EN
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-        {/* ARTICLE */}
-        <div className="md:col-span-2 max-w-3xl space-y-4">
-          {t.content.split("\n").map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-        </div>
-
-        {/* SIDEBAR */}
-        <div className="space-y-6">
-          {/* ADS */}
-          <div className="border p-4 rounded">
-            <h3 className="font-semibold mb-2">Sponsored</h3>
-            <p className="text-sm">Local Business Ad Space</p>
-          </div>
-
-          <div className="border p-4 rounded">
-            <p className="text-sm">
-              Promote your business here. Contact: 1234567890
-            </p>
-          </div>
-
-          {/* RELATED */}
-          <div className="border p-4 rounded space-y-3">
-            <h3 className="font-semibold">Related Articles</h3>
-
-            {related.map((r) => (
-              <a
-                key={r.id}
-                href={`/article/${r.slug}`}
-                className="block text-sm hover:underline"
-              >
-                {r.translations?.[lang]?.title || r.translations?.["kn"]?.title}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* NEXT / PREV */}
-      <div className="flex justify-between border-t pt-6">
-        <button className="text-sm text-gray-600 hover:underline">
-          ← Previous
-        </button>
-
-        <button className="text-sm text-gray-600 hover:underline">
-          Next →
-        </button>
-      </div>
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="bg-black text-white px-4 py-2 disabled:opacity-50"
+      >
+        {saving ? "Saving..." : "Save"}
+      </button>
     </div>
   );
 }

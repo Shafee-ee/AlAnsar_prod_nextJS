@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
 export default function ArticlePage() {
@@ -56,39 +56,38 @@ export default function ArticlePage() {
     }
 
     setSaving(true);
-    const loadingToast = toast.loading("Saving article...");
+
+    const promise = fetch("/api/articles/translations/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        articleId: id,
+        language: lang,
+        title,
+        content,
+        author,
+        image,
+      }),
+    }).then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      return data;
+    });
 
     try {
-      const res = await fetch("/api/articles/translations/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          articleId: id,
-          language: lang,
-          title,
-          content,
-          author,
-          image,
-        }),
+      await toast.promise(promise, {
+        loading: "Saving article...",
+        success: "Saved successfully",
+        error: (err) => err.message,
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error);
-      }
-
-      toast.success("Saved successfully", { id: loadingToast });
-      setTimeout(() => {
-        router.push("/admin/articles");
-      }, 800);
+      router.push("/admin/articles?success=1");
     } catch (err) {
-      toast.error(err.message, { id: loadingToast });
+      // already handled by toast
     } finally {
       setSaving(false);
     }
   }
-
   async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;

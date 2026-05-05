@@ -1847,3 +1847,148 @@ Start next chat with:
 * Later: refine understanding for interviews
 
 ---
+
+Build a working Articles CMS pipeline
+CREATE → EDIT → SAVE → AUTO TRANSLATE → STORE → UPLOAD IMAGE → MANAGE → DISPLAY
+
+✅ What is now working
+1. Article creation + editing
+
+
+Articles stored in Firestore
+
+
+Translations stored in:
+
+
+articles/{id}/translations/{lang}
+
+2. Translation pipeline
+
+
+Any language (EN / KN) can be source
+
+
+Other language auto-generated
+
+
+Fixed:
+
+
+wrong overwrite logic
+
+
+inconsistent saves
+
+
+partial writes
+
+
+
+
+Now:
+Validate → Translate → Save BOTH
+
+3. Image upload (real, not fake)
+You moved from:
+C:\fakepath ❌
+To:
+Firebase Storage URL ✅
+Flow:
+Select file → Upload → Get URL → Save to Firestore
+Stored at:
+articles/{id}.coverImage
+
+4. UI improvements
+
+
+Replaced ugly file input with custom button
+
+
+Added image preview
+
+
+Disabled spam clicks during save
+
+
+Added loading states
+
+
+
+5. Toast system (root issue found)
+Problem:
+Toast worked in QnA but not Articles
+Root cause:
+Toaster was mounted ONLY inside QnA page
+Fix direction:
+Move <Toaster /> to global wrapper (ClientAppWrapper)
+Rule now:
+Mount Toaster once → use toast() anywhere
+
+❌ What we removed / corrected
+
+
+Fake image URL handling (C:\fakepath)
+
+
+Broken file input (value on file input)
+
+
+EN/KN toggle (not wired to real data)
+
+
+Wrong API routes
+
+
+Missing Firebase Storage export
+
+
+Image saving inside catch block (critical bug)
+
+
+
+⚠️ Current known limitations (intentional)
+
+
+Translation is slow (~30s) → acceptable for now
+
+
+No background processing yet
+
+
+No caching yet
+
+
+Manage Articles UI not built yet
+
+
+
+🔥 What’s next (next chat)
+We don’t touch backend anymore.
+Next focus:
+Manage Articles Page (like ManageQnA)
+
+
+list all articles
+
+
+show title + category + status
+
+
+edit button → open editor
+
+
+delete / publish later
+
+
+
+🧠 Final state
+You now have:
+✔ Stable backend✔ Working translation system✔ Working image upload✔ Functional editor✔ Clean data model
+You moved from:
+fragile prototype
+To:
+real CMS foundation
+
+Start next chat with:
+👉 “Build Manage Articles page (like ManageQnA)”

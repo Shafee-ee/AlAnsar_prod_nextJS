@@ -87,11 +87,9 @@ function ManageArticles() {
                 <td className="p-3">{a.status || "draft"}</td>
 
                 <td className="p-3">
-                  {a.createdAt?.seconds
-                    ? new Date(a.createdAt.seconds * 1000).toLocaleDateString()
-                    : a.createdAt?.toDate
-                      ? a.createdAt.toDate().toLocaleDateString()
-                      : "-"}
+                  {a.createdAt?._seconds
+                    ? new Date(a.createdAt._seconds * 1000).toLocaleDateString()
+                    : "-"}
                 </td>
 
                 <td className="p-3 flex gap-2">

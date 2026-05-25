@@ -86,6 +86,31 @@ const BotResponseCard = ({
   const editorNote =
     best?.editorNote || best?.editorNote_en || best?.editorNote_kn || "";
 
+  const imamName = best?.imamName;
+  const samputa = best?.samputa;
+  const sanchike = best?.sanchike;
+  const sourceTitle = best?.sourceTitle;
+
+  const sourceLabel = selectedLang === "kn" ? "ಉತ್ತರದ ಮೂಲ" : "Answer source";
+
+  let answerSource =
+    selectedLang === "kn"
+      ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆ (1991–2016)"
+      : "Al Ansar Weekly Archive (1991–2016)";
+
+  if (imamName) {
+    answerSource = imamName;
+  } else if (samputa || sanchike) {
+    answerSource =
+      selectedLang === "kn"
+        ? `${samputa ? `ಸಂಪುಟ ${samputa}` : ""}${
+            samputa && sanchike ? " " : ""
+          }${sanchike ? `ಸಂಚಿಕೆ ${sanchike}` : ""}`
+        : `${samputa ? `Samputa ${samputa}` : ""}${
+            samputa && sanchike ? " " : ""
+          }${sanchike ? `Sanchike ${sanchike}` : ""}`;
+  }
+
   if (result?.noMatch) {
     return (
       <div className="bg-gray-50 text-gray-700 p-4 rounded-xl border">
@@ -131,22 +156,24 @@ const BotResponseCard = ({
           Strong match
         </div>
       )}
-
       {!isSystem && isClose && (
         <div className="mb-2 text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1 rounded-sm inline-block">
           Close match
         </div>
       )}
-
       <div className="flex items-start text-blue-700 font-semibold mb-3">
         <Zap className="w-4 h-4 mr-2 mt-0.5" />
         {best.question}
       </div>
-
       <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-gray-50 rounded-lg whitespace-pre-line">
         {best.answer}
       </div>
-
+      <div className="border-t border-gray-100 pt-2 mb-3 text-xs text-gray-500">
+        <span className="font-medium text-gray-600">
+          {selectedLang === "kn" ? "ಉತ್ತರದ ಮೂಲ" : "Answer source"}:
+        </span>{" "}
+        {answerSource}
+      </div>
       {editorNote && (
         <div className="mb-4 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded text-xs text-gray-700">
           <div className="font-semibold text-yellow-800 mb-1">
@@ -155,7 +182,6 @@ const BotResponseCard = ({
           <div className="whitespace-pre-line">{editorNote}</div>
         </div>
       )}
-
       <div className="flex justify-center mb-3 text-xs">
         <div className="flex justify-center gap-3 mb-3 text-xs">
           <button
@@ -176,10 +202,13 @@ const BotResponseCard = ({
           </a>
         </div>
       </div>
-
       <div className="flex flex-col items-center gap-2 mb-3 text-xs">
         {!isSystem && isHigh && (
-          <div className="text-gray-500">Not what you were looking for?</div>
+          <div className="text-gray-500">
+            {selectedLang === "kn"
+              ? "ನೀವು ಹುಡುಕುತ್ತಿದ್ದ ಉತ್ತರ ಸಿಗಲಿಲ್ಲವೇ?"
+              : "Not what you were looking for?"}
+          </div>
         )}
 
         {!isSystem && isClose && (
@@ -214,7 +243,6 @@ const BotResponseCard = ({
           )}
         </div>
       </div>
-
       {result.relatedQuestions?.length > 0 && (
         <div className="pt-3 border-t border-gray-100">
           <div className="flex items-center text-xs font-semibold text-gray-500 mb-2">
@@ -527,10 +555,21 @@ const ChatbotSection = () => {
                         question: data.bestMatch.question,
                         answer: data.bestMatch.answer,
                         score: data.bestMatch.score ?? 0,
+
                         editorNote:
                           selectedLang === "kn"
                             ? data.bestMatch.editorNote_kn
                             : data.bestMatch.editorNote_en,
+
+                        imamName: data.bestMatch.imam_name,
+
+                        samputa: data.bestMatch.samputa,
+
+                        sanchike: data.bestMatch.sanchike,
+
+                        sourceTitle:
+                          data.bestMatch.source_title ||
+                          "Al Ansar Knowledge Base",
                       }
                     : null,
                   relatedQuestions: relatedFiltered,

@@ -29,7 +29,7 @@ export default function ArticlePage() {
     async function load() {
       const res = await fetch(`/api/articles/by-id?id=${id}`);
       const data = await res.json();
-      setArticle(data);
+      setArticle(data.article);
       setLoading(false);
     }
 
@@ -43,9 +43,7 @@ export default function ArticlePage() {
       setContent(t.content || "");
       setAuthor(t.author || "");
     } else {
-      setTitle("");
-      setContent("");
-      setAuthor("");
+      // keep current input
     }
   }, [article, lang]);
 
@@ -125,8 +123,18 @@ export default function ArticlePage() {
       <h1 className="text-2xl font-bold">Edit Article</h1>
 
       <div className="flex gap-2">
-        <button onClick={() => setLang("en")}>EN</button>
-        <button onClick={() => setLang("kn")}>KN</button>
+        <button
+          className="bg-gray-300 hover:bg-gray-200  px-2 py-1"
+          onClick={() => setLang("en")}
+        >
+          EN
+        </button>
+        <button
+          className="bg-gray-300 hover:bg-gray-200 px-2 py-1"
+          onClick={() => setLang("kn")}
+        >
+          KN
+        </button>
       </div>
 
       <input

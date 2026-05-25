@@ -95,8 +95,8 @@ const BotResponseCard = ({
 
   let answerSource =
     selectedLang === "kn"
-      ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆ (1991–2016)"
-      : "Al Ansar Weekly Archive (1991–2016)";
+      ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
+      : "From the Archives of AlAnsar Weekly  (1991–2016)";
 
   if (imamName) {
     answerSource = imamName;

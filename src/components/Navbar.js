@@ -62,7 +62,15 @@ function LanguageSwitcher({ highlight }) {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const [highlight, setHighlight] = React.useState(true);
+  const [showLanguageHint, setShowLanguageHint] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLanguageHint(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -73,14 +81,6 @@ const Navbar = () => {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setHighlight(false);
-    }, 2000);
-
-    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -121,9 +121,60 @@ const Navbar = () => {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-2">
+            {showLanguageHint && (
+              <div
+                className="
+        absolute
+        top-9
+        right-0
+        z-50
+
+        bg-white
+        border
+        border-gray-200
+
+        rounded-lg
+        shadow-md
+
+        px-3
+        py-2
+
+        text-xs
+        text-gray-600
+
+        whitespace-nowrap
+
+        animate-languageHint
+      "
+              >
+                <div className="font-medium">🌐 English ↔ ಕನ್ನಡ</div>
+
+                <div className="text-[11px] text-gray-500">Change language</div>
+
+                <div
+                  className="
+          absolute
+          -top-1
+          right-5
+
+          w-2
+          h-2
+
+          bg-white
+
+          border-l
+          border-t
+          border-gray-200
+
+          rotate-45
+        "
+                />
+              </div>
+            )}
+
             <Suspense fallback={null}>
-              <LanguageSwitcher highlight={highlight} />
+              <LanguageSwitcher />
             </Suspense>
 
             {/* Mobile Burger */}

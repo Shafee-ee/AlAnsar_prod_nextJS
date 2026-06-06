@@ -318,6 +318,7 @@ const ChatbotSection = () => {
   const [seenQuestions, setSeenQuestions] = useState(new Set());
   const chatRef = useRef(null);
   const inputRef = useRef(null);
+  const [expanded, setExpanded] = useState(false);
 
   //toaster notification
   const [toast, setToast] = useState(null);
@@ -619,67 +620,99 @@ const ChatbotSection = () => {
         </div>
       </header>
       <div
-        className="w-full max-w-2xl mx-auto flex flex-col 
-bg-white border border-gray-200 rounded-lg overflow-hidden"
+        className={`
+    w-full max-w-2xl mx-auto
+    bg-white border border-gray-200
+    overflow-hidden
+    transition-all duration-500
+    ${expanded ? "rounded-lg" : "rounded-full"}
+  `}
       >
-        {" "}
-        <div
-          ref={chatRef}
-          className="flex-grow px-4 py-6 overflow-y-auto flex flex-col h-[65vh]"
+        {/* Search bar */}
+        <button
+          onClick={() => setExpanded(true)}
+          className="
+      w-full
+      px-6
+      py-4
+      flex
+      items-center
+      justify-between
+      text-left
+      bg-white
+    "
         >
-          {messages.length === 0 && !isLoading ? (
-            /* CENTERED EMPTY STATE */
-            <div className="flex flex-1 items-center justify-center text-center">
-              <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
-                {headings[selectedLang].disclaimer}
+          <span className="text-gray-500">
+            {selectedLang === "kn"
+              ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ..."
+              : "Ask your Islamic question..."}
+          </span>
+
+          <Search className="w-5 h-5 text-gray-400" />
+        </button>
+
+        {/* Chat UI */}
+        {expanded && (
+          <>
+            <div
+              ref={chatRef}
+              className="flex-grow px-4 py-6 overflow-y-auto flex flex-col h-[65vh] border-t border-gray-100"
+            >
+              {messages.length === 0 && !isLoading ? (
+                <div className="flex flex-1 items-center justify-center text-center">
+                  <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
+                    {headings[selectedLang].disclaimer}
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {messages.map((m, i) => (
+                    <MessageBubble
+                      key={i}
+                      message={m}
+                      selectedLang={selectedLang}
+                      onRelatedClick={handleSend}
+                      onShare={shareQA}
+                      onRephrase={handleRephrase}
+                    />
+                  ))}
+
+                  {isLoading && (
+                    <div className="flex justify-start mb-4">
+                      <TypingDots />
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            <div className="p-3 border-t border-gray-200 bg-white">
+              <div className="flex items-center gap-2">
+                <input
+                  ref={inputRef}
+                  disabled={isLoading}
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                  placeholder={
+                    selectedLang === "kn"
+                      ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                      : "Type your question..."
+                  }
+                  className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
+                />
+
+                <button
+                  disabled={isLoading || !userInput.trim()}
+                  onClick={() => handleSend()}
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
               </div>
             </div>
-          ) : (
-            <>
-              {messages.map((m, i) => (
-                <MessageBubble
-                  key={i}
-                  message={m}
-                  selectedLang={selectedLang}
-                  onRelatedClick={handleSend}
-                  onShare={shareQA}
-                  onRephrase={handleRephrase}
-                />
-              ))}
-
-              {isLoading && (
-                <div className="flex justify-start mb-4">
-                  <TypingDots />
-                </div>
-              )}
-            </>
-          )}
-        </div>
-        <div className="p-3 border-t border-gray-200 bg-white">
-          {" "}
-          <div className="flex items-center gap-2">
-            <input
-              ref={inputRef}
-              disabled={isLoading}
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder={
-                selectedLang === "kn"
-                  ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
-                  : "Type your question..."
-              }
-              className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
-            />
-            <button
-              disabled={isLoading || !userInput.trim()}
-              onClick={() => handleSend()}
-              className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ import ChatbotSection from "@/components/ChatbotSection";
 // import { CATEGORIES_DATA } from "@/components/ArticleComponents";
 import { useLanguage } from "@/context/LanguageContext";
 import AskQuestionBox from "@/components/AskQuestionBox";
+import HomeQuickAccess from "@/components/HomeQuickAccess";
 
 //banner QnA count
 import HomeCarousel from "@/components/HomeCarousel";
@@ -46,7 +47,10 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-sans">
       <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
-        <HomeCarousel lang={lang} />
+        {/* <HomeCarousel lang={lang} /> */}
+
+        <HomeQuickAccess />
+
         <Suspense fallback={null}>
           <ChatbotSection />
         </Suspense>

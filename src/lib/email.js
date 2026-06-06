@@ -4,8 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
   "shafeeazeemag@gmail.com",
-  "shafeeghani@gmail.com"
-  
+  "muyeen@technopulse.in",
 ];
 
 export async function sendEmailToImam(question, submissionId) {
@@ -43,34 +42,19 @@ export async function sendEmailToImam(question, submissionId) {
             Submission ID: ${submissionId}
           </p>
 
-          <a 
-            href="${adminLink}" 
-            style="
-              display:inline-block;
-              background:#1D3F9A;
-              color:white;
-              padding:10px 18px;
-              border-radius:6px;
-              text-decoration:none;
-              margin-top:10px;
-            "
-          >
-            Open Admin Panel
-          </a>
+         
 
           <p style="margin-top:30px; font-size:12px; color:#777;">
             Al Ansar Weekly
           </p>
 
         </div>
-      `
+      `,
     });
-
   } catch (err) {
     console.error("Email to imam failed:", err);
   }
 }
-
 
 export async function sendEmailToUser({ email, question, answer }) {
   return resend.emails.send({

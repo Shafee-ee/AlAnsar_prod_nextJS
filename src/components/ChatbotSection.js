@@ -358,6 +358,19 @@ const ChatbotSection = () => {
     });
   }
 
+  //chatbox expand useEffect
+  useEffect(() => {
+    const expandChat = () => {
+      setExpanded(true);
+    };
+
+    window.addEventListener("expand-chatbot", expandChat);
+
+    return () => {
+      window.removeEventListener("expand-chatbot", expandChat);
+    };
+  }, []);
+
   //chat history
   useEffect(() => {
     const saved = localStorage.getItem("chat_history");
@@ -395,6 +408,17 @@ const ChatbotSection = () => {
       behavior: "smooth",
     });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (!expanded) return;
+
+    setTimeout(() => {
+      chatRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 250);
+  }, [expanded]);
 
   //chat history
   useEffect(() => {
@@ -594,8 +618,10 @@ const ChatbotSection = () => {
   };
 
   return (
-    <section className="w-full flex flex-col items-center py-12">
-      {" "}
+    <section
+      id="chatbot-section"
+      className="w-full flex flex-col items-center py-12"
+    >
       {toast && (
         <div
           className="fixed top-20 left-1/2 -translate-x-1/2 
@@ -629,9 +655,19 @@ const ChatbotSection = () => {
   `}
       >
         {/* Search bar */}
-        <button
-          onClick={() => setExpanded(true)}
-          className="
+        {!expanded && (
+          <button
+            onClick={() => {
+              setExpanded(true);
+
+              setTimeout(() => {
+                document.getElementById("chatbot-section")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }, 300);
+            }}
+            className="
       w-full
       px-6
       py-4
@@ -641,78 +677,86 @@ const ChatbotSection = () => {
       text-left
       bg-white
     "
-        >
-          <span className="text-gray-500">
-            {selectedLang === "kn"
-              ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ..."
-              : "Ask your Islamic question..."}
-          </span>
+          >
+            <span className="text-gray-500">
+              {selectedLang === "kn"
+                ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ..."
+                : "Ask your Islamic question..."}
+            </span>
 
-          <Search className="w-5 h-5 text-gray-400" />
-        </button>
-
-        {/* Chat UI */}
-        {expanded && (
-          <>
-            <div
-              ref={chatRef}
-              className="flex-grow px-4 py-6 overflow-y-auto flex flex-col h-[65vh] border-t border-gray-100"
-            >
-              {messages.length === 0 && !isLoading ? (
-                <div className="flex flex-1 items-center justify-center text-center">
-                  <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
-                    {headings[selectedLang].disclaimer}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {messages.map((m, i) => (
-                    <MessageBubble
-                      key={i}
-                      message={m}
-                      selectedLang={selectedLang}
-                      onRelatedClick={handleSend}
-                      onShare={shareQA}
-                      onRephrase={handleRephrase}
-                    />
-                  ))}
-
-                  {isLoading && (
-                    <div className="flex justify-start mb-4">
-                      <TypingDots />
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            <div className="p-3 border-t border-gray-200 bg-white">
-              <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  disabled={isLoading}
-                  value={userInput}
-                  onChange={(e) => setUserInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                  placeholder={
-                    selectedLang === "kn"
-                      ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
-                      : "Type your question..."
-                  }
-                  className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
-                />
-
-                <button
-                  disabled={isLoading || !userInput.trim()}
-                  onClick={() => handleSend()}
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </>
+            <Search className="w-5 h-5 text-gray-400" />
+          </button>
         )}
+        {/* Chat UI */}
+        <div
+          className={`
+    overflow-hidden
+    transition-all duration-700 ease-in-out
+    ${expanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}
+  `}
+        >
+          <div
+            ref={chatRef}
+            className={`
+    px-4 py-6 overflow-y-auto flex flex-col border-t border-gray-100
+    transition-all duration-700 ease-in-out
+    ${expanded ? "h-[75vh]" : "h-0"}
+  `}
+          >
+            {messages.length === 0 && !isLoading ? (
+              <div className="flex flex-1 items-center justify-center text-center">
+                <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
+                  {headings[selectedLang].disclaimer}
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((m, i) => (
+                  <MessageBubble
+                    key={i}
+                    message={m}
+                    selectedLang={selectedLang}
+                    onRelatedClick={handleSend}
+                    onShare={shareQA}
+                    onRephrase={handleRephrase}
+                  />
+                ))}
+
+                {isLoading && (
+                  <div className="flex justify-start mb-4">
+                    <TypingDots />
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="p-3 border-t border-gray-200 bg-white">
+            <div className="flex items-center gap-2">
+              <input
+                ref={inputRef}
+                disabled={isLoading}
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                placeholder={
+                  selectedLang === "kn"
+                    ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                    : "Type your question..."
+                }
+                className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
+              />
+
+              <button
+                disabled={isLoading || !userInput.trim()}
+                onClick={() => handleSend()}
+                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

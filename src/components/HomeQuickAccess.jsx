@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { BookOpen } from "lucide-react";
+import Link from "next/link";
 export default function HomeQuickAccess() {
   const [total, setTotal] = useState(null);
 
@@ -14,17 +15,17 @@ export default function HomeQuickAccess() {
     <section className="px-6 -mt-8 relative z-30">
       <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
         {/* DigiPaper */}
-        <div className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl">
+        <Link
+          href="/digipaper"
+          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block"
+        >
           <img
             src="/digipaper-main.png"
             alt="Latest DigiPaper"
             className="absolute inset-12 w-full h-full object-cover"
           />
-
           <div className="absolute inset-0 bg-gradient-to-br from-[#0f4c97]/90 to-[#1d3f9a]/85" />
-
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/20 to-transparent" />
-
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/20 to-transparent" />
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
@@ -44,26 +45,30 @@ export default function HomeQuickAccess() {
               Read Now →
             </button>
           </div>
-        </div>
+        </Link>
 
         {/* Articles */}
-        <div className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl">
+        <div
+          onClick={() =>
+            document.getElementById("articles-section")?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            })
+          }
+          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+        >
           {/* Background image */}
           <img
             src="/articles-image.png"
             alt="Featured articles"
             className="absolute -right-6 -bottom-6 h-[280px] w-auto object-contain pointer-events-none"
           />
-
           {/* Blue tint overlay - this is what makes it behave like DigiPaper */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/70 via-[#3d68b8]/70 to-[#284f9e]/95" />
-
           {/* Top gloss */}
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/20 to-transparent" />
-
           {/* Bottom depth */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
-
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
@@ -87,8 +92,20 @@ export default function HomeQuickAccess() {
         </div>
 
         {/* Keli Nodi */}
-        {/* Keli Nodi */}
-        <div className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl">
+        <div
+          onClick={() => {
+            document.getElementById("chatbot-section")?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+
+            setTimeout(() => {
+              window.dispatchEvent(new Event("expand-chatbot"));
+            }, 200);
+          }}
+          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+        >
+          {" "}
           {/* Background image */}
           <img
             src="/qna-card.png"
@@ -103,16 +120,12 @@ export default function HomeQuickAccess() {
       pointer-events-none
     "
           />
-
           {/* Blue tint overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/80 via-[#3d68b8]/80 to-[#284f9e]/95" />
-
           {/* Top gloss */}
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/10 to-transparent" />
-
           {/* Bottom depth */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
-
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
@@ -120,7 +133,7 @@ export default function HomeQuickAccess() {
 
               <div className="text-lg font-medium mt-1">Questions Answered</div>
 
-              <p className="mt-3 max-w-[180px] text-white/80">
+              <p className="mt-1 mb-4 max-w-[180px] text-white/80">
                 Search 35 years of Islamic scholarship.
               </p>
             </div>

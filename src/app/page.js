@@ -47,8 +47,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-sans">
       <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
-        {/* <HomeCarousel lang={lang} /> */}
-
+ 
         <HomeQuickAccess />
 
         <Suspense fallback={null}>

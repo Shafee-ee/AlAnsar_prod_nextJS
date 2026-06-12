@@ -16,6 +16,8 @@ export default function Home() {
   const { user, isAdmin, loading } = useAuth();
   const [showAskBox, setShowAskBox] = useState(false);
   const [prefillQuestion, setPrefillQuestion] = useState("");
+  const [offset, setOffset] = useState(0);
+
   const askRef = useRef(null);
   const { lang } = useLanguage();
 
@@ -33,6 +35,16 @@ export default function Home() {
     return () => window.removeEventListener("trigger-ask-question", handler);
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setOffset(window.scrollY * 0.12);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#F0F8FF]">
@@ -47,7 +59,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-sans">
       <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
- 
+        <section className="relative w-full h-[180px] md:h-[180px] mb-15 overflow-hidden">
+          <img
+            src="/BannerBG.png"
+            alt="Banner"
+            className="absolute inset-0 w-full h-[120%] object-cover"
+            style={{
+              transform: `translateY(${offset}px)`,
+              willChange: "transform",
+            }}
+          />
+
+          {/* dark overlay */}
+          <div className="absolute inset-0 bg-black/20" />
+
+          {/* logo text overlay later */}
+          <div className="relative z-10 h-full flex items-center justify-center">
+            <img
+              src="/alansar-logo-text.gif"
+              alt="Al Ansar"
+              className="h-32 md:h-40 object-contain"
+            />
+          </div>
+        </section>
+
         <HomeQuickAccess />
 
         <Suspense fallback={null}>

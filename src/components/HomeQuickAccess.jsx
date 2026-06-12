@@ -12,12 +12,22 @@ export default function HomeQuickAccess() {
       .catch(() => setTotal(1366));
   }, []);
   return (
-    <section className="px-6 -mt-8 relative z-30">
-      <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory">
+    <section className="px-6 -mt-8 relative z-30 max-w-7xl mx-auto">
+      <div
+        className="
+    flex lg:grid
+    lg:grid-cols-3
+    gap-4
+    overflow-x-auto lg:overflow-visible
+    pb-4
+    snap-x snap-mandatory
+  "
+      >
+        {" "}
         {/* DigiPaper */}
         <Link
           href="/digipaper"
-          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block"
         >
           <img
             src="/digipaper-main.png"
@@ -46,7 +56,6 @@ export default function HomeQuickAccess() {
             </button>
           </div>
         </Link>
-
         {/* Articles */}
         <div
           onClick={() =>
@@ -55,7 +64,7 @@ export default function HomeQuickAccess() {
               block: "start",
             })
           }
-          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+          className="snap-center  lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
         >
           {/* Background image */}
           <img
@@ -90,7 +99,6 @@ export default function HomeQuickAccess() {
             </button>
           </div>
         </div>
-
         {/* Keli Nodi */}
         <div
           onClick={() => {
@@ -103,7 +111,7 @@ export default function HomeQuickAccess() {
               window.dispatchEvent(new Event("expand-chatbot"));
             }, 200);
           }}
-          className="snap-center min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+          className="snap-center lg:min-w-0   min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
         >
           {" "}
           {/* Background image */}

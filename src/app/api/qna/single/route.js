@@ -7,14 +7,14 @@ import { sendEmailToUser } from "@/lib/email";
    Detect Kannada (simple + reliable for our use case)
 ------------------------------------------------------- */
 function isKannada(text = "") {
-    return /[\u0C80-\u0CFF]/.test(text);
+  return /[\u0C80-\u0CFF]/.test(text);
 }
 
 /* -------------------------------------------------------
    Translate using your existing pipeline
 ------------------------------------------------------- */
 async function translate(text, targetLang) {
-    const prompt = `
+  const prompt = `
 Translate the text into ${targetLang}.
 STRICT RULES:
 - ONLY return the translated sentence.
@@ -26,191 +26,204 @@ TEXT:
 ${text}
     `;
 
-    const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
-        {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 0.0 }
-            })
-        }
-    );
+  const r = await fetch(
+    `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${process.env.GOOGLE_API_KEY}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.0 },
+      }),
+    },
+  );
 
-    if (!r.ok) {
-        throw new Error("Gemini translate failed");
-    }
+  if (!r.ok) {
+    const errorBody = await r.text();
 
-    const data = await r.json();
+    console.error("========== GEMINI ERROR ==========");
+    console.error("Status:", r.status);
+    console.error("Body:", errorBody);
+    console.error("Target Language:", targetLang);
+    console.error("Text Length:", text.length);
+    console.error("=================================");
 
-    return (
-        data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text
-    );
+    throw new Error(`Gemini translate failed (${r.status})`);
+  }
+  const data = await r.json();
+
+  if (!data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+    console.error("========== GEMINI EMPTY RESPONSE ==========");
+    console.error(JSON.stringify(data, null, 2));
+    console.error("==========================================");
+
+    throw new Error("Gemini returned empty response");
+  }
+  return data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || text;
 }
 
 /* -------------------------------------------------------
    MAIN HANDLER (new schema, auto-detect override)
 ------------------------------------------------------- */
 export async function POST(req) {
-    try {
-        const {
-            question,
-            answer,
-            lang: userLang,
-            keywords = [],
-            editor_note_en = "",
-            editor_note_kn = "",
-            imam_name = null,
-            source_title = null,
-            samputa = null,
-            sanchike = null,
-            image_urls = [],
-            submissionId=null
-        } = await req.json();
+  try {
+    const {
+      question,
+      answer,
+      lang: userLang,
+      keywords = [],
+      editor_note_en = "",
+      editor_note_kn = "",
+      imam_name = null,
+      source_title = null,
+      samputa = null,
+      sanchike = null,
+      image_urls = [],
+      submissionId = null,
+    } = await req.json();
 
-        if (!question || !answer || !userLang) {
-            return NextResponse.json({ success: false, reason: "missing-fields" });
-        }
+    if (!question || !answer || !userLang) {
+      return NextResponse.json({ success: false, reason: "missing-fields" });
+    }
 
-        const q = question.trim();
-        const a = answer.trim();
+    const q = question.trim();
+    const a = answer.trim();
 
-        if (q.length < 2 || a.length < 2) {
-            return NextResponse.json({ success: false, reason: "too-short" });
-        }
+    if (q.length < 2 || a.length < 2) {
+      return NextResponse.json({ success: false, reason: "too-short" });
+    }
 
-        /* -------------------------------------------------------
+    /* -------------------------------------------------------
            AUTO-DETECT AND OVERRIDE USER SELECTION
         ------------------------------------------------------- */
-        let detectedLang = isKannada(q) ? "kn" : "en";
+    let detectedLang = isKannada(q) ? "kn" : "en";
 
-        // If text is short (< 6 chars), user may be right → fallback to user selection
-        const finalLang =
-            q.length < 6 ? userLang : detectedLang;
+    // If text is short (< 6 chars), user may be right → fallback to user selection
+    const finalLang = q.length < 6 ? userLang : detectedLang;
 
-        /* -------------------------------------------------------
+    /* -------------------------------------------------------
            CREATE EN + KN VERSIONS
         ------------------------------------------------------- */
-        let question_en, answer_en, question_kn, answer_kn;
+    let question_en, answer_en, question_kn, answer_kn;
 
-        if (finalLang === "en") {
-            // original is English
-            question_en = q;
-            answer_en = a;
+    if (finalLang === "en") {
+      // original is English
+      question_en = q;
+      answer_en = a;
 
-            // auto-translate to Kannada
-            question_kn = await translate(q, "kn");
-            answer_kn = await translate(a, "kn");
+      // auto-translate to Kannada
+      question_kn = await translate(q, "kn");
+      answer_kn = await translate(a, "kn");
+    } else {
+      // original is Kannada
+      question_kn = q;
+      answer_kn = a;
 
-        } else {
-            // original is Kannada
-            question_kn = q;
-            answer_kn = a;
+      // auto-translate to English
+      question_en = await translate(q, "en");
+      answer_en = await translate(a, "en");
 
-            // auto-translate to English
-            question_en = await translate(q, "en");
-            answer_en = await translate(a, "en");
+      if (!question_en || !answer_en) {
+        return NextResponse.json({
+          success: false,
+          reason: "translation-failed",
+        });
+      }
+    }
 
-            if (!question_en || !answer_en) {
-                return NextResponse.json({ success: false, reason: "translation-failed" });
-            }
-        }
-
-        /* -------------------------------------------------------
+    /* -------------------------------------------------------
            GENERATE EMBEDDING USING ENGLISH VERSION
         ------------------------------------------------------- */
-        const embedding = await generateEmbedding(question_en);
-        if (!embedding) {
-            return NextResponse.json({ success: false, reason: "embedding-failed" });
-        }
+    const embedding = await generateEmbedding(question_en);
+    if (!embedding) {
+      return NextResponse.json({ success: false, reason: "embedding-failed" });
+    }
 
-        //new fields added here
-        const normalizedImam =
-            imam_name && imam_name.trim() !== "" ? imam_name.trim() : null;
+    //new fields added here
+    const normalizedImam =
+      imam_name && imam_name.trim() !== "" ? imam_name.trim() : null;
 
-        const normalizedSource =
-            source_title && source_title.trim() !== "" ? source_title.trim() : null;
+    const normalizedSource =
+      source_title && source_title.trim() !== "" ? source_title.trim() : null;
 
-        const normalizedSamputa =
-            samputa !== null && samputa !== "" && !isNaN(Number(samputa))
-                ? Number(samputa)
-                : null;
+    const normalizedSamputa =
+      samputa !== null && samputa !== "" && !isNaN(Number(samputa))
+        ? Number(samputa)
+        : null;
 
-        const normalizedSanchike =
-            sanchike !== null && sanchike !== "" && !isNaN(Number(sanchike))
-                ? Number(sanchike)
-                : null;
+    const normalizedSanchike =
+      sanchike !== null && sanchike !== "" && !isNaN(Number(sanchike))
+        ? Number(sanchike)
+        : null;
 
-        const normalizedImages =
-            Array.isArray(image_urls) ? image_urls : [];
+    const normalizedImages = Array.isArray(image_urls) ? image_urls : [];
 
-        /* -------------------------------------------------------
+    /* -------------------------------------------------------
            SAVE IN CLEAN FORMAT
         ------------------------------------------------------- */
-        const docRef = await adminDB.collection("qna_items").add({
-            question_en,
-            answer_en,
-            question_kn,
-            answer_kn,
-            editor_note_en,
-            editor_note_kn,
-            lang_original: finalLang,
-            keywords,
-            embedding,
-            imam_name: normalizedImam,
-            source_title: normalizedSource,
-            samputa: normalizedSamputa,
-            sanchike: normalizedSanchike,
-            image_urls: normalizedImages,
-            createdAt: new Date().toISOString(),
-            updatedAt: null
-        });
+    const docRef = await adminDB.collection("qna_items").add({
+      question_en,
+      answer_en,
+      question_kn,
+      answer_kn,
+      editor_note_en,
+      editor_note_kn,
+      lang_original: finalLang,
+      keywords,
+      embedding,
+      imam_name: normalizedImam,
+      source_title: normalizedSource,
+      samputa: normalizedSamputa,
+      sanchike: normalizedSanchike,
+      image_urls: normalizedImages,
+      createdAt: new Date().toISOString(),
+      updatedAt: null,
+    });
 
     console.log("submissionId:", submissionId);
-        const newQnaId=docRef.id;
+    const newQnaId = docRef.id;
 
-        //if promoted send email to user if email exists 
-        
-if (submissionId) {
-    try {
+    //if promoted send email to user if email exists
+
+    if (submissionId) {
+      try {
         const submissionRef = adminDB
-            .collection("qna_submissions")
-            .doc(submissionId);
+          .collection("qna_submissions")
+          .doc(submissionId);
 
         const snap = await submissionRef.get();
         console.log("Submission exists?", snap.exists);
 
         if (snap.exists) {
-            const submission = snap.data();
-            console.log("Submission data:", submission);
+          const submission = snap.data();
+          console.log("Submission data:", submission);
 
-            if (submission.email && !submission.isAnonymous) {
-             await sendEmailToUser({
-                 email: submission.email,
-                 question: submission.question_original,
-                    answer: answer_en // IMPORTANT: use translated English
-                 });
-} else {
-    console.log("No email sent (anonymous or missing email)");
-}
-
-            await submissionRef.update({
-                promoted_qna_id: newQnaId,
-                email_sent: true
+          if (submission.email && !submission.isAnonymous) {
+            await sendEmailToUser({
+              email: submission.email,
+              question: submission.question_original,
+              answer: answer_en, // IMPORTANT: use translated English
             });
-        }
-    } catch (err) {
-        console.error("Submission linkage failed:", err);
-    }
-}
+          } else {
+            console.log("No email sent (anonymous or missing email)");
+          }
 
-return NextResponse.json({ success: true, id: newQnaId });
-    } catch (err) {
-        console.error("Upload error:", err);
-        return NextResponse.json(
-            { success: false, reason: "server-error" },
-            { status: 500 }
-        );
+          await submissionRef.update({
+            promoted_qna_id: newQnaId,
+            email_sent: true,
+          });
+        }
+      } catch (err) {
+        console.error("Submission linkage failed:", err);
+      }
     }
+
+    return NextResponse.json({ success: true, id: newQnaId });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return NextResponse.json(
+      { success: false, reason: "server-error" },
+      { status: 500 },
+    );
+  }
 }

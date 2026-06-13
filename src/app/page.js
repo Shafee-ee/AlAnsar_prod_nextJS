@@ -76,9 +76,13 @@ export default function Home() {
           {/* logo text overlay later */}
           <div className="relative z-10 h-full flex items-center justify-center">
             <img
-              src="/alansar-logo-text.gif"
+              src={
+                lang === "en"
+                  ? "/Logo-Alansar-eng.gif"
+                  : "/alansar-logo-text.gif"
+              }
               alt="Al Ansar"
-              className="h-32 md:h-40 object-contain"
+              className="h-40 md:h-56 object-contain"
             />
           </div>
         </section>

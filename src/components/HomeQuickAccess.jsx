@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 export default function HomeQuickAccess() {
   const [total, setTotal] = useState(null);
   const scrollRef = useRef(null);
+  const { lang } = useLanguage();
 
   useEffect(() => {
     if (window.innerWidth >= 1024) return;
@@ -34,6 +36,32 @@ export default function HomeQuickAccess() {
       .then((data) => setTotal(data.total))
       .catch(() => setTotal(1366));
   }, []);
+
+  const t = {
+    qnaTitle: lang === "en" ? "Questions Answered" : "ಉತ್ತರಿಸಲಾದ ಪ್ರಶ್ನೆಗಳು",
+    qnaDesc:
+      lang === "en"
+        ? "Search 35 years of Islamic scholarship."
+        : "35 ವರ್ಷಗಳ ಇಸ್ಲಾಮಿಕ್ ಪಾಂಡಿತ್ಯವನ್ನು ಹುಡುಕಿ.",
+
+    qnaBtn: lang === "en" ? "Ask & Discover →" : "ಕೇಳಿ ಮತ್ತು ತಿಳಿಯಿರಿ →",
+
+    digiBadge: lang === "en" ? "Latest Edition" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆ",
+    digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತ್ತೀಚಿನ ಡಿಜಿಪೇಪರ್",
+    digiDesc:
+      lang === "en" ? "Weekly Islamic Publication" : "ವಾರದ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಕಟಣೆ",
+
+    digiBtn: lang === "en" ? "Read Now →" : "ಈಗ ಓದಿ →",
+
+    articleBadge: lang === "en" ? "Featured Content" : "ವಿಶೇಷ ವಿಷಯ",
+    articleTitle: lang === "en" ? "Articles" : "ಲೇಖನಗಳು",
+    articleDesc:
+      lang === "en"
+        ? "Guidance, reflections and contemporary Islamic topics."
+        : "ಮಾರ್ಗದರ್ಶನ, ಚಿಂತನೆಗಳು ಮತ್ತು ಸಮಕಾಲೀನ ಇಸ್ಲಾಮಿಕ್ ವಿಷಯಗಳು.",
+
+    articleBtn: lang === "en" ? "Explore →" : "ಅನ್ವೇಷಿಸಿ →",
+  };
   return (
     <section className="px-6 -mt-8 relative z-30 max-w-7xl mx-auto">
       <div
@@ -53,7 +81,6 @@ export default function HomeQuickAccess() {
           }}
           className="snap-center lg:min-w-0   min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
         >
-          {" "}
           {/* Background image */}
           <img
             src="/qna-card.png"
@@ -79,15 +106,14 @@ export default function HomeQuickAccess() {
             <div>
               <div className="text-5xl font-bold">{total || "1366"}+</div>
 
-              <div className="text-lg font-medium mt-1">Questions Answered</div>
-
-              <p className="mt-1 mb-4 max-w-[180px] text-white/80">
-                Search 35 years of Islamic scholarship.
+              <div className="text-lg font-medium mt-1">{t.qnaTitle}</div>
+              <p className="mt-1 mb-4 max-w-[280px] text-white/80">
+                {t.qnaDesc}
               </p>
             </div>
 
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
-              Ask & Discover →
+            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] cursor-pointer font-bold rounded-full font-medium">
+              {t.qnaBtn}
             </button>
           </div>
         </div>
@@ -108,18 +134,18 @@ export default function HomeQuickAccess() {
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs">
-                Latest Edition
+                {t.digiBadge}
               </span>
 
               <h2 className="mt-4 text-3xl font-bold leading-tight">
-                Latest DigiPaper
+                {t.digiTitle}
               </h2>
 
-              <p className="mt-2 text-white/80">Weekly Islamic Publication</p>
+              <p className="mt-2 text-white/80">{t.digiDesc}</p>
             </div>
 
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
-              Read Now →
+            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] cursor-pointer rounded-full font-medium">
+              {t.digiBtn}
             </button>
           </div>
         </Link>
@@ -149,20 +175,18 @@ export default function HomeQuickAccess() {
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
               <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs">
-                Featured Content
+                {t.articleBadge}
               </span>
 
               <h2 className="mt-4 text-3xl font-bold leading-tight">
-                Articles
+                {t.articleTitle}
               </h2>
 
-              <p className=" text-white/80 max-w-[180px]">
-                Guidance, reflections and contemporary Islamic topics.
-              </p>
+              <p className=" text-white/80 max-w-[280px]">{t.articleDesc} </p>
             </div>
 
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
-              Explore →
+            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full cursor-pointer font-medium">
+              {t.articleBtn}
             </button>
           </div>
         </div>

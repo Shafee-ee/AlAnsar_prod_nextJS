@@ -36,15 +36,31 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    let targetOffset = 0;
+    let currentOffset = 0;
+    let animationFrame;
+
     const handleScroll = () => {
-      setOffset(window.scrollY * 0.12);
+      targetOffset = window.scrollY * 0.25;
+    };
+
+    const animate = () => {
+      currentOffset += (targetOffset - currentOffset) * 0.08;
+
+      setOffset(currentOffset);
+
+      animationFrame = requestAnimationFrame(animate);
     };
 
     window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    animate();
 
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#F0F8FF]">

@@ -59,11 +59,11 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-sans">
       <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
-        <section className="relative w-full h-[180px] md:h-[180px] mb-15 overflow-hidden">
+        <section className="relative w-full h-[120px] md:h-[280px] mb-15 overflow-hidden">
           <img
             src="/BannerBG.png"
             alt="Banner"
-            className="absolute inset-0 w-full h-[120%] object-cover"
+            className="absolute inset-0 w-full h-[150%] object-cover"
             style={{
               transform: `translateY(${offset}px)`,
               willChange: "transform",

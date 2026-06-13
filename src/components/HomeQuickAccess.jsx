@@ -1,9 +1,32 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
 export default function HomeQuickAccess() {
   const [total, setTotal] = useState(null);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) return;
+
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let currentIndex = 0;
+
+    const interval = setInterval(() => {
+      currentIndex = (currentIndex + 1) % 3;
+
+      const cardWidth = container.children[0].offsetWidth + 16; // 16 = gap-4
+
+      container.scrollTo({
+        left: currentIndex * cardWidth,
+        behavior: "smooth",
+      });
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetch("/api/stats")
@@ -14,16 +37,60 @@ export default function HomeQuickAccess() {
   return (
     <section className="px-6 -mt-8 relative z-30 max-w-7xl mx-auto">
       <div
-        className="
-    flex lg:grid
-    lg:grid-cols-3
-    gap-4
-    overflow-x-auto lg:overflow-visible
-    pb-4
-    snap-x snap-mandatory
-  "
+        ref={scrollRef}
+        className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto lg:overflow-visible pb-4 snap-x snap-mandatory"
       >
-        {" "}
+        <div
+          onClick={() => {
+            document.getElementById("chatbot-section")?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+
+            setTimeout(() => {
+              window.dispatchEvent(new Event("expand-chatbot"));
+            }, 200);
+          }}
+          className="snap-center lg:min-w-0   min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+        >
+          {" "}
+          {/* Background image */}
+          <img
+            src="/qna-card.png"
+            alt="Questions and Answers"
+            className="
+      absolute
+      -right-18
+      bottom-0
+      h-[240px]
+      w-auto
+      object-contain
+      pointer-events-none
+    "
+          />
+          {/* Blue tint overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/80 via-[#3d68b8]/80 to-[#284f9e]/95" />
+          {/* Top gloss */}
+          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/10 to-transparent" />
+          {/* Bottom depth */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
+          {/* Content */}
+          <div className="relative h-full p-6 flex flex-col justify-between text-white">
+            <div>
+              <div className="text-5xl font-bold">{total || "1366"}+</div>
+
+              <div className="text-lg font-medium mt-1">Questions Answered</div>
+
+              <p className="mt-1 mb-4 max-w-[180px] text-white/80">
+                Search 35 years of Islamic scholarship.
+              </p>
+            </div>
+
+            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
+              Ask & Discover →
+            </button>
+          </div>
+        </div>
         {/* DigiPaper */}
         <Link
           href="/digipaper"
@@ -100,57 +167,6 @@ export default function HomeQuickAccess() {
           </div>
         </div>
         {/* Keli Nodi */}
-        <div
-          onClick={() => {
-            document.getElementById("chatbot-section")?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-
-            setTimeout(() => {
-              window.dispatchEvent(new Event("expand-chatbot"));
-            }, 200);
-          }}
-          className="snap-center lg:min-w-0   min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
-        >
-          {" "}
-          {/* Background image */}
-          <img
-            src="/qna-card.png"
-            alt="Questions and Answers"
-            className="
-      absolute
-      -right-18
-      bottom-0
-      h-[240px]
-      w-auto
-      object-contain
-      pointer-events-none
-    "
-          />
-          {/* Blue tint overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/80 via-[#3d68b8]/80 to-[#284f9e]/95" />
-          {/* Top gloss */}
-          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/10 to-transparent" />
-          {/* Bottom depth */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
-          {/* Content */}
-          <div className="relative h-full p-6 flex flex-col justify-between text-white">
-            <div>
-              <div className="text-5xl font-bold">{total || "1366"}+</div>
-
-              <div className="text-lg font-medium mt-1">Questions Answered</div>
-
-              <p className="mt-1 mb-4 max-w-[180px] text-white/80">
-                Search 35 years of Islamic scholarship.
-              </p>
-            </div>
-
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
-              Ask & Discover →
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );

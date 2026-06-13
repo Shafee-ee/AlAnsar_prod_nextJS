@@ -5,6 +5,8 @@ Folder PATH listing for volume crucial drive
 Volume serial number is 7CE2-F75F
 
 Volume serial number is E2DA-00C7
+
+Volume serial number is 00000254 E2DA:00C7
 C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\SRC
 ├───app
 │   │   favicon.ico
@@ -114,6 +116,12 @@ C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\
 │   │   │   ├───export
 │   │   │   │       route.js
 │   │   │   │       
+│   │   │   ├───export-html
+│   │   │   │       route.js
+│   │   │   │       
+│   │   │   ├───export-qna-pdf
+│   │   │   │       route.js
+│   │   │   │       
 │   │   │   ├───fix-all
 │   │   │   │       route.js
 │   │   │   │       
@@ -194,6 +202,7 @@ C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\
 │       DigiUpload.jsx
 │       Footer.js
 │       HomeCarousel.jsx
+│       HomeQuickAccess.jsx
 │       IconBubble.jsx
 │       ManageQnA.js
 │       Navbar.js
@@ -218,7 +227,7 @@ C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\
 │       
 └───models
         Article.js
-        
+                
 PS C:\Users\shafe\OneDrive\Desktop\Technopulse\AlAnsarWeekly.com\alansarweekly-app> 
 
 
@@ -1992,3 +2001,230 @@ real CMS foundation
 
 Start next chat with:
 👉 “Build Manage Articles page (like ManageQnA)”
+
+######
+Completed Today
+1. QnA Export Feature
+You originally tried generating PDFs.
+Problems encountered:
+
+
+pdfkit missing Helvetica files.
+
+
+pdf-lib could generate English PDFs.
+
+
+Kannada failed due to font embedding issues (WinAnsi cannot encode Kannada).
+
+
+Even after loading Noto Sans Kannada, pdf-lib threw regeneratorRuntime is not defined.
+
+
+Decision:
+
+
+Abandoned PDF generation.
+
+
+Switched to HTML export.
+
+
+Current route:
+/api/qna/export-html
+This:
+
+
+Pulls all QnA from Firestore.
+
+
+Renders Kannada correctly.
+
+
+Can be printed or saved as PDF from the browser.
+
+
+Uses almost no server CPU.
+
+
+This is now the recommended export solution.
+
+2. Export Button
+Added Export tab to QnA admin panel.
+Current approach:
+
+
+Export tab simply links to:
+
+
+/api/qna/export-html
+Future enhancement:
+
+
+Language selector:
+
+
+Kannada
+
+
+English
+
+
+
+
+Then generate:
+/api/qna/export-html?lang=kn/api/qna/export-html?lang=en
+
+3. QnA Upload Server Error
+Issue:
+Upload error: Gemini translate failed
+Changes made:
+
+
+Added logging around Gemini translation.
+
+
+Tested multiple uploads.
+
+
+Results:
+
+
+Uploads now succeed.
+
+
+Google Cloud billing is healthy.
+
+
+Credit available.
+
+
+API key working.
+
+
+Embedding generation working.
+
+
+Most likely cause:
+Temporary Gemini outageorGemini rate limitorTransient Google API failure
+Since uploads work repeatedly now, no further action tonight.
+Future improvement:
+Replace:
+if (!r.ok) {  throw new Error("Gemini translate failed");}
+with detailed logging:
+console.error(await r.text());
+so future failures show the actual Google error.
+
+4. Homepage Cards
+Desktop looked bad because cards were still using mobile carousel layout.
+Changed:
+flex
+to:
+flex lg:gridlg:grid-cols-3
+Added:
+lg:min-w-0
+to each card.
+Result:
+
+
+Mobile = swipe carousel.
+
+
+Desktop = 3-column grid.
+
+
+Looks much better.
+
+5. New Al Ansar Banner
+Client wanted a banner above the cards.
+Created:
+BannerBG.png
+with:
+
+
+Mosque silhouettes.
+
+
+Moon.
+
+
+Blue gradient.
+
+
+No text.
+
+
+Added:
+<section>  BannerBG.png  alansar-logo-text.gif</section>
+Structure:
+NavbarBannerCardsChatbot
+
+6. Banner Parallax
+Implemented:
+const [offset, setOffset] = useState(0);useEffect(() => {  const handleScroll = () => {    setOffset(window.scrollY * 0.25);  };  window.addEventListener("scroll", handleScroll);  return () => window.removeEventListener("scroll", handleScroll);}, []);
+Background:
+<img  style={{    transform: `translateY(${offset}px)`,    willChange: "transform",  }}/>
+Recommended tweak:
+window.scrollY * 0.12
+instead of:
+window.scrollY * 0.25
+for a subtler effect.
+
+7. Current Banner Code
+Current:
+<section className="relative w-full h-[180px] md:h-[180px] mb-15 overflow-hidden">
+To make banner taller:
+<section className="relative w-full h-[220px] md:h-[280px] mb-15 overflow-hidden">
+and
+<img  src="/alansar-logo-text.gif"  className="h-40 md:h-56 object-contain"/>
+
+Tomorrow's Likely Tasks
+
+
+Polish banner.
+
+
+Adjust height.
+
+
+Adjust logo sizing.
+
+
+Decide if parallax stays.
+
+
+
+
+Make export support:
+
+
+Kannada export.
+
+
+English export.
+
+
+
+
+Add proper Gemini failure logging.
+
+
+Desktop homepage refinement.
+
+
+Card spacing.
+
+
+Banner/card relationship.
+
+
+Large-screen visual balance.
+
+
+
+
+Potentially make banner full-width outside:
+
+
+max-w-6xl
+container if client wants true edge-to-edge appearance.

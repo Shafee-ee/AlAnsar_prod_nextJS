@@ -16,7 +16,6 @@ export default function Home() {
   const { user, isAdmin, loading } = useAuth();
   const [showAskBox, setShowAskBox] = useState(false);
   const [prefillQuestion, setPrefillQuestion] = useState("");
-  const [offset, setOffset] = useState(0);
 
   const askRef = useRef(null);
   const { lang } = useLanguage();
@@ -35,32 +34,6 @@ export default function Home() {
     return () => window.removeEventListener("trigger-ask-question", handler);
   }, []);
 
-  useEffect(() => {
-    let targetOffset = 0;
-    let currentOffset = 0;
-    let animationFrame;
-
-    const handleScroll = () => {
-      targetOffset = window.scrollY * 0.25;
-    };
-
-    const animate = () => {
-      currentOffset += (targetOffset - currentOffset) * 0.08;
-
-      setOffset(currentOffset);
-
-      animationFrame = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    animate();
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(animationFrame);
-    };
-  }, []);
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#F0F8FF]">
@@ -79,11 +52,7 @@ export default function Home() {
           <img
             src="/BannerBG.png"
             alt="Banner"
-            className="absolute inset-0 w-full h-[150%] object-cover"
-            style={{
-              transform: `translateY(${offset}px)`,
-              willChange: "transform",
-            }}
+            className="absolute inset-0 w-full h-full object-cover"
           />
 
           {/* dark overlay */}

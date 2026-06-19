@@ -57,6 +57,7 @@ export async function POST(req) {
     }
 
     const translated = await translateRes.json();
+    console.log("TRANSLATION RESPONSE:", translated);
 
     if (!translated?.title || !translated?.content) {
       throw new Error("Invalid translation response");

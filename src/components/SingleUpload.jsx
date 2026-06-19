@@ -317,7 +317,7 @@ export default function SingleUpload() {
         <div className="space-y-2">
           <label className="font-medium">Samputa</label>
           <input
-            type="number"
+            type="text"
             value={samputa}
             onChange={(e) => setSamputa(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
@@ -328,7 +328,7 @@ export default function SingleUpload() {
         <div className="space-y-2">
           <label className="font-medium">Sanchike</label>
           <input
-            type="number"
+            type="text"
             value={sanchike}
             onChange={(e) => setSanchike(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"

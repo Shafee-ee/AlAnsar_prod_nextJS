@@ -518,7 +518,7 @@ export default function ManageQnA() {
 
             <div className="grid grid-cols-2 gap-3">
               <input
-                type="number"
+                type="text"
                 placeholder="Samputa"
                 className="p-2 border rounded"
                 value={selectedItem.samputa ?? ""}
@@ -531,7 +531,7 @@ export default function ManageQnA() {
                 }
               />
               <input
-                type="number"
+                type="text"
                 placeholder="Sanchike"
                 className="p-2 border rounded"
                 value={selectedItem.sanchike ?? ""}

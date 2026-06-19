@@ -11,7 +11,6 @@ import AskQuestionBox from "@/components/AskQuestionBox";
 import HomeQuickAccess from "@/components/HomeQuickAccess";
 
 //banner QnA count
-import HomeCarousel from "@/components/HomeCarousel";
 export default function Home() {
   const { user, isAdmin, loading } = useAuth();
   const [showAskBox, setShowAskBox] = useState(false);
@@ -48,7 +47,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#f8f9fb] font-sans">
       <div className="w-full max-w-6xl mx-auto py-10 space-y-4">
-        <section className="relative w-full h-[180px] md:h-[280px] mb-15 overflow-hidden">
+        <section className="relative w-full h-[220px] md:h-[320px] mb-10 overflow-hidden">
           <img
             src="/BannerBG.png"
             alt="Banner"
@@ -67,7 +66,7 @@ export default function Home() {
                   : "/alansar-logo-text.gif"
               }
               alt="Al Ansar"
-              className="h-40 md:h-56 object-contain"
+              className="max-h-[140px] md:max-h-[200px] object-contain"
             />
           </div>
         </section>

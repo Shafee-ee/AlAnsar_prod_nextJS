@@ -147,14 +147,10 @@ export async function POST(req) {
       source_title && source_title.trim() !== "" ? source_title.trim() : null;
 
     const normalizedSamputa =
-      samputa !== null && samputa !== "" && !isNaN(Number(samputa))
-        ? Number(samputa)
-        : null;
+      samputa && samputa.trim() !== "" ? samputa.trim() : null;
 
     const normalizedSanchike =
-      sanchike !== null && sanchike !== "" && !isNaN(Number(sanchike))
-        ? Number(sanchike)
-        : null;
+      sanchike && sanchike.trim() !== "" ? sanchike.trim() : null;
 
     const normalizedImages = Array.isArray(image_urls) ? image_urls : [];
 

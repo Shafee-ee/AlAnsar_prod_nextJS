@@ -49,6 +49,82 @@ function ManageArticles() {
   const [articles, setArticles] = useState([]);
   const router = useRouter();
 
+  async function handleDelete(articleId) {
+    const confirmed = confirm("Are you sure you want to delete this article?");
+
+    if (!confirmed) return;
+
+    const res = await fetch("/api/articles/delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        articleId,
+      }),
+    });
+
+    if (!res.ok) {
+      alert("Failed to delete article");
+      return;
+    }
+
+    setArticles((prev) => prev.filter((article) => article.id !== articleId));
+  }
+
+  async function handleFeaturedToggle(articleId, isFeatured) {
+    const res = await fetch("/api/articles/update-featured", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        articleId,
+        isFeatured: !isFeatured,
+      }),
+    });
+
+    if (!res.ok) {
+      alert("Failed to update featured status");
+      return;
+    }
+
+    setArticles((prev) =>
+      prev.map((article) =>
+        article.id === articleId
+          ? {
+              ...article,
+              isFeatured: !isFeatured,
+            }
+          : article,
+      ),
+    );
+  }
+
+  async function handleStatusChange(articleId, status) {
+    const res = await fetch("/api/articles/update-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        articleId,
+        status,
+      }),
+    });
+
+    if (!res.ok) {
+      alert("Failed to update status");
+      return;
+    }
+
+    setArticles((prev) =>
+      prev.map((article) =>
+        article.id === articleId ? { ...article, status } : article,
+      ),
+    );
+  }
+
   useEffect(() => {
     async function load() {
       const res = await fetch("/api/articles");
@@ -68,7 +144,9 @@ function ManageArticles() {
             <th className="p-3">Slug</th>
             <th className="p-3">Category</th>
             <th className="p-3">Status</th>
+            <th className="p-3">Featured</th>
             <th className="p-3">Created</th>
+            <th className="p-3">Actions</th>
           </tr>
         </thead>
 
@@ -84,8 +162,18 @@ function ManageArticles() {
               >
                 <td className="p-3 font-medium">{a.slug}</td>
                 <td className="p-3">{a.category || "-"}</td>
-                <td className="p-3">{a.status || "draft"}</td>
-
+                <td className="p-3">
+                  <span
+                    className={
+                      a.status === "published"
+                        ? "text-green-600 font-medium"
+                        : "text-orange-600 font-medium"
+                    }
+                  >
+                    {a.status || "draft"}
+                  </span>
+                </td>
+                <td className="p-3">{a.isFeatured ? "⭐ Yes" : "—"}</td>
                 <td className="p-3">
                   {a.createdAt?._seconds
                     ? new Date(a.createdAt._seconds * 1000).toLocaleDateString()
@@ -93,6 +181,30 @@ function ManageArticles() {
                 </td>
 
                 <td className="p-3 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      handleStatusChange(
+                        a.id,
+                        a.status === "published" ? "draft" : "published",
+                      );
+                    }}
+                    className="text-blue-600"
+                  >
+                    {a.status === "published" ? "Unpublish" : "Publish"}
+                  </button>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFeaturedToggle(a.id, a.isFeatured);
+                    }}
+                    className="text-amber-600"
+                  >
+                    {a.isFeatured ? "Unfeature" : "Feature"}
+                  </button>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

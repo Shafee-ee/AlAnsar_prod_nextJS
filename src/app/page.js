@@ -9,6 +9,7 @@ import ChatbotSection from "@/components/ChatbotSection";
 import { useLanguage } from "@/context/LanguageContext";
 import AskQuestionBox from "@/components/AskQuestionBox";
 import HomeQuickAccess from "@/components/HomeQuickAccess";
+import FeaturedArticles from "@/components/FeaturedArticles";
 
 //banner QnA count
 export default function Home() {
@@ -76,6 +77,8 @@ export default function Home() {
         <Suspense fallback={null}>
           <ChatbotSection />
         </Suspense>
+
+        <FeaturedArticles />
         <div ref={askRef} className="ask-wrapper">
           {showAskBox && (
             <AskQuestionBox

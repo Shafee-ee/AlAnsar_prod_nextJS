@@ -2228,3 +2228,610 @@ Potentially make banner full-width outside:
 
 max-w-6xl
 container if client wants true edge-to-edge appearance.
+
+#######
+# Al Ansar Upgrade – Chat Summary
+
+## Homepage Banner
+
+### Language-Based Logo Switching
+
+Implemented language-aware logo swapping on the homepage banner.
+
+Current logic:
+
+```jsx
+const { lang } = useLanguage();
+
+<img
+  src={
+    lang === "en"
+      ? "/Logo-Alansar-eng.gif"
+      : "/alansar-logo-text.gif"
+  }
+  alt="Al Ansar"
+/>
+```
+
+Result:
+
+* Kannada → `alansar-logo-text.gif`
+* English → `Logo-Alansar-eng.gif`
+
+---
+
+### English Logo Work
+
+Created an English version of the Al Ansar logo.
+
+Discussion points:
+
+* Direct translation of the Kannada slogan:
+
+  * "ಅರಿವಿನ ಅಕ್ಷರ ಕ್ರಾಂತಿ"
+  * "A Revolution of Knowledge Through Words"
+
+* Translation of:
+
+  * "ಕನ್ನಡ ವಾರ ಪತ್ರಿಕೆ"
+  * "Kannada Weekly"
+
+Font recommendations explored:
+
+* Cinzel
+* Playfair Display
+* Cormorant Garamond
+* Merriweather
+* Arco
+
+Final direction:
+
+* English logo should feel like a publication/newspaper.
+* Avoid generic Islamic app aesthetics.
+* Preserve existing Al Ansar brand identity.
+
+---
+
+### Banner Parallax Removal
+
+Initially attempted:
+
+```js
+setOffset(window.scrollY * 0.12);
+```
+
+Then experimented with lag-based parallax.
+
+Problem:
+
+* Grey background became visible.
+* Banner height was too small for meaningful parallax.
+* Effect felt distracting.
+
+Decision:
+
+Removed parallax completely.
+
+Removed:
+
+* offset state
+* scroll listeners
+* requestAnimationFrame loop
+* transform styling
+
+Final banner:
+
+```jsx
+<img
+  src="/BannerBG.png"
+  alt="Banner"
+  className="absolute inset-0 w-full h-full object-cover"
+/>
+```
+
+Current banner size:
+
+```jsx
+h-[220px] md:h-[320px]
+```
+
+Current logo size:
+
+```jsx
+max-h-[140px] md:max-h-[200px]
+```
+
+Banner considered complete.
+
+---
+
+## HomeQuickAccess
+
+### Auto Scroll
+
+Implemented automatic mobile carousel scrolling.
+
+Features:
+
+* Auto-scroll every 4 seconds.
+* Loops continuously.
+* Disabled on desktop.
+
+Implementation:
+
+```js
+const scrollRef = useRef(null);
+```
+
+and interval-based scrolling:
+
+```js
+container.scrollTo({
+  left: currentIndex * cardWidth,
+  behavior: "smooth",
+});
+```
+
+---
+
+### Language Support
+
+Next planned task:
+
+Add translations for:
+
+* Questions Answered
+* Ask & Discover
+* Latest DigiPaper
+* Weekly Islamic Publication
+* Articles
+* Explore
+
+Not completed yet.
+
+---
+
+## QnA Upload System
+
+### Samputa / Sanchike Bug
+
+Problem:
+
+Publication identifiers are not always numeric.
+
+Examples:
+
+```text
+8-9
+10-11
+vol 59
+Special Issue
+```
+
+System previously assumed:
+
+```js
+Number(samputa)
+Number(sanchike)
+```
+
+Result:
+
+```text
+8-9 -> NaN -> null
+```
+
+Metadata was lost.
+
+---
+
+### Frontend Fixes
+
+Changed inputs from:
+
+```jsx
+type="number"
+```
+
+to:
+
+```jsx
+type="text"
+```
+
+in:
+
+* SingleUpload
+* ManageQnA modal
+
+Also removed:
+
+```js
+Number(e.target.value)
+```
+
+from edit handlers.
+
+---
+
+### Backend Fixes
+
+Found issue inside upload route.
+
+Old code:
+
+```js
+const normalizedSamputa =
+  samputa !== null &&
+  samputa !== "" &&
+  !isNaN(Number(samputa))
+    ? Number(samputa)
+    : null;
+```
+
+and similar for sanchike.
+
+Replaced with:
+
+```js
+const normalizedSamputa =
+  samputa && samputa.trim() !== ""
+    ? samputa.trim()
+    : null;
+
+const normalizedSanchike =
+  sanchike && sanchike.trim() !== ""
+    ? sanchike.trim()
+    : null;
+```
+
+---
+
+### Firestore Schema Change
+
+Previous storage:
+
+```text
+samputa: 18 (int64)
+sanchike: 51 (int64)
+```
+
+New storage:
+
+```text
+samputa: "18-19"
+sanchike: "vol 59"
+```
+
+Decision:
+
+Treat both fields as publication identifiers (strings), not numeric values.
+
+Benefits:
+
+Supports:
+
+```text
+18
+18-19
+51
+51-52
+vol 59
+Special Issue
+Ramzan Special
+```
+
+without future schema changes.
+
+---
+
+### Validation
+
+Confirmed:
+
+`api/qna/update/route.js`
+
+contains no validation forcing numeric values.
+
+Root cause was only the upload route normalization.
+
+---
+
+### Testing
+
+Successfully tested:
+
+```text
+Samputa: 16-19
+Sanchike: vol 59
+```
+
+Values now save correctly.
+
+Feature considered complete.
+
+---
+
+## Next Session Focus
+
+### DigiPaper Architecture
+
+Planned discussion:
+
+* DigiPaper redesign
+* DigiPaper archive organization
+* Year structure
+* Samputa/Sanchike metadata usage
+* Search/filtering strategy
+* Mobile UX
+* Homepage DigiPaper card behavior
+* Long-term scalability
+
+Need to review:
+
+1. Current DigiPaper page screenshot
+2. Firestore DigiPaper document structure
+3. Pain points with current organization
+
+Goal:
+
+Design DigiPaper structure before implementation.
+#####
+# Article System Progress Summary## Translation System- Translation stopped working unexpectedly.- Root cause discovered:  - `/api/translate` was using deprecated model:    ```js    models/gemini-2.0-flash    ```  - Gemini API returned:    ```json    {      "error": {        "code": 404,        "message": "This model models/gemini-2.0-flash is no longer available."      }    }    ```- Fixed by upgrading to:  ```js  models/gemini-2.5-flash
+
+
+QnA translations continue to work.
+
+
+Article translations now work correctly.
+
+
+Translation save flow automatically creates:
+
+
+Original language translation
+
+
+Opposite language translation
+
+
+
+
+
+Article Edit Page
+
+
+/api/articles/by-id was not returning translations.
+
+
+Updated endpoint to return:
+{  article: {    ...data,    translations: {      en,      kn    }  }}
+
+
+Edit page now loads existing translations properly.
+
+
+Language switching inside editor works.
+
+
+
+Article Admin Features
+Publish / Unpublish
+Created:
+/api/articles/update-status
+Features:
+
+
+draft → published
+
+
+published → draft
+
+
+Status updates immediately in UI.
+
+
+Delete Article
+Created:
+/api/articles/delete
+Features:
+
+
+Deletes article document.
+
+
+Deletes translation subcollection.
+
+
+Removes article from admin list immediately.
+
+
+Feature / Unfeature
+Created:
+/api/articles/update-featured
+Features:
+
+
+Toggle featured status.
+
+
+Updates Firestore.
+
+
+Updates UI immediately.
+
+
+No manual Firestore editing required anymore.
+
+
+
+Homepage Featured Articles
+Created:
+FeaturedArticles.jsx
+Features:
+
+
+Fetches articles from:
+/api/articles
+
+
+Filters:
+status === "published"isFeatured === true
+
+
+Displays top 3 featured articles.
+
+
+
+Public Article Flow
+Confirmed working:
+Admin↓Create Article↓Translate↓Publish↓Feature↓Homepage Featured Card↓Click↓Public Article Page
+Route
+Existing route discovered:
+src/app/article/[slug]/page.jsx
+Issue:
+
+
+Homepage linked to:
+/articles/[slug]
+
+
+Actual route:
+/article/[slug]
+
+
+Fixed:
+router.push(`/article/${article.slug}`)
+
+Article Titles on Homepage
+Problem:
+
+
+Homepage cards displayed:
+article.slug
+
+
+Real title lives in:
+articles/{id}/translations/enarticles/{id}/translations/kn
+
+
+Updated:
+/api/articles
+to fetch translation titles.
+Added:
+title: translationSnap.exists  ? translationSnap.data().title  : articleData.slug
+Result:
+
+
+Homepage now shows article title instead of slug.
+
+
+
+Language-Aware Featured Articles
+Problem:
+
+
+Homepage always displayed Kannada titles.
+
+
+Cause:
+
+
+API hardcoded:
+.doc("kn")
+
+
+Fix:
+
+
+Homepage sends:
+/api/articles?lang=${lang}
+
+
+API now reads:
+const lang = searchParams.get("lang") || "kn";
+
+
+API fetches:
+.doc(lang)
+
+
+Additional bug fixed:
+
+
+Used:
+"/api/articles?lang=${lang}"
+instead of:
+`/api/articles?lang=${lang}`
+
+
+Required template literals.
+
+
+Result:
+
+
+Language switch now updates Featured Article titles correctly.
+
+
+
+Current State
+Working:
+
+
+Article creation
+
+
+Image upload
+
+
+Translation (EN ↔ KN)
+
+
+Edit article
+
+
+Publish / Unpublish
+
+
+Delete article
+
+
+Feature / Unfeature
+
+
+Homepage featured section
+
+
+Language-aware titles
+
+
+Public article pages
+
+
+Article page routing
+
+
+
+Next Tasks
+Priority:
+
+
+Latest Articles carousel
+
+
+Related Articles section
+
+
+Share Article button
+
+
+Print Article button
+
+
+Better Featured Articles card design
+
+
+Voice-to-text QnA search
+
+

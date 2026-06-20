@@ -2,12 +2,10 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Printer, Save } from "lucide-react";
+import { ArrowLeft, share2 } from "lucide-react";
 
 const ArticleView = ({ article }) => {
   const router = useRouter();
-  const [lang, setLang] = useState("en"); // keeping it
-  const [isSaved, setIsSaved] = useState(false);
 
   const handleNavigate = (path) => {
     if (path === "home") {
@@ -15,11 +13,24 @@ const ArticleView = ({ article }) => {
     }
   };
 
-  const handleSaveArticle = () => {
-    setIsSaved((prev) => !prev);
-  };
-
   const handlePrint = () => window.print();
+
+  async function handleShare() {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: article.title,
+          text: article.title,
+          url: shareUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        alert("Link copied to clipboard");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString("en-US", {
@@ -88,7 +99,15 @@ const ArticleView = ({ article }) => {
         ))}
       </div>
 
-      {/* Actions */}
+      <div className="flex gap-3 mt-8">
+        <button onClick={handleShare} className="px-4 py-2 border rounded">
+          Share
+        </button>
+
+        <button onClick={handlePrint} className="px-4 py-2 border rounded">
+          Print
+        </button>
+      </div>
 
       {/* Footer */}
       <footer className="mt-8 text-center text-sm text-gray-500">

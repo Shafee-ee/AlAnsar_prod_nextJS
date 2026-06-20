@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const MODEL = "models/gemini-2.0-flash";
+const MODEL = "models/gemini-2.5-flash";
 
 function cleanOutput(text) {
   if (!text) return "";
@@ -45,7 +45,7 @@ ${input}
             contents: [{ parts: [{ text: prompt }] }],
             generationConfig: { temperature: 0.0 },
           }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -83,7 +83,6 @@ ${input}
       title: translatedTitle,
       content: translatedContent,
     });
-
   } catch (err) {
     console.error("Fatal translate error:", err);
 

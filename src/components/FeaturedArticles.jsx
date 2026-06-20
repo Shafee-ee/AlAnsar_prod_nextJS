@@ -13,7 +13,6 @@ export default function featuredArticles() {
     async function load() {
       const res = await fetch(`/api/articles?lang=${lang}`);
       const data = await res.json();
-      console.log(data.articles);
 
       const featured = (data.articles || [])
         .filter((a) => a.status === "published" && a.isFeatured === true)

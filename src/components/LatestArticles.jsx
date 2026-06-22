@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function LatestArticles() {
   const [articles, setArticles] = useState([]);
   const scrollref = useRef(null);
   const { lang } = useLanguage();
+  const router = useRouter();
 
   async function loadArticles() {
     const res = await fetch(`/api/articles?lang=${lang}`);
@@ -26,14 +27,12 @@ export default function LatestArticles() {
     <section className="mt-8">
       <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
 
-      <div
-        ref={scrollref}
-        className="flex overflow-x-auto gap-6 no-scrollbar pb-5"
-      >
+      <div ref={scrollref} className="flex overflow-x-auto gap-6  pb-5">
         {articles.map((article) => (
           <div
             key={article.id}
-            className="relative  bg-white rounded-2xl overflow-hidden shadow-lg w-80 flex-shrink-0"
+            onClick={() => router.push(`/article/${article.slug}`)}
+            className="relative  bg-white rounded-2xl overflow-hidden  cursor-pointer shadow-lg w-80 flex-shrink-0"
           >
             <img
               src={article.coverImage}

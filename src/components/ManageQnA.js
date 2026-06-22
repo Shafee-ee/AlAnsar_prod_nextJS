@@ -525,8 +525,7 @@ export default function ManageQnA() {
                 onChange={(e) =>
                   setSelectedItem({
                     ...selectedItem,
-                    samputa:
-                      e.target.value === "" ? null : Number(e.target.value),
+                    samputa: e.target.value,
                   })
                 }
               />
@@ -538,8 +537,7 @@ export default function ManageQnA() {
                 onChange={(e) =>
                   setSelectedItem({
                     ...selectedItem,
-                    sanchike:
-                      e.target.value === "" ? null : Number(e.target.value),
+                    sanchike: e.target.value,
                   })
                 }
               />

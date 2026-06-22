@@ -44,7 +44,7 @@ export default function featuredArticles() {
               )}
             </div>
             <div className="p-4">
-              <div className="text-xs text-gray-500 mb-2">
+              <div className="text-xs text-gray-900 inline-block bg-green-100 px-3 py-1 rounded-full mb-2">
                 {article.category}
               </div>
 

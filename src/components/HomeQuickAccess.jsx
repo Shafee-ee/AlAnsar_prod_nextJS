@@ -66,7 +66,7 @@ export default function HomeQuickAccess() {
     <section className="px-6 -mt-8 relative z-30 max-w-7xl mx-auto">
       <div
         ref={scrollRef}
-        className="flex lg:grid lg:grid-cols-3 gap-4 overflow-x-auto lg:overflow-visible pb-4 snap-x snap-mandatory"
+        className="flex lg:grid no-scrollbar lg:grid-cols-3 gap-4 overflow-x-auto lg:overflow-visible pb-4 snap-x snap-mandatory"
       >
         <div
           onClick={() => {

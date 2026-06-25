@@ -2835,3 +2835,159 @@ Better Featured Articles card design
 Voice-to-text QnA search
 
 
+#######
+Articles System Progress (Current State)
+Related Articles
+Created:
+components/RelatedArticles.jsx
+Features completed:
+
+
+Fetches articles from:
+
+
+/api/articles?lang=${lang}
+
+
+Filters by:
+
+
+article.category === categoryarticle.slug !== currentSlugarticle.status === "published"
+
+
+Limits to:
+
+
+.slice(0, 3)
+
+
+Sidebar layout:
+
+
+[image] Title[image] Title[image] Title
+
+
+Clicking a related article navigates to:
+
+
+/article/${article.slug}?lang=${lang}
+Lessons learned:
+Props↓Parent passes data↓Child receives data↓Filters using props
+Found bug where:
+<RelatedArticles />
+was not passing:
+categorycurrentSlug
+Fixed by:
+<RelatedArticles  category={article.category}  currentSlug={article.slug}/>
+
+Article Page
+File:
+src/app/article/[slug]/page.jsx
+Added:
+<RelatedArticles  category={article.category}  currentSlug={article.slug}/>
+Fixed Next.js 15 async route params:
+const { slug } = await params;const { lang = "kn" } = await searchParams;
+
+Articles Landing Page
+Created:
+src/app/article/page.jsx
+Features:
+
+
+Fetch all articles
+
+
+Filter published articles
+
+
+Display card grid
+
+
+Open article on click
+
+
+Pattern used:
+Fetch↓Store in state↓Map↓Render cards
+
+Articles Grid
+Current structure:
+ImageCategory PillTitle
+Features:
+
+
+Responsive grid
+
+
+Hover animation
+
+
+Clickable cards
+
+
+Navigation:
+router.push(`/article/${article.slug}?lang=${lang}`)
+
+Category Filters
+Added state:
+const [selectedCategory, setSelectedCategory] = useState("All");
+Added categories:
+const categories = [  "All",  "Hadith",  "Fiqh",  "Islamic History",  "Smaniyaru",  "Vishleshanagalu",  "Vismaya Jagattu",  "Quranic vyakhanagalu",];
+Added filter logic:
+const filteredArticles =  selectedCategory === "All"    ? articles    : articles.filter(        (article) =>          article.category === selectedCategory      );
+Important lesson learned:
+articles=master datafilteredArticles=derived datafilteredArticles.map(...)=what gets rendered
+Major React concept that clicked:
+State changes↓Component rerenders↓Derived data recalculates↓UI updates automatically
+Buttons were converted to:
+setSelectedCategory(...)
+and category filtering works.
+
+Dynamic Category Buttons
+Completed.
+Using:
+categories.map(...)
+instead of manually creating buttons.
+Pattern learned:
+Array↓map()↓UI
+Same pattern now used for:
+ArticlesRelated ArticlesCategory Filters
+
+Remaining Work
+Articles Page
+Search Bar (Recommended Next)
+Add:
+const [searchTerm, setSearchTerm] = useState("");
+Add search input.
+Filter by:
+article.title
+and possibly:
+article.category
+Flow:
+articles↓category filter↓search filter↓filteredArticles↓render
+This is the next logical feature.
+
+Active Category Styling
+Current:
+AllHadithFiqh...
+Need:
+Selected category visually highlighted
+Example:
+Selected = blueOthers = gray
+
+Navbar
+Need Articles link:
+/article
+so users can reach the Articles page from navigation.
+
+Homepage
+Latest Articles section still needs:
+Auto-scroll carousel
+Already completed:
+scrollRefhorizontal scrollinghidden scrollbar
+Only auto-scroll logic remains.
+
+DigiPaper
+Still pending.
+Once Articles section is complete:
+Search↓Navbar Link↓Latest Auto Scroll↓DigiPaper organization
+That should be the next major focus.

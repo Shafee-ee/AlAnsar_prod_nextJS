@@ -37,13 +37,14 @@ export default function RelatedArticles({ category, currentSlug }) {
         <div
           key={article.id}
           onClick={() => router.push(`/article/${article.slug}?lang=${lang}`)}
-          className="flex gap-3 mb-4  py-3 cursor-pointer border-b border-blue-200"
+          className="flex gap-3 mb-4  py-3 cursor-pointer  hover:bg-gray-50 border-b border-blue-200"
         >
           <img
             src={article.coverImage}
             alt={article.title}
             className="w-16 h-16 object-cover rounded"
           />
+
           <div>
             <h4 className="font-medium text-sm leading-snug">
               {article.title}

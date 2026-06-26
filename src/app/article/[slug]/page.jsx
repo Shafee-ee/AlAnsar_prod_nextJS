@@ -6,7 +6,7 @@ export default async function ArticlePage({ params, searchParams }) {
   const { lang = "kn" } = await searchParams;
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
+    `${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
     { next: { revalidate: 60 } },
   );
 

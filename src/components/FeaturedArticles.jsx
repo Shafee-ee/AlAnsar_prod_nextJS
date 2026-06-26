@@ -26,7 +26,9 @@ export default function featuredArticles() {
 
   return (
     <section className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">Featured Articles</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        Featured Articles
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {articles.map((article) => (
           <div
@@ -48,7 +50,7 @@ export default function featuredArticles() {
                 {article.category}
               </div>
 
-              <h3 className="font-semibold">{article.title}</h3>
+              <h3 className="font-semibold text-gray-900">{article.title}</h3>
             </div>
           </div>
         ))}

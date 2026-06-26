@@ -82,7 +82,7 @@ export default function AtticlesPage() {
             className={`px-4 py-1 rounded-full inline-block mb-2 cursor-pointer ${
               selectedCategory === category
                 ? "bg-blue-600 text-white"
-                : "bg-blue-100"
+                : "bg-blue-100 text-gray-900"
             }`}
           >
             {category}
@@ -104,10 +104,10 @@ export default function AtticlesPage() {
             />
 
             <div className="p-5">
-              <p className="text-sm text-gray-900  mb-2  bg-green-100 inline-block p-1 rounded-full ">
+              <p className="text-sm text-gray-900 text-gray-900 mb-2  bg-green-100 inline-block p-1 rounded-full ">
                 {article.category}
               </p>
-              <h3 className="font-semibold text-lg leading-snug">
+              <h3 className="font-semibold text-lg text-gray-900 leading-snug">
                 {article.title}
               </h3>
             </div>

@@ -25,7 +25,7 @@ export default function LatestArticles() {
 
   return (
     <section className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">Latest Articles</h2>
+      <h2 className="text-2xl font-bold text-gray-900 mb-6">Latest Articles</h2>
 
       <div ref={scrollref} className="flex overflow-x-auto gap-6  pb-5">
         {articles.map((article) => (
@@ -45,10 +45,10 @@ export default function LatestArticles() {
             </button>
 
             <div className="p-5">
-              <p className="text-sm text-gray-900 mb-2 bg-green-100 px-3 py-1 inline-block rounded-full">
+              <p className="text-sm text-gray-900 mb-2 text-gray-900 bg-green-100 px-3 py-1 inline-block rounded-full">
                 {article.category}
               </p>
-              <h3 className="font-semibold text-lg leading-snug">
+              <h3 className="font-semibold text-lg text-gray-900 leading-snug">
                 {article.title}
               </h3>
             </div>

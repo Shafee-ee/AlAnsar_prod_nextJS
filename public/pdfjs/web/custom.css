@@ -93,3 +93,56 @@
 #loadingBar {
   top: 56px !important;
 }
+
+@media (max-width: 768px) {
+  #toolbarContainer,
+  #toolbarViewer {
+    height: 48px !important;
+  }
+
+  .toolbarButton {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  #pageNumber {
+    width: 42px !important;
+    font-size: 16px !important;
+  }
+}
+
+/* ---------- Page Counter ---------- */
+
+#pageNumber {
+  width: 36px !important;
+  height: auto !important;
+  background: transparent !important;
+  border: none !important;
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  text-align: right !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  pointer-events: none !important;
+  appearance: none !important;
+}
+
+#pageNumber::-webkit-inner-spin-button,
+#pageNumber::-webkit-outer-spin-button {
+  display: none !important;
+}
+
+#numPages {
+  color: white !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  margin-left: 4px !important;
+}
+
+.loadingInput {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

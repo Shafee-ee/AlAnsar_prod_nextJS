@@ -13,7 +13,6 @@ function LanguageSwitcher({ highlight }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { lang: currentLang } = useLanguage();
-
   const [localLang, setLocalLang] = React.useState(currentLang);
 
   React.useEffect(() => {
@@ -63,6 +62,7 @@ function LanguageSwitcher({ highlight }) {
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showLanguageHint, setShowLanguageHint] = React.useState(true);
+  const { lang } = useLanguage();
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -90,7 +90,7 @@ const Navbar = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href={`/?lang=${lang}`} className="flex items-center">
             <img
               src="/logo.png"
               alt="ALANSARWEEKLY Logo"
@@ -101,22 +101,29 @@ const Navbar = () => {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-6">
             <Link
-              href="/"
+              href={`/?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Home
             </Link>
             <Link
-              href="/about"
+              href={`/about?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Pioneers
             </Link>
             <Link
-              href="/digipaper"
+              href={`/digipaper?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               Digital paper
+            </Link>
+
+            <Link
+              href={`/article?lang=${lang}`}
+              className="text-white/80 hover:text-white text-sm font-medium transition"
+            >
+              Articles
             </Link>
           </div>
 
@@ -193,7 +200,7 @@ const Navbar = () => {
       {isMenuOpen && (
         <div className="md:hidden px-4 pb-4 bg-[#0B4C8C] space-y-4">
           <Link
-            href="/"
+            href={`/?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
@@ -201,18 +208,26 @@ const Navbar = () => {
           </Link>
 
           <Link
-            href="/about"
+            href={`/about?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             Pioneers
           </Link>
           <Link
-            href="/digipaper"
+            href={`/digipaper?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             Digital Paper
+          </Link>
+
+          <Link
+            href={`/article?lang=${lang}`}
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
+          >
+            Articles
           </Link>
         </div>
       )}

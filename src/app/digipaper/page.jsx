@@ -24,13 +24,34 @@ export default async function DigiPaperListing(props) {
     baseQuery = baseQuery.where("type", "==", selectedType);
   }
 
-  if (selectedYear) {
-    const startDate = new Date(selectedYear, 0, 1);
-    const endDate = new Date(selectedYear + 1, 0, 1);
+  const monthParam = searchParams?.month;
 
-    baseQuery = baseQuery
-      .where("publishDate", ">=", startDate)
-      .where("publishDate", "<", endDate);
+  const selectedMonth =
+    monthParam === undefined || monthParam === ""
+      ? null
+      : parseInt(monthParam, 10);
+
+  console.log({
+    selectedYear,
+    selectedMonth,
+  });
+
+  if (selectedYear) {
+    if (selectedMonth !== null) {
+      const startDate = new Date(selectedYear, selectedMonth, 1);
+      const endDate = new Date(selectedYear, selectedMonth + 1, 1);
+
+      baseQuery = baseQuery
+        .where("publishDate", ">=", startDate)
+        .where("publishDate", "<", endDate);
+    } else {
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear + 1, 0, 1);
+
+      baseQuery = baseQuery
+        .where("publishDate", ">=", startDate)
+        .where("publishDate", "<", endDate);
+    }
   }
 
   baseQuery = baseQuery.orderBy("publishDate", "desc");
@@ -82,7 +103,12 @@ export default async function DigiPaperListing(props) {
 
       {/* Year Filter */}
       <div className="max-w-6xl mx-auto mb-6">
-        <DigiFilters selectedType={selectedType} selectedYear={selectedYear} />
+        <DigiFilters
+          selectedType={selectedType}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          years={years}
+        />
       </div>
 
       {/* Showing Info */}
@@ -94,11 +120,9 @@ export default async function DigiPaperListing(props) {
       {/* Content Grid*/}
       <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {issues.map((issue) => (
-          <a
+          <Link
             key={issue.id}
-            href={issue.pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+            href={`/digipaper/${issue.slug}`}
             className="bg-white shadow hover:shadow-lg transition p-4"
           >
             <img
@@ -109,7 +133,7 @@ export default async function DigiPaperListing(props) {
             <h3 className="mt-3 font-semibold text-gray-800 text-center">
               {issue.title}
             </h3>
-          </a>
+          </Link>
         ))}
       </div>
 

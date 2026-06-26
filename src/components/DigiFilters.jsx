@@ -72,7 +72,7 @@ export default function DigiFilters({
             className={`px-4 py-2 rounded transition ${
               selectedType === type
                 ? "bg-green-200 border-2 border-green-600"
-                : "bg-gray-100 border"
+                : "bg-gray-100 border text-gray-900"
             } ${isPending ? "opacity-70" : ""}`}
           >
             {type}
@@ -87,6 +87,7 @@ export default function DigiFilters({
         <select
           value={selectedYear ?? ""}
           onChange={(e) => handleYearChange(e.target.value)}
+          className="bg-white text-gray-900 border rounded px-3 py-2"
         >
           <option value="">All Years</option>
 
@@ -101,6 +102,7 @@ export default function DigiFilters({
           <select
             value={selectedMonth ?? ""}
             onChange={(e) => handleMonthChange(e.target.value)}
+            className="bg-white text-gray-900 border rounded px-3 py-2"
           >
             <option value="">All Months</option>
             {months.map((month, index) => (

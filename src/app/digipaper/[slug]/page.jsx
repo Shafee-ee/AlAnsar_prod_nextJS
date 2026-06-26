@@ -8,8 +8,11 @@ export default async function EpaperViewer({ params }) {
   const issue = snap.data();
 
   return (
-    <div className="p-8 ">
-      <Link href="/digipaper" className="text-white">
+    <div className="relative h-screen ">
+      <Link
+        href="/digipaper"
+        className="absolute left-5 top-4 z-50 text-white font-medium"
+      >
         ← Back
       </Link>
       <iframe

@@ -12,8 +12,11 @@ export default async function EpaperViewer({ params }) {
       <Link href="/digipaper" className="text-white">
         ← Back
       </Link>
-
-      <iframe src={issue.pdfUrl} className="w-full h-[calc(100vh-80px)]" />
+      <iframe
+        src={`/pdfjs/web/viewer.html?file=/api/pdf/${slug}`}
+        className="w-full h-[calc(100vh-80px)] border rounded"
+        title={issue.title}
+      />
     </div>
   );
 }

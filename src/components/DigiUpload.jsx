@@ -37,7 +37,11 @@ export default function DigiUpload() {
 
       // Upload PDF
       const pdfRef = ref(storage, `digipaper/${slug}/${pdfFile.name}`);
-      await uploadBytes(pdfRef, pdfFile);
+      await uploadBytes(pdfRef, pdfFile, {
+        contentType: "application/pdf",
+        contentDisposition: "inline",
+      });
+
       const pdfUrl = await getDownloadURL(pdfRef);
 
       // Upload Cover

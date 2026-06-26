@@ -2991,3 +2991,223 @@ Still pending.
 Once Articles section is complete:
 Search↓Navbar Link↓Latest Auto Scroll↓DigiPaper organization
 That should be the next major focus.
+
+#####
+DigiPaper Progress Summary
+✅ Completed
+1. DigiPaper Listing
+File: app/digipaper/page.jsx
+
+
+Displays published DigiPaper issues.
+
+
+Pagination works.
+
+
+Type filters:
+
+
+Weekly
+
+
+Monthly
+
+
+Special
+
+
+
+
+Year filter implemented.
+
+
+Month filter implemented.
+
+
+Month filter only appears when selectedType === "weekly".
+
+
+
+2. Firestore Query Logic
+Current query flow:
+status == "published"↓type filter↓year filter↓month filter (weekly only)↓orderBy publishDate desc
+Year filter:
+const startDate = new Date(selectedYear, 0, 1);const endDate = new Date(selectedYear + 1, 0, 1);
+Month filter:
+const startDate = new Date(selectedYear, selectedMonth, 1);const endDate = new Date(selectedYear, selectedMonth + 1, 1);
+
+3. DigiFilters Component
+File:
+components/DigiFilters.jsx
+Implemented:
+
+
+Type buttons
+
+
+Year dropdown
+
+
+Month dropdown
+
+
+Page reset when filters change
+
+
+Fixed bug:
+<option value="">All Years</option>
+instead of
+<option>All Years</option>
+to avoid NaN.
+
+4. Navigation
+Cards now use:
+<Link href={`/digipaper/${issue.slug}`}>
+instead of opening Firebase PDFs directly.
+
+5. DigiPaper Detail Page
+File
+app/digipaper/[slug]/page.jsx
+Converted from Client Component to Server Component.
+Now:
+const { slug } = await params;const snap = await adminDB    .collection("digipaper_issues")    .doc(slug)    .get();const issue = snap.data();
+This works correctly.
+Current page:
+Listing      ↓/digipaper/[slug]      ↓Fetch Firestore document      ↓Render page
+
+Database Discovery
+The Firestore document ID is the slug.
+Example:
+Document ID:alansarweeklyslug:alansarweekly
+Therefore we do not need a /api/digipaper/by-slug endpoint.
+Fetching directly via adminDB.doc(slug) is correct.
+
+Remaining Problem
+Original requirement:
+
+Mobile should NOT immediately download the PDF.
+
+
+Browser iframe
+Using:
+<iframe src={issue.pdfUrl} />
+Works:
+
+
+Desktop ✅
+
+
+Fails:
+
+
+Android Chrome shows Open
+
+
+Opens external app / downloads
+
+
+Not acceptable.
+
+Attempted Solution
+Installed:
+react-pdfpdfjs-dist
+Problems encountered:
+
+
+Object.defineProperty called on non-object
+
+
+DOMMatrix is not defined
+
+
+Worker mismatch
+
+
+Next.js 15 SSR issues
+
+
+Dynamic import issues
+
+
+Webpack compatibility issues
+
+
+Eventually confirmed:
+The issue is with
+
+
+Next.js 15
+
+
+React 19
+
+
+Webpack
+
+
+react-pdf/pdfjs-dist compatibility
+
+
+Not our application code.
+After cleanup:
+react-pdf@10.4.1└── pdfjs-dist@5.4.296
+Only one pdfjs version remains.
+Still failed with:
+Object.defineProperty called on non-object
+during:
+await import("react-pdf")
+Decision:
+Stop fighting React PDF.
+
+Current Plan (Next Chat)
+Use Mozilla's hosted PDF.js viewer instead.
+Instead of:
+<PDFViewer />
+Use:
+<iframe    src={`https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(issue.pdfUrl)}`}    className="w-full h-[calc(100vh-80px)] border rounded"    title={issue.title}/>
+Advantages:
+
+
+Works today.
+
+
+No React PDF.
+
+
+No PDF.js bundling.
+
+
+Full PDF viewer.
+
+
+Mobile-friendly.
+
+
+Can finish DigiPaper today.
+
+
+
+After DigiPaper
+Remaining DigiPaper work:
+
+
+Verify Mozilla viewer works on Android.
+
+
+Improve UI around viewer.
+
+
+Download button.
+
+
+Better back navigation.
+
+
+Fix DigiPaper naming inconsistencies after discussing with the team.
+
+
+Clarify "Samput Sanchike" naming convention.
+
+
+Then DigiPaper V1 is essentially complete.

@@ -6,7 +6,7 @@ export default async function ArticlePage({ params, searchParams }) {
   const { lang = "kn" } = await searchParams;
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
     { next: { revalidate: 60 } },
   );
 
@@ -17,7 +17,7 @@ export default async function ArticlePage({ params, searchParams }) {
   const article = await res.json();
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8 bg-white min-h-screen">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* ARTICLE */}
         <div className="md:col-span-2">

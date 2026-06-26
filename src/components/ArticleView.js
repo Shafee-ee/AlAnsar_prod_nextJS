@@ -50,7 +50,7 @@ const ArticleView = ({ article }) => {
   }, []);
 
   return (
-    <article className="max-w-3xl mx-auto px-4 md:px-0 py-8">
+    <article className="max-w-3xl mx-auto px-4 md:px-0 py-8 bg-white rounded-xl">
       {/* Back */}
       <nav className="mb-6">
         <button
@@ -61,7 +61,6 @@ const ArticleView = ({ article }) => {
           Back to Home
         </button>
       </nav>
-
       {/* Image */}
       {article.image && (
         <div className="mb-6 rounded-lg overflow-hidden">
@@ -72,7 +71,6 @@ const ArticleView = ({ article }) => {
           />
         </div>
       )}
-
       {/* Header */}
       <header className="mb-6">
         <div className="mb-3">
@@ -91,14 +89,12 @@ const ArticleView = ({ article }) => {
           <time>{formatDate(article.createdAt || new Date())}</time>
         </div>
       </header>
-
       {/* Content */}
       <div className="text-[18px] leading-9 text-gray-800 space-y-6">
         {article.content.split("\n").map((p, i) => (
           <p key={i}>{p}</p>
         ))}
       </div>
-
       <div className="flex gap-3 mt-8">
         <button onClick={handleShare} className="px-4 py-2 border rounded">
           Share
@@ -108,7 +104,6 @@ const ArticleView = ({ article }) => {
           Print
         </button>
       </div>
-
       {/* Footer */}
       <footer className="mt-8 text-center text-sm text-gray-500">
         Published on {formatDate(article.createdAt || new Date())} By{" "}

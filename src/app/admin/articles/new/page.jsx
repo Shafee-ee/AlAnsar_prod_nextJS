@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 export default function NewArticlePage() {
   const router = useRouter();
 
-  const [slug, setSlug] = useState("");
   const [category, setCategory] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,8 +15,8 @@ export default function NewArticlePage() {
     e.preventDefault();
     setError("");
 
-    if (!slug || !category) {
-      setError("Slug and Category are required fields");
+    if (!category) {
+      setError("Category is required");
       return;
     }
 
@@ -28,7 +27,6 @@ export default function NewArticlePage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug,
           category,
           isFeatured,
         }),
@@ -54,19 +52,6 @@ export default function NewArticlePage() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/*slug*/}
-        <div className="space-y-1">
-          <label className="font-medium">Slug</label>
-          <input
-            type="text"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder='Enter permanent address ex:"talaq-during-pregnancy" '
-          />
-          <p className="text-sm text-gray-500">
-            Permanent adress.cannot be changed after published
-          </p>
-        </div>
 
         {/*category*/}
         <div className="space-y-1">

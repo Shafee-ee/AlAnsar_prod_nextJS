@@ -31,24 +31,29 @@ export default function RelatedArticles({ category, currentSlug }) {
 
   return (
     <div>
-      <h3 className="font-semibold mb-4">Related Articles</h3>
-
+      <h3 className="mb-5 text-lg font-bold text-slate-900">
+        Related Articles
+      </h3>
       {articles.map((article) => (
         <div
           key={article.id}
           onClick={() => router.push(`/article/${article.slug}?lang=${lang}`)}
-          className="flex gap-3 mb-4  py-3 cursor-pointer  hover:bg-gray-50 border-b border-blue-200"
+          className="group mb-4 flex cursor-pointer gap-4 rounded-xl p-2 transition hover:bg-slate-50"
         >
           <img
             src={article.coverImage}
             alt={article.title}
-            className="w-16 h-16 object-cover rounded"
+            className="h-20 w-20 flex-shrink-0 rounded-xl object-cover"
           />
 
-          <div>
-            <h4 className="font-medium text-sm leading-snug">
+          <div className="flex flex-col justify-center">
+            <h4 className="line-clamp-2 text-sm font-semibold leading-6 text-slate-900 transition group-hover:text-blue-600">
               {article.title}
             </h4>
+
+            <span className="mt-2 text-xs text-slate-500">
+              {article.category}
+            </span>
           </div>
         </div>
       ))}

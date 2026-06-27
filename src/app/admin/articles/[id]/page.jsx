@@ -55,12 +55,14 @@ export default function ArticlePage() {
 
     setSaving(true);
 
+    const detectedLanguage = /[\u0C80-\u0CFF]/.test(title) ? "kn" : "en";
+
     const promise = fetch("/api/articles/translations/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         articleId: id,
-        language: lang,
+        language: detectedLanguage,
         title,
         content,
         author,

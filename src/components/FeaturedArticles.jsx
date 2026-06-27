@@ -33,7 +33,7 @@ export default function featuredArticles() {
         {articles.map((article) => (
           <div
             key={article.id}
-            onClick={() => router.push(`/article/${article.slug}`)}
+            onClick={() => router.push(`/article/${article.slug}?lang=${lang}`)}
             className="bg-white rounded-xl shadow overflow-hidden cursor-pointer"
           >
             <div className="h-48 bg-gray-200">

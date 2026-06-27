@@ -15,7 +15,15 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    const { text, title, content, targetLang } = body;
+    const { text, title, content, sourceLang, targetLang } = body;
+
+    const languageNames = {
+      en: "English",
+      kn: "Kannada",
+    };
+
+    const sourceLanguage = languageNames[sourceLang] || sourceLang;
+    const targetLanguage = languageNames[targetLang] || targetLang;
 
     if (!targetLang || (!text && !title && !content)) {
       return NextResponse.json({ translated: null });
@@ -25,16 +33,18 @@ export async function POST(req) {
       if (!input) return "";
 
       const prompt = `
-Translate the text into ${targetLang}.
-STRICT RULES:
-- ONLY return the translated sentence.
-- NO explanations.
-- NO markdown.
-- Preserve Islamic terms exactly.
+Translate the following ${sourceLanguage} text into ${targetLanguage}.
+
+Rules:
+- Return ONLY the translated text.
+- Do NOT explain anything.
+- Do NOT repeat the original language.
+- Preserve Quranic verses, Arabic words, and Islamic terminology appropriately.
+- Do NOT use markdown.
 
 TEXT:
 ${input}
-      `;
+`;
 
       const response = await fetch(
         `https://generativelanguage.googleapis.com/v1/${MODEL}:generateContent?key=${process.env.GOOGLE_API_KEY}`,
@@ -52,6 +62,13 @@ ${input}
 
       const raw =
         data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || input;
+
+      console.log({
+        sourceLanguage,
+        targetLanguage,
+        input,
+        output: raw,
+      });
 
       return cleanOutput(raw);
     }

@@ -31,7 +31,7 @@ export default function LatestArticles() {
         {articles.map((article) => (
           <div
             key={article.id}
-            onClick={() => router.push(`/article/${article.slug}`)}
+            onClick={() => router.push(`/article/${article.slug}?lang=${lang}`)}
             className="relative  bg-white rounded-2xl overflow-hidden  cursor-pointer shadow-lg w-80 flex-shrink-0"
           >
             <img

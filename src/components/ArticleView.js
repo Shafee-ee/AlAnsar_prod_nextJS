@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, share2 } from "lucide-react";
-
+import { ArrowLeft, Share2, CalendarDays, User, Clock } from "lucide-react";
 const ArticleView = ({ article }) => {
   const router = useRouter();
 
@@ -45,12 +44,16 @@ const ArticleView = ({ article }) => {
 
   const [shareUrl, setShareUrl] = useState("");
 
+  const wordCount = article.content.trim().split(/\s+/).filter(Boolean).length;
+
+  const readTime = Math.max(1, Math.ceil(wordCount / 200));
+
   React.useEffect(() => {
     setShareUrl(window.location.href);
   }, []);
 
   return (
-    <article className="max-w-3xl mx-auto px-4 md:px-0 py-8 bg-white rounded-xl">
+    <article className="w-full py-8">
       {/* Back */}
       <nav className="mb-6">
         <button
@@ -74,38 +77,49 @@ const ArticleView = ({ article }) => {
       {/* Header */}
       <header className="mb-6">
         <div className="mb-3">
-          <span className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full uppercase tracking-wide font-semibold">
+          <span className="inline-block bg-blue-100 text-blue-700 text-sm px-3 py-1 rounded-full uppercase tracking-wide font-semibold">
             {article.category?.replace("-", " ")}
           </span>
         </div>
 
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+        <h1 className="text-5xl font-serif font-bold leading-tight tracking-tight text-slate-900 md:text-6xl">
           {article.title}
         </h1>
 
-        <div className="flex items-center text-gray-600 gap-3 text-sm">
-          <span className="font-medium">{article.author}</span>
-          <span>•</span>
-          <time>{formatDate(article.createdAt || new Date())}</time>
+        <div className="mt-5 flex flex-wrap items-center gap-6 text-sm text-slate-500">
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            <span>{article.author}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4" />
+            <time>{formatDate(article.createdAt || new Date())}</time>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <span>{readTime} min read</span>
+          </div>
         </div>
       </header>
       {/* Content */}
-      <div className="text-[18px] leading-9 text-gray-800 space-y-6">
+      <div className="mx-auto mt-10 max-w-2xl space-y-7 text-[18px] leading-9 text-slate-800">
         {article.content.split("\n").map((p, i) => (
           <p key={i}>{p}</p>
         ))}
       </div>
-      <div className="flex gap-3 mt-8">
-        <button onClick={handleShare} className="px-4 py-2 border rounded">
-          Share
-        </button>
-
-        <button onClick={handlePrint} className="px-4 py-2 border rounded">
-          Print
+      <div className="mx-auto mt-12 flex max-w-2xl gap-3">
+        <button
+          onClick={handleShare}
+          className="px-4 py-2 border text-gray-900 rounded flex"
+        >
+          <Share2 className="h-3 w-3 mt-[6px] mr-2" />
+          <span>Share</span>
         </button>
       </div>
       {/* Footer */}
-      <footer className="mt-8 text-center text-sm text-gray-500">
+      <footer className="mx-auto mt-10 max-w-2xl border-t border-slate-200 pt-6 text-center text-sm text-slate-500">
         Published on {formatDate(article.createdAt || new Date())} By{" "}
         {article.author}
       </footer>

@@ -64,6 +64,23 @@ const Navbar = () => {
   const [showLanguageHint, setShowLanguageHint] = React.useState(true);
   const { lang } = useLanguage();
 
+  const navText = {
+    en: {
+      home: "Home",
+      pioneers: "Pioneers",
+      digipaper: "Digital Paper",
+      articles: "Articles",
+    },
+    kn: {
+      home: "ಮುಖಪುಟ",
+      pioneers: "ಪೂರ್ವಜರು",
+      digipaper: "ಡಿಜಿಟಲ್ ಪತ್ರಿಕೆ",
+      articles: "ಲೇಖನಗಳು",
+    },
+  };
+
+  const t = navText[lang];
+
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setShowLanguageHint(false);
@@ -104,26 +121,26 @@ const Navbar = () => {
               href={`/?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
-              Home
+              {t.home}
             </Link>
             <Link
               href={`/about?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
-              Pioneers
+              {t.pioneers}
             </Link>
             <Link
               href={`/digipaper?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
-              Digital paper
+              {t.digipaper}
             </Link>
 
             <Link
               href={`/article?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
-              Articles
+              {t.articles}
             </Link>
           </div>
 
@@ -204,7 +221,7 @@ const Navbar = () => {
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
-            Home
+            {t.home}
           </Link>
 
           <Link
@@ -212,14 +229,14 @@ const Navbar = () => {
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
-            Pioneers
+            {t.pioneers}
           </Link>
           <Link
             href={`/digipaper?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
-            Digital Paper
+            {t.digipaper}
           </Link>
 
           <Link
@@ -227,7 +244,7 @@ const Navbar = () => {
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
-            Articles
+            {t.articles}
           </Link>
         </div>
       )}

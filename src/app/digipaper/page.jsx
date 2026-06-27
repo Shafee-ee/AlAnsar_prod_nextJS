@@ -118,12 +118,13 @@ export default async function DigiPaperListing(props) {
       </div>
 
       {/* Content Grid*/}
-      <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-6">
+        {" "}
         {issues.map((issue) => (
           <Link
             key={issue.id}
             href={`/digipaper/${issue.slug}`}
-            className="bg-white shadow hover:shadow-lg transition p-4"
+            className="w-52 bg-white shadow hover:shadow-lg transition p-4"
           >
             <img
               src={issue.coverImageUrl}

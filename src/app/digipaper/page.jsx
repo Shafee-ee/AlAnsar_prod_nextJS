@@ -109,7 +109,12 @@ export default async function DigiPaperListing(props) {
         .where("publishDate", ">=", startDate)
         .where("publishDate", "<", endDate);
     } else {
-      baseQuery = baseQuery.where("year", "==", selectedYear);
+      const startDate = new Date(selectedYear, 0, 1);
+      const endDate = new Date(selectedYear + 1, 0, 1);
+
+      baseQuery = baseQuery
+        .where("publishDate", ">=", startDate)
+        .where("publishDate", "<", endDate);
     }
   }
 
@@ -213,7 +218,7 @@ export default async function DigiPaperListing(props) {
       <div className="flex justify-center mt-8 gap-2">
         {page > 1 && (
           <Link
-            href={`/digipaper?page=${page - 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
+            href={`/digipaper?page=${page - 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}${selectedMonth !== null ? `&month=${selectedMonth}` : ""}`}
             className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm"
           >
             Prev
@@ -228,7 +233,7 @@ export default async function DigiPaperListing(props) {
           .map((_, i) => (
             <Link
               key={i}
-              href={`/digipaper?page=${i + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
+              href={`/digipaper?page=${i + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}${selectedMonth !== null ? `&month=${selectedMonth}` : ""}`}
               className={`px-3 py-1 border border-gray-300 text-sm ${
                 page === i + 1
                   ? "bg-blue-600 text-white"
@@ -241,7 +246,7 @@ export default async function DigiPaperListing(props) {
 
         {page < totalPages && (
           <Link
-            href={`/digipaper?page=${page + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
+            href={`/digipaper?page=${page + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}${selectedMonth !== null ? `&month=${selectedMonth}` : ""}`}
             className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm"
           >
             Next

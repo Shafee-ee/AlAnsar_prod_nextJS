@@ -24,6 +24,10 @@ export default function DigiManage() {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
   const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const fetchIssues = async () => {
     try {
@@ -64,6 +68,55 @@ export default function DigiManage() {
       fetchIssues();
     } catch {
       toast.error("Delete failed");
+    }
+  };
+
+  const handleEdit = (issue) => {
+    setEditingId(issue.id);
+    setEditTitle(issue.title || "");
+
+    if (issue.publishDate) {
+      const date = new Date(issue.publishDate.seconds * 1000);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+
+      setEditDate(`${year}-${month}-${day}`);
+    } else {
+      setEditDate("");
+    }
+  };
+
+  const handleSaveEdit = async (id) => {
+    if (!editTitle.trim() || !editDate) {
+      toast.error("Title and date are required");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const dateObj = new Date(`${editDate}T00:00:00`);
+
+      await updateDoc(doc(db, "digipaper_issues", id), {
+        title: editTitle.trim(),
+        publishDate: dateObj,
+        year: dateObj.getFullYear(),
+      });
+
+      toast.success("Issue updated");
+
+      setEditingId(null);
+      setEditTitle("");
+      setEditDate("");
+
+      await fetchIssues();
+    } catch (err) {
+      console.error(err);
+      toast.error("Update failed");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -133,7 +186,44 @@ export default function DigiManage() {
           className="border rounded-lg p-4 flex justify-between items-center shadow-sm"
         >
           <div>
-            <div className="font-semibold text-lg">{issue.title}</div>
+            {editingId === issue.id ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="border p-2 rounded w-full"
+                  placeholder="Title"
+                />
+
+                <input
+                  type="date"
+                  value={editDate}
+                  onChange={(e) => setEditDate(e.target.value)}
+                  className="border p-2 rounded"
+                />
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSaveEdit(issue.id)}
+                    disabled={saving}
+                    className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50"
+                  >
+                    {saving ? "Saving..." : "Save"}
+                  </button>
+
+                  <button
+                    onClick={() => setEditingId(null)}
+                    disabled={saving}
+                    className="px-3 py-1 bg-gray-200 text-gray-700 rounded"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="font-semibold text-lg">{issue.title}</div>
+            )}
 
             <div className="text-sm text-gray-500">
               {issue.slug} •{" "}
@@ -162,6 +252,13 @@ export default function DigiManage() {
           </div>
 
           <div className="flex gap-3">
+            <button
+              onClick={() => handleEdit(issue)}
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600"
+            >
+              Edit
+            </button>
+
             <button
               onClick={() => toggleStatus(issue.id, issue.status)}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"

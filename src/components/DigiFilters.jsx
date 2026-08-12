@@ -14,6 +14,7 @@ export default function DigiFilters({
 
   const [isPending, startTransition] = useTransition();
   const [pendingType, setPendingType] = useState(null);
+  const [pendingFilter, setPendingFilter] = useState(null);
 
   const handleChange = (type) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -22,6 +23,7 @@ export default function DigiFilters({
     params.delete("page");
 
     setPendingType(type);
+    setPendingFilter(null);
 
     startTransition(() => {
       router.push(`/digipaper?${params.toString()}`);
@@ -34,6 +36,8 @@ export default function DigiFilters({
     params.set("year", year);
     params.delete("page");
 
+    setPendingFilter("year");
+
     startTransition(() => {
       router.push(`/digipaper?${params.toString()}`);
     });
@@ -44,6 +48,8 @@ export default function DigiFilters({
 
     params.set("month", month);
     params.delete("page");
+
+    setPendingFilter("month");
 
     startTransition(() => {
       router.push(`/digipaper?${params.toString()}`);
@@ -92,7 +98,8 @@ export default function DigiFilters({
         <select
           value={selectedYear ?? ""}
           onChange={(e) => handleYearChange(e.target.value)}
-          className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2"
+          disabled={isPending}
+          className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2 disabled:opacity-70 disabled:cursor-wait"
         >
           <option value="">All Years</option>
 
@@ -102,21 +109,31 @@ export default function DigiFilters({
             </option>
           ))}
         </select>
+        {isPending && pendingFilter === "year" && (
+          <span className="inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin self-center" />
+        )}
 
         {selectedType === "weekly" && (
-          <select
-            value={selectedMonth ?? ""}
-            onChange={(e) => handleMonthChange(e.target.value)}
-            className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2"
-          >
-            <option value="">All Months</option>
+          <>
+            <select
+              value={selectedMonth ?? ""}
+              onChange={(e) => handleMonthChange(e.target.value)}
+              disabled={isPending}
+              className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2 disabled:opacity-70 disabled:cursor-wait"
+            >
+              <option value="">All Months</option>
 
-            {months.map((month, index) => (
-              <option key={index} value={index}>
-                {month}
-              </option>
-            ))}
-          </select>
+              {months.map((month, index) => (
+                <option key={index} value={index}>
+                  {month}
+                </option>
+              ))}
+            </select>
+
+            {isPending && pendingFilter === "month" && (
+              <span className="inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin self-center" />
+            )}
+          </>
         )}
       </div>
     </div>

@@ -6,6 +6,70 @@ export const dynamic = "force-dynamic";
 
 const PER_PAGE = 8;
 
+function formatDigiPaperTitle(title, type) {
+  if (!title) {
+    return {
+      title: "",
+      subtitle: "",
+    };
+  }
+
+  if (type === "weekly") {
+    const match = title.match(
+      /^(.*?)(?:\s+)(Vloume|Volume):\s*(\d+)\s*-\s*Issue:\s*(\d+)$/i,
+    );
+
+    if (match) {
+      return {
+        title: match[1].trim(),
+        subtitle: `Vol. ${match[3]} · No. ${match[4]}`,
+      };
+    }
+
+    return {
+      title,
+      subtitle: "",
+    };
+  }
+
+  if (type === "monthly") {
+    const match = title.match(/^(\d{4}(?:-\d{2})?)\s+(.+)$/i);
+
+    if (match) {
+      return {
+        title: match[1].trim(),
+        subtitle: match[2].trim(),
+      };
+    }
+
+    return {
+      title,
+      subtitle: "",
+    };
+  }
+
+  if (type === "special") {
+    const match = title.match(/^(.*?)(?:\s*-\s*)(\d{4})$/);
+
+    if (match) {
+      return {
+        title: match[1].trim(),
+        subtitle: match[2],
+      };
+    }
+
+    return {
+      title,
+      subtitle: "",
+    };
+  }
+
+  return {
+    title,
+    subtitle: "",
+  };
+}
+
 export default async function DigiPaperListing(props) {
   const searchParams = await props.searchParams;
 
@@ -54,8 +118,7 @@ export default async function DigiPaperListing(props) {
     }
   }
 
-  baseQuery = baseQuery.orderBy("publishDate", "desc");
-
+  baseQuery = baseQuery.orderBy("createdAt", "asc");
   //get total count efficiency
   const totalSnapshot = await baseQuery.count().get();
   const total = totalSnapshot.data().count;
@@ -70,6 +133,7 @@ export default async function DigiPaperListing(props) {
 
     const lastVisible =
       previousDocsSnapShot.docs[previousDocsSnapShot.docs.length - 1];
+
     pageQuery = baseQuery.startAfter(lastVisible).limit(PER_PAGE);
   }
 
@@ -118,24 +182,36 @@ export default async function DigiPaperListing(props) {
       </div>
 
       {/* Content Grid*/}
-      <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-6">
-        {" "}
-        {issues.map((issue) => (
-          <Link
-            key={issue.id}
-            href={`/digipaper/${issue.slug}`}
-            className="w-52 bg-white shadow hover:shadow-lg transition p-4"
-          >
-            <img
-              src={issue.coverImageUrl}
-              alt={issue.title}
-              className="w-full h-auto"
-            />
-            <h3 className="mt-3 font-semibold text-gray-800 text-center">
-              {issue.title}
-            </h3>
-          </Link>
-        ))}
+      <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {issues.map((issue) => {
+          const formatted = formatDigiPaperTitle(issue.title, issue.type);
+
+          return (
+            <Link
+              key={issue.id}
+              href={`/digipaper/${issue.slug}`}
+              className="bg-white shadow hover:shadow-lg transition p-3"
+            >
+              <img
+                src={issue.coverImageUrl}
+                alt={issue.title}
+                className="w-full h-auto"
+              />
+
+              <div className="mt-3 text-center">
+                <h3 className="text-xs font-semibold text-gray-900 leading-tight">
+                  {formatted.title}
+                </h3>
+
+                {formatted.subtitle && (
+                  <p className="mt-1 text-xs text-gray-500 leading-tight">
+                    {formatted.subtitle}
+                  </p>
+                )}
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {/* Pagination */}
@@ -143,7 +219,7 @@ export default async function DigiPaperListing(props) {
         {page > 1 && (
           <Link
             href={`/digipaper?page=${page - 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
-            className="px-3 py-1 border bg-white"
+            className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm"
           >
             Prev
           </Link>
@@ -158,8 +234,10 @@ export default async function DigiPaperListing(props) {
             <Link
               key={i}
               href={`/digipaper?page=${i + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
-              className={`px-3 py-1 border ${
-                page === i + 1 ? "bg-blue-600 text-white" : "bg-white"
+              className={`px-3 py-1 border border-gray-300 text-sm ${
+                page === i + 1
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-900"
               }`}
             >
               {i + 1}
@@ -169,7 +247,7 @@ export default async function DigiPaperListing(props) {
         {page < totalPages && (
           <Link
             href={`/digipaper?page=${page + 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}`}
-            className="px-3 py-1 border bg-white"
+            className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm"
           >
             Next
           </Link>

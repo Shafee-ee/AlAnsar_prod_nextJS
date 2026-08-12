@@ -31,10 +31,14 @@ export default function HomeQuickAccess() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/stats")
+    fetch("/api/stats", {
+      cache: "no-store",
+    })
       .then((res) => res.json())
       .then((data) => setTotal(data.total))
-      .catch(() => setTotal(1366));
+      .catch((error) => {
+        console.error("Failed to load Q&A count:", error);
+      });
   }, []);
 
   const t = {
@@ -104,8 +108,9 @@ export default function HomeQuickAccess() {
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
-              <div className="text-5xl font-bold">{total || "1366"}+</div>
-
+              <div className="text-5xl font-bold">
+                {total !== null ? `${total}+` : "..."}
+              </div>
               <div className="text-lg font-medium mt-1">{t.qnaTitle}</div>
               <p className="mt-1 mb-4 max-w-[280px] text-white/80">
                 {t.qnaDesc}

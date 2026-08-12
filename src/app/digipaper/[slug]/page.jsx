@@ -16,8 +16,8 @@ export default async function EpaperViewer({ params }) {
         ← Back
       </Link>
       <iframe
-        src={`/pdfjs/web/viewer.html?file=/api/pdf/${slug}`}
-        className="w-full h-[calc(100vh-80px)] border rounded"
+        src={`/pdfjs/web/viewer.html?file=/api/pdf/${slug}#zoom=page-height`}
+        className="w-full h-screen border-0"
         title={issue.title}
       />
     </div>

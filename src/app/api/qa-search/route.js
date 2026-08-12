@@ -5,17 +5,32 @@ import { geminiTranslate } from "@/lib/geminiTranslate";
 
 let cachedItems = null;
 let lastLoadTime = 0;
+let cachedCount = null;
+let lastCountCheck = 0;
 
 const embeddingCache = new Map();
 
 async function loadEmbeddingsIfNeeded() {
   const now = Date.now();
 
-  //Reload every 10 minutes
-  if (cachedItems && now - lastLoadTime < 10 * 60 * 1000) {
+  // Check the database count only every 30 seconds.
+  if (!cachedItems || now - lastCountCheck >= 30 * 1000) {
+    const countSnap = await adminDB.collection("qna_items").count().get();
+
+    cachedCount = countSnap.data().count;
+    lastCountCheck = now;
+  }
+
+  // Cache is still valid.
+  if (
+    cachedItems &&
+    cachedItems.length === cachedCount &&
+    now - lastLoadTime < 10 * 60 * 1000
+  ) {
     return cachedItems;
   }
 
+  // Reload embeddings.
   const snap = await adminDB
     .collection("qna_items")
     .select("embedding", "question_en", "question_kn")
@@ -26,7 +41,9 @@ async function loadEmbeddingsIfNeeded() {
     ...d.data(),
   }));
 
+  cachedCount = cachedItems.length;
   lastLoadTime = now;
+
   return cachedItems;
 }
 

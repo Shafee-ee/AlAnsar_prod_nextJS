@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 export default function DigiFilters({
   selectedType,
@@ -13,12 +13,15 @@ export default function DigiFilters({
   const searchParams = useSearchParams();
 
   const [isPending, startTransition] = useTransition();
+  const [pendingType, setPendingType] = useState(null);
 
   const handleChange = (type) => {
     const params = new URLSearchParams(searchParams.toString());
 
     params.set("type", type);
-    params.delete("page"); // reset pagination
+    params.delete("page");
+
+    setPendingType(type);
 
     startTransition(() => {
       router.push(`/digipaper?${params.toString()}`);
@@ -49,7 +52,7 @@ export default function DigiFilters({
 
   const months = [
     "January",
-    "Febuary",
+    "February",
     "March",
     "April",
     "May",
@@ -64,30 +67,32 @@ export default function DigiFilters({
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 ">
+      <div className="flex gap-4">
         {["weekly", "monthly", "special"].map((type) => (
           <button
             key={type}
             onClick={() => handleChange(type)}
-            className={`px-4 py-2 rounded transition ${
+            disabled={isPending}
+            className={`px-4 py-2 rounded border transition capitalize ${
               selectedType === type
-                ? "bg-green-200 border-2 border-green-600"
-                : "bg-gray-100 border text-gray-900"
-            } ${isPending ? "opacity-70" : ""}`}
+                ? "bg-green-200 border-2 border-green-600 text-gray-900"
+                : "bg-white border-gray-800 text-gray-900"
+            }`}
           >
             {type}
-            {isPending && selectedType === type && (
-              <span className="ml-2 inline-block w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+
+            {isPending && pendingType === type && (
+              <span className="ml-2 inline-block w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin align-middle" />
             )}
           </button>
         ))}
       </div>
 
-      <div className="flex gap-4 ">
+      <div className="flex gap-4">
         <select
           value={selectedYear ?? ""}
           onChange={(e) => handleYearChange(e.target.value)}
-          className="bg-white text-gray-900 border rounded px-3 py-2"
+          className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2"
         >
           <option value="">All Years</option>
 
@@ -102,9 +107,10 @@ export default function DigiFilters({
           <select
             value={selectedMonth ?? ""}
             onChange={(e) => handleMonthChange(e.target.value)}
-            className="bg-white text-gray-900 border rounded px-3 py-2"
+            className="bg-white text-gray-900 border border-gray-800 rounded px-3 py-2"
           >
             <option value="">All Months</option>
+
             {months.map((month, index) => (
               <option key={index} value={index}>
                 {month}

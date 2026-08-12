@@ -109,12 +109,7 @@ export default async function DigiPaperListing(props) {
         .where("publishDate", ">=", startDate)
         .where("publishDate", "<", endDate);
     } else {
-      const startDate = new Date(selectedYear, 0, 1);
-      const endDate = new Date(selectedYear + 1, 0, 1);
-
-      baseQuery = baseQuery
-        .where("publishDate", ">=", startDate)
-        .where("publishDate", "<", endDate);
+      baseQuery = baseQuery.where("year", "==", selectedYear);
     }
   }
 

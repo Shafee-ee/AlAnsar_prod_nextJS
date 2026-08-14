@@ -72,3 +72,14 @@ input[type="submit"] {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+
+
+
+/* Disable text selection/copying in the PDF viewer */
+.textLayer {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  pointer-events: none !important;
+}

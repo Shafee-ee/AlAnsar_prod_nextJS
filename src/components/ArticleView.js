@@ -104,7 +104,12 @@ const ArticleView = ({ article }) => {
         </div>
       </header>
       {/* Content */}
-      <div className="mx-auto mt-10 max-w-2xl space-y-7 text-[18px] leading-9 text-slate-800">
+      <div
+        className="mx-auto mt-10 max-w-2xl space-y-7 text-[18px] leading-9 text-slate-800 select-none"
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
+      >
         {article.content.split("\n").map((p, i) => (
           <p key={i}>{p}</p>
         ))}

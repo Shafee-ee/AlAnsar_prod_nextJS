@@ -5191,3 +5191,13 @@ dialog :link{
     display:none;
   }
 }
+
+
+/* Disable text selection/copying */
+.textLayer {
+  display: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  pointer-events: none !important;
+}

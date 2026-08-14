@@ -69,7 +69,13 @@ export default function PDFViewer({ pdfUrl }) {
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
       >
         {Array.from({ length: numPages || 0 }, (_, index) => (
-          <Page key={index} pageNumber={index + 1} renderTextLayer={false} />
+          <Page
+            key={index}
+            pageNumber={index + 1}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
+            className="pdf-page"
+          />
         ))}
       </Document>
     </div>

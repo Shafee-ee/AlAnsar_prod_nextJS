@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-export default function CalendarView({ calendars, initialCalendarId }) {
+import { Share2 } from "lucide-react";
+export default function CalendarView({
+  calendars,
+  initialCalendarId,
+  initialEventId,
+}) {
   const years = useMemo(() => {
     return [
       ...new Set(
@@ -33,6 +37,10 @@ export default function CalendarView({ calendars, initialCalendarId }) {
 
   const [selectedId, setSelectedId] = useState(
     initialCalendarId || calendars[0]?.id || null,
+  );
+
+  const [selectedEventId, setSelectedEventId] = useState(
+    initialEventId || null,
   );
 
   const handleShare = async () => {
@@ -138,6 +146,45 @@ export default function CalendarView({ calendars, initialCalendarId }) {
     String(a.date || "").localeCompare(String(b.date || "")),
   );
 
+  const shareEvent = async (event) => {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("calendar", selectedCalendar.id);
+    url.searchParams.set("event", event.id);
+
+    const shareUrl = url.toString();
+
+    const shareText = [
+      event.title,
+      event.date,
+      event.time && `Time: ${event.time}`,
+      event.location && `Location: ${event.location}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: event.title,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(
+        `${shareText}\n\nView details: ${shareUrl}`,
+      );
+
+      alert("Event link copied.");
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Share failed:", err);
+      }
+    }
+  };
+  const selectedEvent = events.find((event) => event.id === selectedEventId);
   return (
     <main className="bg-gray-50 min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
@@ -330,9 +377,15 @@ export default function CalendarView({ calendars, initialCalendarId }) {
                   : null;
 
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={event.id || index}
-                    className="px-5 sm:px-6 py-4 border-b last:border-b-0"
+                    onClick={() => setSelectedEventId(event.id)}
+                    className={`w-full text-left px-5 sm:px-6 py-4 border-b last:border-b-0 transition ${
+                      selectedEventId === event.id
+                        ? "bg-blue-50"
+                        : "hover:bg-gray-50"
+                    }`}
                   >
                     <div className="flex items-center gap-4">
                       {/* Date */}
@@ -373,12 +426,71 @@ export default function CalendarView({ calendars, initialCalendarId }) {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           )}
         </section>
+
+        {selectedEvent && (
+          <section className="mt-5 bg-white border border-blue-100 rounded-2xl shadow-sm overflow-hidden">
+            <div className="px-5 sm:px-6 py-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-[#145A96]">
+                    Event details
+                  </p>
+
+                  <h2 className="text-2xl font-bold text-gray-900 mt-1">
+                    {selectedEvent.title}
+                  </h2>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedEventId(null)}
+                  className="text-sm text-gray-500 hover:text-gray-900"
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="mt-5 space-y-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-gray-400">
+                    Date
+                  </p>
+                  <p className="font-medium text-gray-800">
+                    {selectedEvent.date}
+                  </p>
+                </div>
+
+                {selectedEvent.time && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-400">
+                      Time
+                    </p>
+                    <p className="font-medium text-gray-800">
+                      {selectedEvent.time}
+                    </p>
+                  </div>
+                )}
+
+                {selectedEvent.location && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-400">
+                      Location
+                    </p>
+                    <p className="font-medium text-gray-800">
+                      {selectedEvent.location}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* Moon sighting note */}
         <div className="mt-6 rounded-xl bg-blue-50 border border-blue-100 px-5 py-4 text-center">

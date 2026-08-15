@@ -29,11 +29,12 @@ export default async function CalendarPage({ searchParams }) {
 
   const params = await searchParams;
   const selectedCalendarId = params?.calendar || null;
-
+  const selectedEventId = params?.event || null;
   return (
     <CalendarView
       calendars={calendars}
       initialCalendarId={selectedCalendarId}
+      initialEventId={selectedEventId}
     />
   );
 }

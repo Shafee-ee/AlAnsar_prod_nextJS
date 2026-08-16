@@ -48,49 +48,33 @@ export default function CalendarView({
     const url = new URL(window.location.href);
 
     url.searchParams.set("calendar", selectedCalendar.id);
-
-    const selectedEvent = events.find((event) => event.id === selectedEventId);
-
-    if (selectedEvent) {
-      url.searchParams.set("event", selectedEvent.id);
-    } else {
-      url.searchParams.delete("event");
-    }
+    url.searchParams.delete("event");
 
     const shareUrl = url.toString();
 
-    const shareText = selectedEvent
-      ? `${selectedEvent.title}\n${selectedEvent.date}\n\n${shareUrl}`
-      : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar\n\n${shareUrl}`;
+    const shareText = `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar\n\n${shareUrl}`;
 
     try {
-      let imageFile = null;
+      const response = await fetch(selectedCalendar.imageUrl);
+      const blob = await response.blob();
 
-      if (selectedCalendar.imageUrl) {
-        const response = await fetch(selectedCalendar.imageUrl);
-        const blob = await response.blob();
+      const extension = blob.type.split("/")[1] || "jpg";
 
-        const extension = blob.type.split("/")[1] || "jpg";
-
-        imageFile = new File(
-          [blob],
-          `${selectedCalendar.hijriMonth}-${selectedCalendar.hijriYear}.${extension}`,
-          {
-            type: blob.type,
-          },
-        );
-      }
+      const imageFile = new File(
+        [blob],
+        `${selectedCalendar.hijriMonth}-${selectedCalendar.hijriYear}.${extension}`,
+        {
+          type: blob.type,
+        },
+      );
 
       if (
         navigator.share &&
-        imageFile &&
         navigator.canShare &&
         navigator.canShare({ files: [imageFile] })
       ) {
         await navigator.share({
-          title: selectedEvent
-            ? selectedEvent.title
-            : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
+          title: `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
           text: shareText,
           files: [imageFile],
         });
@@ -100,11 +84,8 @@ export default function CalendarView({
 
       if (navigator.share) {
         await navigator.share({
-          title: selectedEvent
-            ? selectedEvent.title
-            : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
+          title: `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
           text: shareText,
-          url: shareUrl,
         });
 
         return;

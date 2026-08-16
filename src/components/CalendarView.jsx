@@ -147,6 +147,8 @@ export default function CalendarView({
   );
 
   const shareEvent = async (event) => {
+    if (!selectedCalendar || !event?.id) return;
+
     const url = new URL(window.location.href);
 
     url.searchParams.set("calendar", selectedCalendar.id);
@@ -164,12 +166,43 @@ export default function CalendarView({
       .join("\n");
 
     try {
+      const response = await fetch(selectedCalendar.imageUrl);
+      const blob = await response.blob();
+
+      const extension = blob.type.split("/")[1] || "jpg";
+
+      const imageFile = new File(
+        [blob],
+        `${selectedCalendar.hijriMonth}-${selectedCalendar.hijriYear}.${extension}`,
+        {
+          type: blob.type,
+        },
+      );
+
+      const shareData = {
+        title: `${event.title} - Al Ansar Weekly`,
+        text: `${shareText}\n\n${shareUrl}`,
+      };
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [imageFile] })
+      ) {
+        await navigator.share({
+          ...shareData,
+          files: [imageFile],
+        });
+
+        return;
+      }
+
       if (navigator.share) {
         await navigator.share({
-          title: event.title,
-          text: shareText,
+          ...shareData,
           url: shareUrl,
         });
+
         return;
       }
 
@@ -179,11 +212,22 @@ export default function CalendarView({
 
       alert("Event link copied.");
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Share failed:", err);
+      if (err.name === "AbortError") return;
+
+      console.error("Event share failed:", err);
+
+      try {
+        await navigator.clipboard.writeText(
+          `${shareText}\n\nView details: ${shareUrl}`,
+        );
+
+        alert("Event link copied.");
+      } catch {
+        alert("Unable to share this event.");
       }
     }
   };
+
   const selectedEvent = events.find((event) => event.id === selectedEventId);
   return (
     <main className="bg-gray-50 min-h-screen">
@@ -377,56 +421,79 @@ export default function CalendarView({
                   : null;
 
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={event.id || index}
-                    onClick={() => setSelectedEventId(event.id)}
-                    className={`w-full text-left px-5 sm:px-6 py-4 border-b last:border-b-0 transition ${
+                    className={`px-5 sm:px-6 py-4 border-b last:border-b-0 transition ${
                       selectedEventId === event.id
                         ? "bg-blue-50"
                         : "hover:bg-gray-50"
                     }`}
                   >
                     <div className="flex items-center gap-4">
-                      {/* Date */}
-                      <div className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 border border-blue-200 rounded-xl flex flex-col items-center justify-center bg-blue-50">
-                        {eventDate ? (
-                          <>
-                            <span className="text-lg sm:text-xl font-bold text-[#145A96] leading-none">
-                              {eventDate.getDate()}
-                            </span>
+                      {/* Event content */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedEventId(event.id);
 
-                            <span className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase mt-1">
-                              {eventDate.toLocaleDateString("en-IN", {
-                                month: "short",
-                              })}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-xs text-gray-400">Date</span>
-                        )}
-                      </div>
+                          const url = new URL(window.location.href);
+                          url.searchParams.set("calendar", selectedCalendar.id);
+                          url.searchParams.set("event", event.id);
 
-                      {/* Event details */}
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-gray-900">
-                          {event.title}
-                        </h3>
+                          window.history.pushState({}, "", url);
+                        }}
+                        className="flex items-center gap-4 flex-1 min-w-0 text-left"
+                      >
+                        {/* Date */}
+                        <div className="shrink-0 w-14 h-14 sm:w-16 sm:h-16 border border-blue-200 rounded-xl flex flex-col items-center justify-center bg-blue-50">
+                          {eventDate ? (
+                            <>
+                              <span className="text-lg sm:text-xl font-bold text-[#145A96] leading-none">
+                                {eventDate.getDate()}
+                              </span>
 
-                        {event.time && (
-                          <p className="text-sm text-gray-600 mt-0.5">
-                            {event.time}
-                          </p>
-                        )}
+                              <span className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase mt-1">
+                                {eventDate.toLocaleDateString("en-IN", {
+                                  month: "short",
+                                })}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-xs text-gray-400">Date</span>
+                          )}
+                        </div>
 
-                        {event.location && (
-                          <p className="text-sm text-gray-500 mt-0.5">
-                            {event.location}
-                          </p>
-                        )}
-                      </div>
+                        {/* Event information */}
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-gray-900">
+                            {event.title}
+                          </h3>
+
+                          {event.time && (
+                            <p className="text-sm text-gray-600 mt-0.5">
+                              {event.time}
+                            </p>
+                          )}
+
+                          {event.location && (
+                            <p className="text-sm text-gray-500 mt-0.5">
+                              {event.location}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+
+                      {/* Share */}
+                      <button
+                        type="button"
+                        onClick={() => shareEvent(event)}
+                        className="shrink-0 inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        <span className="hidden sm:inline">Share</span>
+                      </button>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

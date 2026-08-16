@@ -77,6 +77,14 @@ export default function CalendarView({
         },
       );
 
+      console.log("Share support:", {
+        navigatorShare: !!navigator.share,
+        navigatorCanShare: !!navigator.canShare,
+        canShareFiles:
+          !!navigator.canShare && navigator.canShare({ files: [imageFile] }),
+        imageFile,
+      });
+
       if (
         navigator.share &&
         navigator.canShare &&

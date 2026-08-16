@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Share2 } from "lucide-react";
 export default function CalendarView({
   calendars,
   initialCalendarId,
@@ -46,29 +45,88 @@ export default function CalendarView({
   const handleShare = async () => {
     if (!selectedCalendar) return;
 
-    const url = `${window.location.origin}/calendar?calendar=${selectedCalendar.id}`;
+    const url = new URL(window.location.href);
 
-    const shareData = {
-      title: `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
-      text: `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar`,
-      url,
-    };
+    url.searchParams.set("calendar", selectedCalendar.id);
+
+    const selectedEvent = events.find((event) => event.id === selectedEventId);
+
+    if (selectedEvent) {
+      url.searchParams.set("event", selectedEvent.id);
+    } else {
+      url.searchParams.delete("event");
+    }
+
+    const shareUrl = url.toString();
+
+    const shareText = selectedEvent
+      ? `${selectedEvent.title}\n${selectedEvent.date}\n\n${shareUrl}`
+      : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar\n\n${shareUrl}`;
 
     try {
-      if (navigator.share) {
-        await navigator.share(shareData);
+      let imageFile = null;
+
+      if (selectedCalendar.imageUrl) {
+        const response = await fetch(selectedCalendar.imageUrl);
+        const blob = await response.blob();
+
+        const extension = blob.type.split("/")[1] || "jpg";
+
+        imageFile = new File(
+          [blob],
+          `${selectedCalendar.hijriMonth}-${selectedCalendar.hijriYear}.${extension}`,
+          {
+            type: blob.type,
+          },
+        );
+      }
+
+      if (
+        navigator.share &&
+        imageFile &&
+        navigator.canShare &&
+        navigator.canShare({ files: [imageFile] })
+      ) {
+        await navigator.share({
+          title: selectedEvent
+            ? selectedEvent.title
+            : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
+          text: shareText,
+          files: [imageFile],
+        });
+
         return;
       }
 
-      await navigator.clipboard.writeText(url);
+      if (navigator.share) {
+        await navigator.share({
+          title: selectedEvent
+            ? selectedEvent.title
+            : `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} - Al Ansar Weekly`,
+          text: shareText,
+          url: shareUrl,
+        });
 
-      alert("Calendar link copied.");
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareText);
+
+      alert("Share link copied.");
     } catch (err) {
-      if (err.name !== "AbortError") {
-        console.error("Share failed:", err);
+      if (err.name === "AbortError") return;
+
+      console.error("Share failed:", err);
+
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert("Share link copied.");
+      } catch {
+        alert("Unable to share.");
       }
     }
   };
+
   const selectedCalendar =
     filteredCalendars.find((calendar) => calendar.id === selectedId) ||
     filteredCalendars[0];
@@ -145,88 +203,6 @@ export default function CalendarView({
   const events = [...(selectedCalendar.events || [])].sort((a, b) =>
     String(a.date || "").localeCompare(String(b.date || "")),
   );
-
-  const shareEvent = async (event) => {
-    if (!selectedCalendar || !event?.id) return;
-
-    const url = new URL(window.location.href);
-
-    url.searchParams.set("calendar", selectedCalendar.id);
-    url.searchParams.set("event", event.id);
-
-    const shareUrl = url.toString();
-
-    const shareText = [
-      event.title,
-      event.date,
-      event.time && `Time: ${event.time}`,
-      event.location && `Location: ${event.location}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    try {
-      const response = await fetch(selectedCalendar.imageUrl);
-      const blob = await response.blob();
-
-      const extension = blob.type.split("/")[1] || "jpg";
-
-      const imageFile = new File(
-        [blob],
-        `${selectedCalendar.hijriMonth}-${selectedCalendar.hijriYear}.${extension}`,
-        {
-          type: blob.type,
-        },
-      );
-
-      const shareData = {
-        title: `${event.title} - Al Ansar Weekly`,
-        text: `${shareText}\n\n${shareUrl}`,
-      };
-
-      if (
-        navigator.share &&
-        navigator.canShare &&
-        navigator.canShare({ files: [imageFile] })
-      ) {
-        await navigator.share({
-          ...shareData,
-          files: [imageFile],
-        });
-
-        return;
-      }
-
-      if (navigator.share) {
-        await navigator.share({
-          ...shareData,
-          url: shareUrl,
-        });
-
-        return;
-      }
-
-      await navigator.clipboard.writeText(
-        `${shareText}\n\nView details: ${shareUrl}`,
-      );
-
-      alert("Event link copied.");
-    } catch (err) {
-      if (err.name === "AbortError") return;
-
-      console.error("Event share failed:", err);
-
-      try {
-        await navigator.clipboard.writeText(
-          `${shareText}\n\nView details: ${shareUrl}`,
-        );
-
-        alert("Event link copied.");
-      } catch {
-        alert("Unable to share this event.");
-      }
-    }
-  };
 
   const selectedEvent = events.find((event) => event.id === selectedEventId);
   return (
@@ -481,16 +457,6 @@ export default function CalendarView({
                             </p>
                           )}
                         </div>
-                      </button>
-
-                      {/* Share */}
-                      <button
-                        type="button"
-                        onClick={() => shareEvent(event)}
-                        className="shrink-0 inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition"
-                      >
-                        <Share2 className="w-4 h-4" />
-                        <span className="hidden sm:inline">Share</span>
                       </button>
                     </div>
                   </div>

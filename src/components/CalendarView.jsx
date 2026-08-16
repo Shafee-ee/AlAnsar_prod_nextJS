@@ -52,8 +52,17 @@ export default function CalendarView({
 
     const shareUrl = url.toString();
 
-    const shareText = `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar\n\n${shareUrl}`;
+    const events = Array.isArray(selectedCalendar.events)
+      ? selectedCalendar.events
+      : [];
 
+    const eventText = events.length
+      ? `\n\nUpcoming events:\n\n${events
+          .map((event) => `${event.date} — ${event.title}`)
+          .join("\n")}`
+      : "";
+
+    const shareText = `${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear} Islamic Calendar${eventText}\n\nView calendar:\n${shareUrl}`;
     try {
       const response = await fetch(selectedCalendar.imageUrl);
       const blob = await response.blob();

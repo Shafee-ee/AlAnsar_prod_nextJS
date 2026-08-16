@@ -63,19 +63,20 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [showLanguageHint, setShowLanguageHint] = React.useState(true);
   const { lang } = useLanguage();
-
   const navText = {
     en: {
       home: "Home",
       pioneers: "Pioneers",
       digipaper: "Digital Paper",
       articles: "Articles",
+      calendar: "Calendar",
     },
     kn: {
       home: "ಮುಖಪುಟ",
       pioneers: "ಪೂರ್ವಜರು",
       digipaper: "ಡಿಜಿಟಲ್ ಪತ್ರಿಕೆ",
       articles: "ಲೇಖನಗಳು",
+      calendar: "ಕ್ಯಾಲೆಂಡರ್",
     },
   };
 
@@ -141,6 +142,12 @@ const Navbar = () => {
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               {t.articles}
+            </Link>
+            <Link
+              href={`/calendar?lang=${lang}`}
+              className="text-white/80 hover:text-white text-sm font-medium transition"
+            >
+              {t.calendar}
             </Link>
           </div>
 
@@ -245,6 +252,14 @@ const Navbar = () => {
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >
             {t.articles}
+          </Link>
+
+          <Link
+            href={`/calendar?lang=${lang}`}
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
+          >
+            {t.calendar}
           </Link>
         </div>
       )}

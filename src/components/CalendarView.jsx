@@ -276,7 +276,7 @@ export default function CalendarView({
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition"
+                className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 active:scale-95 transition"
               >
                 <svg
                   viewBox="0 0 24 24"

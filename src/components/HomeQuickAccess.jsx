@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { BookOpen } from "lucide-react";
 import Link from "next/link";
 export default function HomeQuickAccess() {
   const [total, setTotal] = useState(null);
@@ -83,7 +82,7 @@ export default function HomeQuickAccess() {
               window.dispatchEvent(new Event("expand-chatbot"));
             }, 200);
           }}
-          className="snap-center lg:min-w-0   min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform"
         >
           {/* Background image */}
           <img
@@ -125,7 +124,7 @@ export default function HomeQuickAccess() {
         {/* DigiPaper */}
         <Link
           href="/digipaper"
-          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block active:scale-[0.98] transition-transform"
         >
           <img
             src="/digipaper-main.png"
@@ -149,20 +148,15 @@ export default function HomeQuickAccess() {
               <p className="mt-2 text-white/80">{t.digiDesc}</p>
             </div>
 
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] cursor-pointer rounded-full font-medium">
+            <span className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.digiBtn}
-            </button>
+            </span>
           </div>
         </Link>
         {/* Articles */}
-        <div
-          onClick={() =>
-            document.getElementById("articles-section")?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            })
-          }
-          className="snap-center  lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer"
+        <Link
+          href={`/article?lang=${lang}`}
+          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform block"
         >
           {/* Background image */}
           <img
@@ -170,12 +164,16 @@ export default function HomeQuickAccess() {
             alt="Featured articles"
             className="absolute -right-6 -bottom-6 h-[280px] w-auto object-contain pointer-events-none"
           />
-          {/* Blue tint overlay - this is what makes it behave like DigiPaper */}
+
+          {/* Blue tint overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/70 via-[#3d68b8]/70 to-[#284f9e]/95" />
+
           {/* Top gloss */}
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/20 to-transparent" />
+
           {/* Bottom depth */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
+
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
@@ -187,14 +185,14 @@ export default function HomeQuickAccess() {
                 {t.articleTitle}
               </h2>
 
-              <p className=" text-white/80 max-w-[280px]">{t.articleDesc} </p>
+              <p className="text-white/80 max-w-[280px]">{t.articleDesc}</p>
             </div>
 
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full cursor-pointer font-medium">
+            <span className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full cursor-pointer font-medium">
               {t.articleBtn}
-            </button>
+            </span>
           </div>
-        </div>
+        </Link>
         {/* Keli Nodi */}
       </div>
     </section>

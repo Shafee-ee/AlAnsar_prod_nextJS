@@ -82,7 +82,7 @@ const ArticleView = ({ article }) => {
           </span>
         </div>
 
-        <h1 className="text-5xl font-serif font-bold leading-tight tracking-tight text-slate-900 md:text-6xl">
+        <h1 className="text-3xl sm:text-4xl md:text-6xl font-serif font-bold leading-tight tracking-tight text-slate-900">
           {article.title}
         </h1>
 
@@ -117,7 +117,7 @@ const ArticleView = ({ article }) => {
       <div className="mx-auto mt-12 flex max-w-2xl gap-3">
         <button
           onClick={handleShare}
-          className="px-4 py-2 border text-gray-900 rounded flex"
+          className="px-4 py-2 border text-gray-900 rounded flex active:scale-95 transition-transform"
         >
           <Share2 className="h-3 w-3 mt-[6px] mr-2" />
           <span>Share</span>

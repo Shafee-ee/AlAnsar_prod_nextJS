@@ -116,23 +116,7 @@
 
 /* ---------- Mobile ---------- */
 
-@media (max-width: 768px) {
-  #toolbarContainer,
-  #toolbarViewer {
-    height: 48px !important;
-  }
 
-  .toolbarButton {
-    width: 36px !important;
-    height: 36px !important;
-  }
-
-  #pageNumber {
-    width: 36px !important;
-    height: 32px !important;
-    font-size: 18px !important;
-  }
-}
 
 /* ---------- Full-height PDF viewer ---------- */
 
@@ -148,4 +132,26 @@
   right: 0 !important;
   height: auto !important;
   overflow: auto !important;
+}
+
+@media (max-width: 768px) {
+  #toolbarContainer,
+  #toolbarViewer {
+    height: 48px !important;
+  }
+
+  #viewerContainer {
+    top: 48px !important;
+  }
+
+  .toolbarButton {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  #pageNumber {
+    width: 36px !important;
+    height: 32px !important;
+    font-size: 18px !important;
+  }
 }

@@ -95,11 +95,6 @@ export default async function DigiPaperListing(props) {
       ? null
       : parseInt(monthParam, 10);
 
-  console.log({
-    selectedYear,
-    selectedMonth,
-  });
-
   if (selectedYear) {
     if (selectedMonth !== null) {
       const startDate = new Date(selectedYear, selectedMonth, 1);
@@ -190,7 +185,7 @@ export default async function DigiPaperListing(props) {
             <Link
               key={issue.id}
               href={`/digipaper/${issue.slug}`}
-              className="bg-white shadow hover:shadow-lg transition p-3"
+              className="bg-white shadow hover:shadow-lg transition p-3 active:scale-[0.98]"
             >
               <img
                 src={issue.coverImageUrl}
@@ -219,7 +214,7 @@ export default async function DigiPaperListing(props) {
         {page > 1 && (
           <Link
             href={`/digipaper?page=${page - 1}&type=${selectedType}${selectedYear ? `&year=${selectedYear}` : ""}${selectedMonth !== null ? `&month=${selectedMonth}` : ""}`}
-            className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm"
+            className="px-3 py-1 border border-gray-300 bg-white text-gray-900 text-sm active:scale-95 transition-transform"
           >
             Prev
           </Link>

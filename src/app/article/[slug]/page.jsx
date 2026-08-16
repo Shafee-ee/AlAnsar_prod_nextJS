@@ -18,7 +18,7 @@ export default async function ArticlePage({ params, searchParams }) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-16">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:py-16">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           {/* ARTICLE */}
           <div className="lg:col-span-8">

@@ -37,8 +37,6 @@ export default function AtticlesPage() {
     loadArticles();
   }, [lang]);
 
-  console.log(articles.title);
-
   const filteredArticles = articles
     .filter((article) => {
       const matchesCategory =
@@ -79,7 +77,7 @@ export default function AtticlesPage() {
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-1 rounded-full inline-block mb-2 cursor-pointer ${
+            className={`px-4 py-1 rounded-full inline-block mb-2 cursor-pointer active:scale-95 transition-transform ${
               selectedCategory === category
                 ? "bg-blue-600 text-white"
                 : "bg-blue-100 text-gray-900"
@@ -95,7 +93,7 @@ export default function AtticlesPage() {
           <div
             key={article.id}
             onClick={() => router.push(`/article/${article.slug}?lang=${lang}`)}
-            className="bg-white rounded-2xl  transition hover:-translate-y-1  hover:shadow-xl overflow-hidden shadow-lg  cursor-pointer "
+            className="bg-white rounded-2xl transition hover:-translate-y-1 hover:shadow-xl overflow-hidden shadow-lg cursor-pointer active:scale-[0.98]"
           >
             <img
               src={article.coverImage}

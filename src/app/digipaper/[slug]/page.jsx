@@ -11,7 +11,7 @@ export default async function EpaperViewer({ params }) {
     <div className="relative h-screen ">
       <Link
         href="/digipaper"
-        className="absolute left-5 top-4 z-50 text-white font-medium"
+        className="absolute left-5 top-4 z-50 text-white font-medium active:scale-95 transition-transform"
       >
         ← Back
       </Link>

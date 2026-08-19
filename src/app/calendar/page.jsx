@@ -93,6 +93,7 @@ export default async function CalendarPage({ searchParams }) {
           ? data.calendarDate.toDate().toISOString()
           : null,
         events: Array.isArray(data.events) ? data.events : [],
+        duas: Array.isArray(data.duas) ? data.duas : [],
       };
     })
     .sort((a, b) => new Date(b.calendarDate) - new Date(a.calendarDate));
@@ -101,12 +102,14 @@ export default async function CalendarPage({ searchParams }) {
 
   const selectedCalendarId = params?.calendar || null;
   const selectedEventId = params?.event || null;
+  const selectedDuaDay = params?.dua || null;
 
   return (
     <CalendarView
       calendars={calendars}
       initialCalendarId={selectedCalendarId}
       initialEventId={selectedEventId}
+      initialDuaDay={selectedDuaDay}
     />
   );
 }

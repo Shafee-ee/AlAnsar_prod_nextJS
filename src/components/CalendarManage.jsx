@@ -22,6 +22,11 @@ export default function CalendarManage() {
   const [editingEventId, setEditingEventId] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  const [showDuaForm, setShowDuaForm] = useState(false);
+  const [duaDay, setDuaDay] = useState("");
+  const [duaImage, setDuaImage] = useState(null);
+  const [savingDua, setSavingDua] = useState(false);
+
   const [eventTitle, setEventTitle] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
@@ -59,6 +64,10 @@ export default function CalendarManage() {
     setShowEventForm(false);
     setEditingEventId(null);
     resetEventForm();
+
+    setShowDuaForm(false);
+    setDuaDay("");
+    setDuaImage(null);
   };
 
   const deleteCalendar = async (calendar) => {
@@ -108,6 +117,110 @@ export default function CalendarManage() {
     } catch (err) {
       console.error(err);
       toast.error(err.message || "Calendar deletion failed.");
+    }
+  };
+
+  const startAddDua = () => {
+    setDuaDay("");
+    setDuaImage(null);
+    setShowDuaForm(true);
+  };
+
+  const cancelDuaForm = () => {
+    setShowDuaForm(false);
+    setDuaDay("");
+    setDuaImage(null);
+  };
+
+  const saveDua = async (calendar) => {
+    if (!duaDay || !duaImage) {
+      toast.error("Day and Dua image are required.");
+      return;
+    }
+
+    try {
+      setSavingDua(true);
+
+      const auth = getAuth(app);
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("You are not logged in.");
+        return;
+      }
+
+      const idToken = await user.getIdToken();
+
+      const formData = new FormData();
+
+      formData.append("calendarId", calendar.id);
+      formData.append("day", duaDay);
+      formData.append("image", duaImage);
+
+      const res = await fetch("/api/calendar/dua", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Dua upload failed.");
+      }
+
+      const existingDuas = Array.isArray(calendar.duas) ? calendar.duas : [];
+
+      const updatedDuas = [...existingDuas, data.dua].sort(
+        (a, b) => Number(a.day) - Number(b.day),
+      );
+
+      setCalendars((current) =>
+        current.map((item) =>
+          item.id === calendar.id ? { ...item, duas: updatedDuas } : item,
+        ),
+      );
+
+      toast.success(`Day ${duaDay} Dua uploaded.`);
+
+      cancelDuaForm();
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || "Dua upload failed.");
+    } finally {
+      setSavingDua(false);
+    }
+  };
+
+  const deleteDua = async (calendar, duaId) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this Dua?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const existingDuas = Array.isArray(calendar.duas) ? calendar.duas : [];
+
+      const updatedDuas = existingDuas.filter((dua) => dua.id !== duaId);
+
+      await updateDoc(doc(db, "calendar_issues", calendar.id), {
+        duas: updatedDuas,
+        updatedAt: new Date(),
+      });
+
+      setCalendars((current) =>
+        current.map((item) =>
+          item.id === calendar.id ? { ...item, duas: updatedDuas } : item,
+        ),
+      );
+
+      toast.success("Dua deleted.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete Dua.");
     }
   };
 
@@ -452,6 +565,116 @@ export default function CalendarManage() {
                       ))}
                     </div>
                   )}
+
+                  <div className="mt-10 border-t pt-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold">Daily Duas</h2>
+
+                      {!showDuaForm && (
+                        <button
+                          type="button"
+                          onClick={startAddDua}
+                          className="px-4 py-2 bg-blue-600 text-white rounded"
+                        >
+                          + Add Dua
+                        </button>
+                      )}
+                    </div>
+
+                    {showDuaForm && (
+                      <div className="border rounded-lg p-4 mb-6 bg-gray-50">
+                        <h3 className="font-semibold mb-4">Add Dua</h3>
+
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              Day
+                            </label>
+
+                            <input
+                              type="number"
+                              min="1"
+                              max="31"
+                              placeholder="Example: 1"
+                              value={duaDay}
+                              onChange={(e) => setDuaDay(e.target.value)}
+                              className="w-full border p-2 rounded"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium mb-1">
+                              Dua Image
+                            </label>
+
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) =>
+                                setDuaImage(e.target.files?.[0] || null)
+                              }
+                              className="w-full"
+                            />
+                          </div>
+
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => saveDua(calendar)}
+                              disabled={savingDua}
+                              className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50"
+                            >
+                              {savingDua ? "Uploading..." : "Save Dua"}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={cancelDuaForm}
+                              disabled={savingDua}
+                              className="px-4 py-2 bg-gray-200 text-gray-700 rounded"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {!calendar.duas || calendar.duas.length === 0 ? (
+                      <p className="text-gray-500">
+                        No Duas added for this calendar.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {calendar.duas.map((dua) => (
+                          <div
+                            key={dua.id}
+                            className="border rounded-lg overflow-hidden bg-white"
+                          >
+                            <img
+                              src={dua.imageUrl}
+                              alt={`Dua Day ${dua.day}`}
+                              className="w-full aspect-square object-cover"
+                            />
+
+                            <div className="p-3">
+                              <div className="font-semibold mb-2">
+                                Day {dua.day}
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => deleteDua(calendar, dua.id)}
+                                className="w-full px-3 py-2 bg-red-600 text-white rounded"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

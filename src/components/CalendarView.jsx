@@ -5,6 +5,7 @@ export default function CalendarView({
   calendars,
   initialCalendarId,
   initialEventId,
+  initialDuaDay,
 }) {
   const years = useMemo(() => {
     return [
@@ -42,6 +43,9 @@ export default function CalendarView({
     initialEventId || null,
   );
 
+  const [selectedDuaDay, setSelectedDuaDay] = useState(
+    initialDuaDay ? Number(initialDuaDay) : null,
+  );
   const handleShare = async () => {
     if (!selectedCalendar) return;
 
@@ -129,6 +133,15 @@ export default function CalendarView({
     filteredCalendars.find((calendar) => calendar.id === selectedId) ||
     filteredCalendars[0];
 
+  const duas = [...(selectedCalendar?.duas || [])].sort(
+    (a, b) => Number(a.day) - Number(b.day),
+  );
+
+  const selectedDua =
+    duas.find((dua) => Number(dua.day) === Number(selectedDuaDay)) ||
+    duas[0] ||
+    null;
+
   const selectedIndex = filteredCalendars.findIndex(
     (calendar) => calendar.id === selectedCalendar?.id,
   );
@@ -197,6 +210,72 @@ export default function CalendarView({
       </main>
     );
   }
+
+  const handleDuaShare = async () => {
+    if (!selectedDua) return;
+
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("calendar", selectedCalendar.id);
+    url.searchParams.set("dua", selectedDua.day);
+    url.searchParams.delete("event");
+
+    const shareUrl = url.toString();
+
+    const shareText = `Dua for Day ${selectedDua.day} - ${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear}\n\nView Dua:\n${shareUrl}`;
+
+    try {
+      const response = await fetch(selectedDua.imageUrl);
+      const blob = await response.blob();
+
+      const extension = blob.type.split("/")[1] || "jpg";
+
+      const imageFile = new File(
+        [blob],
+        `dua-day-${selectedDua.day}.${extension}`,
+        {
+          type: blob.type,
+        },
+      );
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({ files: [imageFile] })
+      ) {
+        await navigator.share({
+          title: `Dua for Day ${selectedDua.day}`,
+          text: shareText,
+          files: [imageFile],
+        });
+
+        return;
+      }
+
+      if (navigator.share) {
+        await navigator.share({
+          title: `Dua for Day ${selectedDua.day}`,
+          text: shareText,
+        });
+
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareText);
+      alert("Dua share link copied.");
+    } catch (err) {
+      if (err.name === "AbortError") return;
+
+      console.error("Dua share failed:", err);
+
+      try {
+        await navigator.clipboard.writeText(shareText);
+        alert("Dua share link copied.");
+      } catch {
+        alert("Unable to share Dua.");
+      }
+    }
+  };
 
   const events = [...(selectedCalendar.events || [])].sort((a, b) =>
     String(a.date || "").localeCompare(String(b.date || "")),
@@ -296,14 +375,110 @@ export default function CalendarView({
           </div>
 
           {/* Calendar image */}
+          {/* Calendar + Dua */}
           <div className="px-4 sm:px-8 pb-7">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-2 sm:p-4">
-              <img
-                src={selectedCalendar.imageUrl}
-                alt={`${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear}`}
-                className="block w-full max-w-2xl mx-auto h-auto rounded-lg"
-              />
+            <div
+              className={`grid gap-6 ${
+                selectedDua ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"
+              }`}
+            >
+              {/* Calendar */}
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-2 sm:p-4">
+                <img
+                  src={selectedCalendar.imageUrl}
+                  alt={`${selectedCalendar.hijriMonth} ${selectedCalendar.hijriYear}`}
+                  className="block w-full h-auto rounded-lg"
+                />
+              </div>
+
+              {/* Dua */}
+              {selectedDua && (
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-2 sm:p-4">
+                  <div className="flex items-center justify-between px-2 pb-3">
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-gray-400">
+                        Daily Dua
+                      </p>
+
+                      <h3 className="text-lg font-bold text-gray-900">
+                        Day {selectedDua.day}
+                      </h3>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleDuaShare}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <path d="m8.6 13.5 6.8 3.9M15.4 6.6 8.6 10.5" />
+                      </svg>
+                      Share
+                    </button>
+                  </div>
+
+                  <img
+                    src={selectedDua.imageUrl}
+                    alt={`Dua for Day ${selectedDua.day}`}
+                    className="block w-full h-auto rounded-lg"
+                  />
+                </div>
+              )}
             </div>
+
+            {/* Dua day selector */}
+            {duas.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-bold text-gray-900">Daily Duas</h3>
+                    <p className="text-sm text-gray-500">
+                      Select a day to view its Dua.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 lg:grid-cols-15 gap-2">
+                  {duas.map((dua) => {
+                    const isSelected =
+                      Number(selectedDua?.day) === Number(dua.day);
+
+                    return (
+                      <button
+                        key={dua.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedDuaDay(Number(dua.day));
+
+                          const url = new URL(window.location.href);
+                          url.searchParams.set("calendar", selectedCalendar.id);
+                          url.searchParams.set("dua", dua.day);
+                          url.searchParams.delete("event");
+
+                          window.history.pushState({}, "", url);
+                        }}
+                        className={`aspect-square border text-sm font-semibold transition ${
+                          isSelected
+                            ? "bg-[#145A96] text-white border-[#145A96]"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-[#145A96] hover:text-[#145A96]"
+                        }`}
+                      >
+                        {dua.day}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Navigation */}

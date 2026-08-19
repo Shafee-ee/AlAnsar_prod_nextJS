@@ -9,7 +9,9 @@ export default function ArticleAd() {
   useEffect(() => {
     async function loadAds() {
       try {
-        const res = await fetch("/api/ads");
+        const res = await fetch("/api/ads", {
+          cache: "no-store",
+        });
         const data = await res.json();
 
         if (!res.ok) {

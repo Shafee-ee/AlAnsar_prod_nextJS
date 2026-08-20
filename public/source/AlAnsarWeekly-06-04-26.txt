@@ -6,228 +6,102 @@ Volume serial number is 7CE2-F75F
 
 Volume serial number is E2DA-00C7
 
-Volume serial number is 00000254 E2DA:00C7
-C:\USERS\SHAFE\ONEDRIVE\DESKTOP\TECHNOPULSE\ALANSARWEEKLY.COM\ALANSARWEEKLY-APP\SRC
-├───app
-│   │   favicon.ico
-│   │   globals.css
-│   │   layout.js
-│   │   page.js
-│   │   
-│   ├───about
-│   │       page.jsx
-│   │       
-│   ├───admin
-│   │   │   layout.js
-│   │   │   page.js
-│   │   │   
-│   │   ├───articles
-│   │   │   │   page.jsx
-│   │   │   │   
-│   │   │   ├───by-id
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───new
-│   │   │   │       page.jsx
-│   │   │   │       
-│   │   │   └───[id]
-│   │   │           page.jsx
-│   │   │           
-│   │   ├───digipaper
-│   │   │   │   loading.jsx
-│   │   │   │   page.jsx
-│   │   │   │   
-│   │   │   ├───manage
-│   │   │   │       page.jsx
-│   │   │   │       
-│   │   │   └───upload
-│   │   │           page.jsx
-│   │   │           
-│   │   └───qna
-│   │       │   page.jsx
-│   │       │   
-│   │       └───qna-submissions
-│   │               page.jsx
-│   │               
-│   ├───api
-│   │   ├───articles
-│   │   │   │   route.js
-│   │   │   │   
-│   │   │   ├───by-id
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───by-slug
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───create
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───related
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───translations
-│   │   │   │   ├───create
-│   │   │   │   │       route.js
-│   │   │   │   │       
-│   │   │   │   ├───list
-│   │   │   │   │       route.js
-│   │   │   │   │       
-│   │   │   │   └───update
-│   │   │   │           route.js
-│   │   │   │           
-│   │   │   ├───update-status
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   └───upload-image
-│   │   │           route.js
-│   │   │           
-│   │   ├───digipaper
-│   │   ├───embed
-│   │   │       route.js
-│   │   │       
-│   │   ├───is-admin
-│   │   │       route.js
-│   │   │       
-│   │   ├───qa-search
-│   │   │       route.js
-│   │   │       
-│   │   ├───qna
-│   │   │   ├───audit
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───bulk
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───by-id
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───csv
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───delete
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───delete-all
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───delete-submissions
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───export
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───export-html
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───export-qna-pdf
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───fix-all
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───fix-embedding
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───link-submissions
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───list
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───paginated
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───single
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───submissions-count
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───submissions-list
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───update
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   ├───update-submission-status
-│   │   │   │       route.js
-│   │   │   │       
-│   │   │   └───user-submission
-│   │   │           route.js
-│   │   │           
-│   │   ├───stats
-│   │   │       route.js
-│   │   │       
-│   │   └───translate
-│   │           route.js
-│   │           
-│   ├───article
-│   │   └───[slug]
-│   │           page.jsx
-│   │           
-│   ├───digipaper
-│   │   │   layout.jsx
-│   │   │   page.jsx
-│   │   │   
-│   │   └───[slug]
-│   │           page.jsx
-│   │           
-│   ├───login
-│   │       page.js
-│   │       
-│   ├───nudi-analyzer
-│   │       page.jsx
-│   │       
-│   └───qna
-│       └───[id]
-│           │   loading.jsx
-│           │   page.jsx
-│           │   
-│           └───opengraph-image
-│               └───[lang]
-│                       route.jsx
-│                       
-├───components
-│       ArticleCard.js
-│       ArticleCarousel.js
-│       ArticleComponents.js
-│       ArticleView.js
-│       AskQuestionBox.jsx
-│       AuthProvider.js
-│       BulkUpload.jsx
-│       ChatbotSection.js
-│       ClientAppWrapper.js
-│       DigiFilters.jsx
-│       DigiManage.jsx
-│       DigiUpload.jsx
-│       Footer.js
-│       HomeCarousel.jsx
-│       HomeQuickAccess.jsx
-│       IconBubble.jsx
-│       ManageQnA.js
-│       Navbar.js
-│       nudiAnalyzer.jsx
-│       QnaContent.jsx
-│       QnaShareButton.jsx
-│       QRModal.jsx
-│       SingleUpload.jsx
-│       
-├───context
-│       AuthContext.js
-│       LanguageContext.js
-│       
-├───lib
-│       email.js
-│       firebaseAdmin.js
-│       firebaseClient.js
-│       geminiTranslate.js
-│       nudiAnalyzer.js
-│       nudiConverter.js
-│       vertexEmbedding.js
-│       
-└───models
-        Article.js
-                
+Volume serial number is 00000254 E2DA:00C7ree src -L 3
+src
+├── app
+│   ├── about
+│   │   └── page.jsx
+│   ├── admin
+│   │   ├── ads
+│   │   ├── articles
+│   │   ├── calendar
+│   │   ├── digipaper
+│   │   ├── layout.js
+│   │   ├── page.js
+│   │   └── qna
+│   ├── api
+│   │   ├── ads
+│   │   ├── articles
+│   │   ├── calendar
+│   │   ├── digipaper
+│   │   ├── embed
+│   │   ├── is-admin
+│   │   ├── pdf
+│   │   ├── qa-search
+│   │   ├── qna
+│   │   ├── stats
+│   │   └── translate
+│   ├── article
+│   │   ├── page.jsx
+│   │   └── [slug]
+│   ├── calendar
+│   │   └── page.jsx
+│   ├── digipaper
+│   │   ├── layout.jsx
+│   │   ├── loading.jsx
+│   │   ├── page.jsx
+│   │   └── [slug]
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.js
+│   ├── login
+│   │   └── page.js
+│   ├── nudi-analyzer
+│   │   └── page.jsx
+│   ├── page.js
+│   └── qna
+│       └── [id]
+├── components
+│   ├── ads
+│   │   └── ArticleAd.jsx
+│   ├── ArticleCard.js
+│   ├── ArticleCarousel.js
+│   ├── ArticleComponents.js
+│   ├── ArticleView.js
+│   ├── AskQuestionBox.jsx
+│   ├── AuthProvider.js
+│   ├── BulkUpload.jsx
+│   ├── CalendarManage.jsx
+│   ├── CalendarUpload.jsx
+│   ├── CalendarView.jsx
+│   ├── ChatbotSection.js
+│   ├── ClientAppWrapper.js
+│   ├── DigiFilters.jsx
+│   ├── DigiManage.jsx
+│   ├── DigiUpload.jsx
+│   ├── FeaturedArticles.jsx
+│   ├── Footer.js
+│   ├── HomeCarousel.jsx
+│   ├── HomeQuickAccess.jsx
+│   ├── IconBubble.jsx
+│   ├── LatestArticles.jsx
+│   ├── ManageQnA.js
+│   ├── Navbar.js
+│   ├── nudiAnalyzer.jsx
+│   ├── PDFViewer.jsx
+│   ├── QnaContent.jsx
+│   ├── QnaShareButton.jsx
+│   ├── QRModal.jsx
+│   ├── RelatedArticles.jsx
+│   └── SingleUpload.jsx
+├── context
+│   ├── AuthContext.js
+│   └── LanguageContext.js
+├── lib
+│   ├── email.js
+│   ├── firebaseAdmin.js
+│   ├── firebaseClient.js
+│   ├── geminiTranslate.js
+│   ├── nudiAnalyzer.js
+│   ├── nudiConverter.js
+│   └── vertexEmbedding.js
+└── models
+    └── Article.js
+
+35 directories, 55 files
+shafee-ee@shafeeee-Aspire-A715-42G:/media/shafee-ee/crucial drive/shafee.dv/Technopulse/AlAnsarWeekly.com/alansarweekly-app$ ^C
+shafee-ee@shafeeee-Aspire-A715-42G:/media/shafee-ee/crucial drive/shafee.dv/Technopulse/AlAnsarWeekly.com/alansarweekly-app$ ^C
+shafee-ee@shafeeee-Aspire-A715-42G:/media/shafee-ee/crucial drive/shafee.dv/Technopulse/AlAnsarWeekly.com/alansarweekly-app$ 
 PS C:\Users\shafe\OneDrive\Desktop\Technopulse\AlAnsarWeekly.com\alansarweekly-app> 
 
 
@@ -3221,3 +3095,518 @@ For your .md:
 ECONNREFUSED 127.0.0.1:3000
 Cause:- Article page fetches its own API using:  `NEXT_PUBLIC_BASE_URL`- Production attempted to call localhost.Temporary fix:- Switched fetch to `NEXT_PUBLIC_SITE_URL`.Future improvement:- Remove internal HTTP call completely.- Server Component should query Firestore directly using `adminDB`.- Eliminate dependency on environment URL.---## Mobile contrast fixesFixed multiple pages where text inherited incorrect colors.Pages affected:- Featured Articles- Latest Articles- Articles listing- DigiPaper filtersApproach:- Explicit `text-gray-*` classes.- Explicit styling for buttons and selects.- Avoid relying on inherited colors.---## Article page redesignStarted redesign.Current status:- `ArticlePage`  - Uses larger centered layout.- `ArticleView`  - Began separating hero image from article content.  - Added white card around article body.Not finished.Need redesign for:- Larger hero image.- Better typography.- Cleaner metadata.- Modern share buttons.- Better sidebar cards.- Improved spacing.---## Copy protectionClient requested preventing users from copying article text.Reality:- Impossible to fully prevent.- Can discourage by:  - disabling selection  - preventing copy event  - disabling context menuDecision still pending.---## Workflow improvementFor next session:- Work on ONE file at a time.- Every JSX edit should include complete opening and closing tags.- Verify current file before suggesting edits.- Avoid referencing stale versions of components.
 I think that will give us a clean restart. We can spend the next chat solely on making the article page look like a polished publication, without mixing it with PDF work or previous component versions.
+
+
+######
+Al Ansar Weekly — Session Handoff
+
+2026-08-19 — Ads + Calendar + Daily Dua
+
+Current Direction
+
+The current work is focused on completing the remaining V2 features without over-engineering them.
+
+Main areas worked on:
+
+Admin Ads management
+
+Calendar admin management
+
+Daily Dua image support
+
+Public Calendar + Dua presentation
+
+The Calendar/Dua layout has been visually tested and is considered a good base. Further decisions about calendar sharing will wait until the client meeting.
+
+1. Ads System
+
+Admin sidebar includes:
+
+Dashboard
+
+Q&A Manager
+
+Articles
+
+Submitted Questions
+
+Manage Digipaper
+
+Calendar
+
+Ads
+
+Ads page:src/app/admin/ads/page.jsx
+
+Tabs:
+
+Upload Ads
+
+Manage Ads
+
+Upload
+
+Admin provides:
+
+Ad title
+
+Destination URL
+
+Ad image
+
+Flow:/api/ads/upload → image URL → /api/ads POST → Firestore ads document.
+
+Fields include:
+
+title
+
+targetUrl
+
+imageUrl
+
+active
+
+createdAt
+
+updatedAt
+
+New ads are active by default.
+
+Manage Ads
+
+Manage Ads intentionally only handles publishing state.
+
+Each ad shows:
+
+image
+
+title
+
+destination URL
+
+Published / Unpublished status
+
+Publish / Unpublish button
+
+PATCH endpoint:src/app/api/ads/route.js
+
+Updates:
+
+active
+
+updatedAt
+
+Verified:
+
+Unpublishing removes the ad from the public site.
+
+Publishing makes it available again.
+
+Public Ads
+
+Component:src/components/ads/ArticleAd.jsx
+
+It fetches /api/ads with cache: "no-store".
+
+The public GET endpoint returns only:active == true
+
+The component:
+
+displays Sponsored
+
+links to the ad destination
+
+rotates active ads every 10 seconds
+
+2. Calendar System
+
+Calendar data is stored in:calendar_issues
+
+Existing fields/functionality:
+
+calendar image
+
+Hijri month/year
+
+Gregorian label
+
+calendar date
+
+draft/published status
+
+events
+
+Admin component:src/components/CalendarManage.jsx
+
+Admin can:
+
+upload calendars
+
+publish/unpublish
+
+delete calendars
+
+expand calendars
+
+add/edit/delete events
+
+Upload API:src/app/api/calendar/upload/route.js
+
+It verifies admin access, uploads the image to Firebase Storage, and creates the calendar document with:
+
+status: "draft"
+
+events: []
+
+3. Daily Dua System
+
+Daily Duas are stored inside each calendar issue:
+
+duas: []
+
+Each Dua currently contains:
+
+id
+
+day
+
+imageUrl
+
+Admin UI is inside:src/components/CalendarManage.jsx
+
+Admin can:
+
+Add Dua
+
+specify the day
+
+upload the Dua image
+
+save it
+
+The intended relationship is:
+
+Calendar → Day → Dua image
+
+A Dua is NOT tied directly to an event.
+
+Example:Ramzan Day 27 can have both an event and a Dua for Day 27, while remaining separate records.
+
+4. Public Calendar Data
+
+Public page:src/app/calendar/page.jsx
+
+It now passes:
+
+duas: Array.isArray(data.duas) ? data.duas : [],
+
+It reads the selected Dua:
+
+const selectedDuaDay = params?.dua || null;
+
+and passes:
+
+<CalendarView
+  calendars={calendars}
+  initialCalendarId={selectedCalendarId}
+  initialEventId={selectedEventId}
+  initialDuaDay={selectedDuaDay}
+/>
+
+Existing calendar/event URL behavior remains intact.
+
+5. Public Calendar + Dua Layout
+
+Current design:
+
+Two columns:
+
+Calendar | Daily Dua
+
+Left:
+
+full monthly calendar image
+
+Right:
+
+DAILY DUA
+
+selected day
+
+Share button
+
+Dua image
+
+Below:Daily Duas
+
+with small square day selectors.
+
+The selected day is highlighted.
+
+Selecting a Dua updates the URL:
+
+?calendar=<calendarId>&dua=<day>
+
+and removes the event parameter.
+
+This makes a specific Dua directly addressable/shareable.
+
+6. Sharing
+
+Dua Share
+
+Keep the Dua Share button.
+
+It should share the specific selected Dua, including the relevant Dua information/image.
+
+Calendar Share
+
+Calendar sharing is also potentially important.
+
+The previous UI had:
+
+Calendar Share
+
+Daily Dua Share
+
+Two equally prominent Share buttons felt redundant in the current layout.
+
+Do NOT remove calendar sharing permanently yet.
+
+Client will be asked during the meeting whether:
+
+calendar sharing should remain
+
+where it should be placed
+
+Likely direction if retained:
+
+calendar share less prominent
+
+Dua share beside the daily Dua
+
+No final decision yet.
+
+7. Current Public UI Status
+
+The current layout is visually approved as a good base:
+
+Rabi-Ul-Avval 1448
+August/September 2026
+
+┌─────────────────────┬─────────────────────┐
+│                     │ DAILY DUA            │
+│                     │ Day 20       Share   │
+│     CALENDAR        │                      │
+│                     │     DUA IMAGE        │
+│                     │                      │
+└─────────────────────┴─────────────────────┘
+
+Daily Duas
+Select a day to view its Dua.
+
+[12] [20] [22]
+
+Do not redesign this from scratch.
+
+8. Relevant Files
+
+Calendar/Dua:
+
+src/app/calendar/page.jsx
+
+src/components/CalendarView.jsx
+
+src/components/CalendarManage.jsx
+
+src/components/CalendarUpload.jsx
+
+src/app/admin/calendar/page.jsx
+
+src/app/admin/calendar/upload/page.jsx
+
+src/app/api/calendar/upload/route.js
+
+src/app/api/calendar/delete/route.js
+
+Ads:
+
+src/app/admin/ads/page.jsx
+
+src/components/ads/ArticleAd.jsx
+
+src/app/api/ads/route.js
+
+src/app/api/ads/upload/route.js
+
+Important: inspect the exact current CalendarView.jsx before making further edits. Do not rely on older versions.
+
+9. Remaining Work
+
+Calendar / Dua
+
+Client meeting:
+
+confirm whether calendar-level Share should remain
+
+decide its placement if retained
+
+Verify/finalize Dua sharing:
+
+share the selected Dua
+
+preserve calendar/day information in the shared URL
+
+Final responsive/mobile check.
+
+Apply any client feedback.
+
+Subscription
+
+After Calendar/Dua is settled:
+
+research subscription requirements
+
+determine exactly what the client wants
+
+do not build subscription architecture before requirements are clear
+
+10. Working Rule For Next Session
+
+Before modifying a file:
+
+Inspect the current file.
+
+Use the exact current code.
+
+State the target file.
+
+Do not assume an older version.
+
+Make one focused change at a time.
+
+Immediate Next Step
+
+Wait for client feedback from the meeting.
+
+Then:Calendar Share decision→ final Dua sharing→ responsive polish→ subscription research
+
+
+Current issue: Q&A submission → Ustaad answer
+
+We discovered a likely UX/data-flow problem while investigating an email issue during the demo.
+
+What currently happens
+
+User submits a question:
+
+User
+ ↓
+qna_submissions
+ ↓
+Email notification
+ ↓
+IMAM_NOTIFICATION_LIST
+
+The notification list is currently:
+
+[
+  "shafeeazeemag@gmail.com",
+  "muyeen@technopulse.in",
+  "gmmkamil@gmail.com",
+]
+
+The email is sent through Resend from:
+
+Al Ansar Weekly <editor@alansarweekly.com>
+
+The Ustaad's notification reaching Gmail Spam is a deliverability issue, not a failed submission. The message reaches Gmail; Gmail classifies it as Spam. We should later check Resend/domain authentication (SPF/DKIM/DMARC).
+
+More important: where the Ustaad's answer goes
+
+We traced the actual code.
+
+The Ustaad's answer is ultimately stored in:
+
+Firestore
+└── qna_items
+    ├── answer_en
+    └── answer_kn
+
+The relevant API is:
+
+src/app/api/qna/update/route.js
+
+ManageQnA.js sends the edited answer to:
+
+POST /api/qna/update
+
+which performs:
+
+const docRef = adminDB.collection("qna_items").doc(id);
+
+
+await docRef.update({
+  ...updates,
+  embedding,
+  updatedAt: new Date().toISOString()
+});
+
+And updates contains:
+
+answer_en
+answer_kn
+
+So the answer is being saved.
+
+The confusing part
+
+The original submission lives in:
+
+qna_submissions
+
+When it becomes a completed Q&A, the system creates/updates:
+
+qna_items
+
+and the submission gets:
+
+promoted_qna_id: newQnaId
+
+So there is a relationship:
+
+qna_submissions
+       │
+       │ promoted_qna_id
+       ↓
+qna_items
+       │
+       ├── question_en
+       ├── answer_en
+       ├── question_kn
+       └── answer_kn
+What we have NOT confirmed yet
+
+We have not yet inspected whether the submission dashboard actually follows promoted_qna_id and displays the completed answer.
+
+The dashboard is:
+
+src/app/admin/qna/qna-submissions/page.jsx
+
+That is the next file to inspect.
+
+The current suspicion is:
+
+The Ustaad answers the question successfully, but the submission dashboard doesn't show the answer because the completed Q&A is stored in qna_items rather than directly in qna_submissions.
+
+We should verify that before changing anything.
+
+Next step
+
+Open:
+
+sed -n '1,220p' src/app/admin/qna/qna-submissions/page.jsx
+
+Then we'll trace exactly what the dashboard displays and fix the missing visibility if necessary.
+
+Also: don't change the database structure. The existing promoted_qna_id relationship may already be enough to solve this cleanly.

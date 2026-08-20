@@ -367,5 +367,12 @@ export async function POST(req) {
       editor_note_kn: bestData.editor_note_kn || "",
     },
     related,
+
+    debug: scored.slice(0, 5).map((item) => ({
+      id: item.id,
+      question: item.question_en,
+      confidence: item.confidenceScore,
+      rank: item.rankScore,
+    })),
   });
 }

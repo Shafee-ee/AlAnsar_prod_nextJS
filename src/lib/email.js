@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const IMAM_NOTIFICATION_LIST = [
   "shafeeazeemag@gmail.com",
   "muyeen@technopulse.in",
-  "gmmkamil@gmail.com",
+  //"gmmkamil@gmail.com",
 ];
 
 export async function sendEmailToImam(question, submissionId) {
@@ -15,8 +15,8 @@ export async function sendEmailToImam(question, submissionId) {
     await resend.emails.send({
       from: "Al Ansar Weekly <editor@alansarweekly.com>",
       to: IMAM_NOTIFICATION_LIST,
-      reply_to: "alansarweekly786@gmail.com",
-      subject: "New Question Approved – Al Ansar Weekly",
+      reply_to: "qna@hslaaxa.resend.app",
+      subject: `New Question Approved – Al Ansar Weekly [${submissionId}]`,
       html: `
         <div style="font-family:Arial, sans-serif; max-width:600px; margin:auto; padding:20px;">
           

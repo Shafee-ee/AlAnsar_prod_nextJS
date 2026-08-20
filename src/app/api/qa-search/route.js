@@ -215,6 +215,17 @@ export async function POST(req) {
   console.timeEnd("SIMILARITY");
 
   scored.sort((a, b) => b.rankScore - a.rankScore);
+
+  console.log(
+    "TOP SEARCH RESULTS:",
+    scored.slice(0, 5).map((item) => ({
+      id: item.id,
+      question: item.question_en,
+      confidence: item.confidenceScore,
+      rank: item.rankScore,
+    })),
+  );
+
   const best = scored[0];
   const secondBest = scored[1];
 

@@ -2,25 +2,31 @@ import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 
 export async function GET() {
-    const snap = await adminDB.collection("qna_items").get();
+  const target =
+    "what should every parent teach their children first and foremost?";
 
-    const items = snap.docs.map(doc => {
-        const d = doc.data();
+  const snap = await adminDB
+    .collection("qna_items")
+    .where("question_en", "==", target)
+    .get();
 
-        return {
-            // id: doc.id,
-            question_en: d.question_en || null,
-            answer_en: d.answer_en || null,
-            question_kn: d.question_kn || null,
-            answer_kn: d.answer_kn || null,
-            // lang_original: d.lang_original || null,
-            // keywords: d.keywords || [],
-            // createdAt: d.createdAt || null,
-            
-    editorNote_en: d.editorNote_en || null,
-    editorNote_kn: d.editorNote_kn || null,
-        };
-    });
+  const items = snap.docs.map((doc) => {
+    const d = doc.data();
 
-    return NextResponse.json({ success: true, items });
+    return {
+      id: doc.id,
+      question_en: d.question_en || null,
+      answer_en: d.answer_en || null,
+      question_kn: d.question_kn || null,
+      answer_kn: d.answer_kn || null,
+      embeddingExists: Array.isArray(d.embedding),
+      embeddingLength: Array.isArray(d.embedding) ? d.embedding.length : 0,
+    };
+  });
+
+  return NextResponse.json({
+    success: true,
+    count: items.length,
+    items,
+  });
 }

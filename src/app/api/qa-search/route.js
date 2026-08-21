@@ -230,7 +230,7 @@ export async function POST(req) {
     const confidenceScore = cosine(queryEmbedding, item.embedding);
     const lexicalScore = tokenOverlapScore(itemNorm, qNorm);
 
-    let rankScore = confidenceScore * 0.4 + lexicalScore * 0.6;
+    let rankScore = confidenceScore * 0.8 + lexicalScore * 0.2;
 
     if (itemNorm === qNorm) rankScore += 0.3;
     else if (itemNorm.includes(qNorm) || qNorm.includes(itemNorm))

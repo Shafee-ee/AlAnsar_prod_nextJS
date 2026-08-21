@@ -174,7 +174,7 @@ export async function POST(req) {
 
     const replyText = rawReply
       .replace(/\r\n/g, "\n")
-      .split(/\nOn .*wrote:\s*\n/i)[0]
+      .split(/\nOn .*wrote:/i)[0]
       .trim();
     await submissionRef.update({
       ustaad_answer: replyText,

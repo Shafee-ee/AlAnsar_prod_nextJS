@@ -48,9 +48,13 @@ async function loadEmbeddingsIfNeeded() {
 }
 
 function normalize(s = "") {
-  return s.toLowerCase().replace(/\s+/g, " ").trim();
+  return s
+    .toLowerCase()
+    .replace(/[“”‘’]/g, "")
+    .replace(/[.,!?;:]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
-
 function hasValidIntent(query = "") {
   const q = normalize(query);
 
@@ -161,26 +165,32 @@ export async function POST(req) {
       reason: "invalid_intent",
     });
   }
-  //exact DB
+
+  // exact DB match — whitespace/case insensitive
   console.time("EXACT_DB");
 
-  const exactSnap = await adminDB
-    .collection("qna_items")
-    .where("question_en", "==", embeddingText)
-    .limit(1)
-    .get();
+  const items = await loadEmbeddingsIfNeeded();
+
+  const exactMatchItem = items.find(
+    (item) => normalize(item.question_en || "") === qNorm,
+  );
+
   console.timeEnd("EXACT_DB");
 
-  if (!exactSnap.empty) {
-    const doc = exactSnap.docs[0];
-    const data = doc.data();
+  if (exactMatchItem) {
+    const fullDoc = await adminDB
+      .collection("qna_items")
+      .doc(exactMatchItem.id)
+      .get();
+
+    const data = fullDoc.data();
 
     console.timeEnd("TOTAL");
 
     return NextResponse.json({
       success: true,
       bestMatch: {
-        id: doc.id,
+        id: exactMatchItem.id,
         question: lang === "kn" ? data.question_kn : data.question_en,
         answer: lang === "kn" ? data.answer_kn : data.answer_en,
         score: 1,
@@ -191,11 +201,6 @@ export async function POST(req) {
     });
   }
 
-  console.time("LOAD_CACHE");
-  const items = await loadEmbeddingsIfNeeded();
-  console.timeEnd("LOAD_CACHE");
-
-  //translate embedding
   console.time("EMBED");
 
   const cacheKey = normalize(embeddingText);
@@ -269,7 +274,6 @@ export async function POST(req) {
       best.confidenceScore < CONFIDENCE_THRESHOLD ||
       (best.confidenceScore < 0.32 && semanticGap < 0.03))
   ) {
-    // ----- FUZZY FALLBACK -----
     const fuzzyMatchItem = items.find((item) => {
       const qEN = normalize(item.question_en || "");
       const qKN = normalize(item.question_kn || "");

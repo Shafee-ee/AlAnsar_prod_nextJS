@@ -3610,3 +3610,131 @@ sed -n '1,220p' src/app/admin/qna/qna-submissions/page.jsx
 Then we'll trace exactly what the dashboard displays and fix the missing visibility if necessary.
 
 Also: don't change the database structure. The existing promoted_qna_id relationship may already be enough to solve this cleanly.
+
+######
+Al Ansar Weekly — Current Roadmap & Project State
+Current Q&A System
+
+The user-submission → Ustaad-answer workflow is now functionally connected:
+
+User submits question → Admin approves → Ustaad receives email → Ustaad replies → Resend webhook receives reply → clean answer extracted → answer saved to qna_submissions → user receives answer email → Admin can promote the answer into Q&A.
+
+However, this system is not considered production-ready yet.
+
+Known issues/concerns:
+
+Emails are going to spam by default and need deliverability investigation.
+Submission rate limiting currently allows only 3 submissions per IP per hour. This needs to be reviewed carefully.
+We need to examine whether the rate limiter can incorrectly block legitimate users, especially users sharing an IP.
+The entire submission → approval → email → webhook → answer → promotion chain needs a robustness review.
+We need to consider duplicate webhooks, failed email delivery, failed Firestore writes, malformed replies, duplicate approval/promotion actions, inconsistent database states, etc.
+The goal is not merely to make it work, but to make the system resilient against failures and inconsistent states.
+Priority 1 — Redesign the Q&A Search + Submit Question Experience
+
+This should be tackled before subscriptions.
+
+The client wants the question-submission experience to be more educational and intuitive so users understand how to ask questions.
+
+The agreed direction:
+
+Search flow
+
+User searches for something.
+
+Instead of simply dumping Q&A results, show a set of approximately 5 relevant questions with a clear heading such as:
+
+Questions based on your search
+
+The user clicks a question → sees the answer.
+
+Below the results, make the fallback action extremely obvious:
+
+Not the question you're looking for?
+
+Then provide an obvious path to:
+
+Rephrase your question or submit a question
+
+The user should understand this flow on the first attempt without needing instructions.
+
+Search itself also needs work
+
+Current search behavior has problems:
+
+Exact wording appears to receive too much preference.
+Paraphrases of the same question do not reliably find the existing Q&A.
+Searching the same intent using different wording can produce poor results.
+
+We need to investigate the current search implementation before changing it.
+
+The objective is:
+
+User intent → relevant existing questions → answer
+
+rather than:
+
+Exact/near-exact wording → matching question
+
+The new search flow must integrate with the existing Q&A system without breaking it.
+
+Priority 2 — Admin Submission UI
+
+The admin submission interface currently truncates questions because of the layout.
+
+Required improvements:
+
+Admin should be able to see the entire question.
+Hovering should reveal the complete question.
+The displayed question should be selectable/copyable.
+Approve and Promote workflows must continue working.
+This is primarily UI cleanup and should not require redesigning the underlying submission system.
+Priority 3 — Subscription + Payment Gateway
+
+This is the largest remaining feature.
+
+Requirements/design still need to be established:
+
+Subscription model
+Payment gateway
+Payment verification
+User subscription/access state
+Successful and failed payments
+Renewal/expiry
+Cancellation
+Refund handling
+Webhook handling
+Security and consistency of payment state
+
+This should be tackled after the Q&A/search system is stable.
+
+Priority 4 — Overall Production Hardening & Polish
+
+After the major functionality is complete:
+
+Mobile/responsive testing
+UI cleanup
+Error states
+Loading states
+Empty states
+API failure handling
+Database consistency
+Duplicate-action protection
+Authentication/authorization checks
+Edge cases
+Remove debugging code
+General production-readiness testing
+Working Order
+
+We should follow this order:
+
+Map and redesign the current Search → Q&A → Submit Question flow
+Improve search relevance/paraphrase handling
+Make the Submit Question path obvious and intuitive
+Test the complete Q&A flow
+Audit and harden the submission/Ustaad/webhook/email/promotion architecture
+Clean up the admin submission UI
+Build Subscription + Payment Gateway
+Final production polish and robustness pass
+
+Important: Do not start coding immediately. For the first task, inspect the existing search → results → Q&A/chat → submission implementation first. Then make targeted changes rather than repeatedly modifying code that already exists.
+

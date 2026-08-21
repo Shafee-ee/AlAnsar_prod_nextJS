@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 
 export default function ManageQnA() {
   const [items, setItems] = useState([]);
+  const [allItems, setAllItems] = useState([]);
+  const [allLoaded, setAllLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [filtered, setFiltered] = useState([]);
   const [badIds, setBadIds] = useState(new Set());
 
@@ -43,30 +46,54 @@ export default function ManageQnA() {
   }, []);
 
   useEffect(() => {
-    fetchPaginated(page);
-  }, [page]);
+    if (!search.trim()) {
+      fetchPaginated(page);
+    }
+  }, [page, search]);
   /* -----------------------------
        DATA FETCHING
     ----------------------------- */
   async function fetchPaginated(pageNum = 1) {
-    const res = await fetch(`/api/qna/paginated?page=${pageNum}`);
-    const data = await res.json();
+    setLoading(true);
 
-    if (data.success) {
-      setItems(data.items);
-      setFiltered(data.items);
-      setTotalCount(data.totalCount);
+    try {
+      const res = await fetch(
+        `/api/qna/paginated?page=${pageNum}&search=${encodeURIComponent(search)}`,
+      );
+
+      const data = await res.json();
+
+      if (data.success) {
+        setItems(data.items);
+        setFiltered(data.items);
+        setTotalCount(data.totalCount);
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
   async function fetchAll() {
-    const res = await fetch("/api/qna/list");
-    const data = await res.json();
+    setLoading(true);
 
-    if (data.success) {
-      setItems(data.items);
+    try {
+      const res = await fetch("/api/qna/list");
+      const data = await res.json();
+
+      if (data.success) {
+        setAllItems(data.items);
+        setAllLoaded(true);
+      }
+    } finally {
+      setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (search.trim() && !allLoaded) {
+      fetchAll();
+    }
+  }, [search, allLoaded]);
 
   async function fetchAudit() {
     const res = await fetch("/api/qna/audit");
@@ -91,14 +118,14 @@ export default function ManageQnA() {
        FILTER + SORT
     ----------------------------- */
   useEffect(() => {
-    let data = [...items];
-
+    let data = search.trim() ? [...allItems] : [...items];
     if (search.trim()) {
+      const term = search.toLowerCase();
+
       data = data.filter((i) =>
-        (i.question_en || "").toLowerCase().includes(search.toLowerCase()),
+        (i.question_en || "").toLowerCase().includes(term),
       );
     }
-
     if (qualityFilter !== "all") {
       data = data.filter((i) =>
         qualityFilter === "bad" ? badIds.has(i.id) : !badIds.has(i.id),
@@ -112,8 +139,7 @@ export default function ManageQnA() {
     });
 
     setFiltered(data);
-  }, [search, sortBy, qualityFilter, items, badIds]);
-
+  }, [search, sortBy, qualityFilter, items, allItems, badIds]);
   /* -----------------------------
        ACTIONS
     ----------------------------- */
@@ -271,6 +297,13 @@ export default function ManageQnA() {
         <div className="text-xs text-gray-600">
           Showing {startIndex}–{endIndex} of {totalCount}
         </div>
+        {loading && (
+          <div className="text-xs text-blue-600 font-medium">
+            {search.trim()
+              ? `Searching all Q&A records for "${search}"...`
+              : "Loading Q&A records..."}
+          </div>
+        )}
       </div>
 
       {/* Table */}

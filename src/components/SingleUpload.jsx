@@ -26,8 +26,9 @@ export default function SingleUpload() {
   const searchParams = useSearchParams();
   const fromSubmission = searchParams.get("fromSubmission");
   const submissionId = searchParams.get("submissionId");
+
+  //deleted the duplicate line
   const questionFromUrl = searchParams.get("question");
-  const answerFromUrl = searchParams.get("answer");
   const answerFromUrl = searchParams.get("answer");
 
   // for image upload

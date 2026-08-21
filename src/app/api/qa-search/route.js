@@ -263,33 +263,6 @@ export async function POST(req) {
 
   const CONFIDENCE_THRESHOLD = isLongQuery ? 0.23 : 0.25;
 
-  const intentWords = ["how", "when", "who", "what", "where", "why"];
-
-  //intent words for stricter search
-  function extractIntent(text = "") {
-    const q = normalize(text);
-    return intentWords.find((w) => q.startsWith(w));
-  }
-
-  const intentSource = normalize(embeddingText);
-  const userIntent = extractIntent(intentSource);
-  const bestIntent = extractIntent(normalize(best?.question_en || ""));
-
-  if (
-    !isKannada(query) &&
-    userIntent &&
-    bestIntent &&
-    userIntent !== bestIntent
-  ) {
-    console.timeEnd("TOTAL");
-
-    return NextResponse.json({
-      success: true,
-      noMatch: true,
-      reason: "intent_mismatch",
-    });
-  }
-
   if (
     !isKeywordQuery &&
     (!best ||

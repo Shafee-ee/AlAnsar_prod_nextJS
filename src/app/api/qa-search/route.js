@@ -311,6 +311,13 @@ export async function POST(req) {
       success: true,
       noMatch: true,
       reason: "low_confidence",
+      debug: scored.slice(0, 10).map((item) => ({
+        id: item.id,
+        question: item.question_en,
+        confidence: item.confidenceScore,
+        lexical: item.lexicalScore,
+        rank: item.rankScore,
+      })),
     });
   }
 

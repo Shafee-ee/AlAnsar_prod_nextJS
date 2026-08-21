@@ -74,19 +74,49 @@ function cosine(a = [], b = []) {
   return na && nb ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
 }
 
-function tokenOverlapScore(a = "", b = "") {
-  const aTokens = new Set(normalize(a).split(" "));
-  const bTokens = new Set(normalize(b).split(" "));
+function tokenOverlapScore(question = "", query = "") {
+  const stopWords = new Set([
+    "what",
+    "is",
+    "the",
+    "a",
+    "an",
+    "of",
+    "to",
+    "and",
+    "or",
+    "in",
+    "on",
+    "for",
+    "by",
+    "with",
+    "how",
+    "when",
+    "where",
+    "who",
+    "why",
+  ]);
+
+  const questionTokens = new Set(
+    normalize(question)
+      .split(" ")
+      .filter((word) => word && !stopWords.has(word)),
+  );
+
+  const queryTokens = new Set(
+    normalize(query)
+      .split(" ")
+      .filter((word) => word && !stopWords.has(word)),
+  );
 
   let overlap = 0;
 
-  for (const word of aTokens) {
-    if (bTokens.has(word)) overlap++;
+  for (const word of queryTokens) {
+    if (questionTokens.has(word)) overlap++;
   }
 
-  return overlap / Math.max(aTokens.size, 1);
+  return overlap / Math.max(queryTokens.size, 1);
 }
-
 export async function POST(req) {
   console.time("TOTAL");
   const { query, lang = "en", excludeId } = await req.json();

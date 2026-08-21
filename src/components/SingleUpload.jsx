@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 export default function SingleUpload() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+
   const [lang, setLang] = useState("kn");
   const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,6 +27,8 @@ export default function SingleUpload() {
   const fromSubmission = searchParams.get("fromSubmission");
   const submissionId = searchParams.get("submissionId");
   const questionFromUrl = searchParams.get("question");
+  const answerFromUrl = searchParams.get("answer");
+  const answerFromUrl = searchParams.get("answer");
 
   // for image upload
   async function handleImageUpload(e) {
@@ -126,12 +129,18 @@ export default function SingleUpload() {
   }
   //prefill
   useEffect(() => {
-    if (fromSubmission === "true" && questionFromUrl) {
-      setQuestion(decodeURIComponent(questionFromUrl));
-      setLang("en"); // since submissions standardized to English
-    }
-  }, [fromSubmission, questionFromUrl]);
+    if (fromSubmission === "true") {
+      if (questionFromUrl) {
+        setQuestion(decodeURIComponent(questionFromUrl));
+      }
 
+      if (answerFromUrl) {
+        setAnswer(decodeURIComponent(answerFromUrl));
+      }
+
+      setLang("en");
+    }
+  }, [fromSubmission, questionFromUrl, answerFromUrl]);
   // handle submit function
   async function handleSubmit(e) {
     e.preventDefault();

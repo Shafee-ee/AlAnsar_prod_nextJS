@@ -171,8 +171,9 @@ export async function POST(req) {
      * ---------------------------------------------------------
      */
 
-    const replyText = email.text || email.html || "";
+    const rawReply = email.text || email.html || "";
 
+    const replyText = rawReply.split(/\nOn .*wrote:\n/i)[0].trim();
     await submissionRef.update({
       ustaad_answer: replyText,
       ustaad_answered_at: new Date(),

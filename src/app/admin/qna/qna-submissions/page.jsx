@@ -57,6 +57,8 @@ export default function QnaSubmissionsPage() {
   };
 
   const handlePromote = (item) => {
+    console.log("Ustaad answer:", item.ustaad_answer);
+
     const encodedQuestion = encodeURIComponent(
       item.translated_question_en || item.question_original,
     );

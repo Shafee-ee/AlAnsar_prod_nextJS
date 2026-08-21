@@ -15,7 +15,7 @@ export async function sendEmailToImam(question, submissionId) {
     await resend.emails.send({
       from: "Al Ansar Weekly <editor@alansarweekly.com>",
       to: IMAM_NOTIFICATION_LIST,
-      reply_to: "qna@hslaaxa.resend.app",
+      replyTo: "qna@hslaaxa.resend.app",
       subject: `New Question Approved – Al Ansar Weekly [${submissionId}]`,
       html: `
         <div style="font-family:Arial, sans-serif; max-width:600px; margin:auto; padding:20px;">
@@ -60,7 +60,7 @@ export async function sendEmailToImam(question, submissionId) {
 export async function sendEmailToUser({ email, question, answer }) {
   return resend.emails.send({
     from: "Al Ansar Weekly <editor@alansarweekly.com>",
-    reply_to: "alansarweekly786@gmail.com",
+    replyTo: "alansarweekly786@gmail.com",
     to: email,
     subject: "Your question has been answered",
     html: `

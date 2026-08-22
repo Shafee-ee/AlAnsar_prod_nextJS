@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { MessageCircleQuestion } from "lucide-react";
+import { IconBubble } from "@/components/IconBubble";
 import Link from "next/link";
 export default function HomeQuickAccess() {
   const [total, setTotal] = useState(null);
@@ -44,10 +46,10 @@ export default function HomeQuickAccess() {
     qnaTitle: lang === "en" ? "Questions Answered" : "ಉತ್ತರಿಸಲಾದ ಪ್ರಶ್ನೆಗಳು",
     qnaDesc:
       lang === "en"
-        ? "Search 35 years of Islamic scholarship."
-        : "35 ವರ್ಷಗಳ ಇಸ್ಲಾಮಿಕ್ ಪಾಂಡಿತ್ಯವನ್ನು ಹುಡುಕಿ.",
+        ? "Ask a question or explore 35 years of scholarship."
+        : "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ ಅಥವಾ 35 ವರ್ಷಗಳ ಪಾಂಡಿತ್ಯವನ್ನು ಅನ್ವೇಷಿಸಿ.",
 
-    qnaBtn: lang === "en" ? "Ask & Discover →" : "ಕೇಳಿ ಮತ್ತು ತಿಳಿಯಿರಿ →",
+    qnaBtn: lang === "en" ? "Keli Nodi →" : "ಕೇಳಿ ನೋಡಿ →",
 
     digiBadge: lang === "en" ? "Latest Edition" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆ",
     digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತ್ತೀಚಿನ ಡಿಜಿಪೇಪರ್",
@@ -82,49 +84,57 @@ export default function HomeQuickAccess() {
               window.dispatchEvent(new Event("expand-chatbot"));
             }, 200);
           }}
-          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[240px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform"
         >
           {/* Background image */}
+          {/* Q&A visual */}
           <img
             src="/qna-card.png"
-            alt="Questions and Answers"
+            alt=""
             className="
-      absolute
-      -right-18
-      bottom-0
-      h-[240px]
-      w-auto
-      object-contain
-      pointer-events-none
-    "
+    absolute
+    -right-16
+    -bottom-4
+    h-[210px]
+    w-auto
+    object-contain
+    opacity-30
+    pointer-events-none
+  "
           />
+
           {/* Blue tint overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#5b82c7]/80 via-[#3d68b8]/80 to-[#284f9e]/95" />
           {/* Top gloss */}
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/10 to-transparent" />
           {/* Bottom depth */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-white/10" />
+          {/*Message bubble*/}
+          <div className="absolute right-6 top-6 z-20">
+            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center">
+              <MessageCircleQuestion className="w-7 h-7 text-white" />
+            </div>
+          </div>
           {/* Content */}
-          <div className="relative h-full p-6 flex flex-col justify-between text-white">
+          <div className="relative h-full p-6 text-white">
             <div>
-              <div className="text-5xl font-bold">
+              <div className="text-4xl font-semibold text-white/95">
                 {total !== null ? `${total}+` : "..."}
               </div>
-              <div className="text-lg font-medium mt-1">{t.qnaTitle}</div>
-              <p className="mt-1 mb-4 max-w-[280px] text-white/80">
+              <div className="text-lg font-semibold mt-1">{t.qnaTitle}</div>
+              <p className="mt-1 max-w-[210px] text-sm font-medium text-white/80">
                 {t.qnaDesc}
               </p>
             </div>
-
-            <button className="w-fit px-5 py-2 bg-white text-[#1d3f9a] cursor-pointer font-bold rounded-full font-medium">
+            <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.qnaBtn}
-            </button>
+            </span>
           </div>
         </div>
         {/* DigiPaper */}
         <Link
           href="/digipaper"
-          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block active:scale-[0.98] transition-transform"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[240px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer block active:scale-[0.98] transition-transform"
         >
           <img
             src="/digipaper-main.png"
@@ -148,7 +158,7 @@ export default function HomeQuickAccess() {
               <p className="mt-2 text-white/80">{t.digiDesc}</p>
             </div>
 
-            <span className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
+            <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.digiBtn}
             </span>
           </div>
@@ -156,7 +166,7 @@ export default function HomeQuickAccess() {
         {/* Articles */}
         <Link
           href={`/article?lang=${lang}`}
-          className="snap-center lg:min-w-0 min-w-[85%] h-[220px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform block"
+          className="snap-center lg:min-w-0 min-w-[85%] h-[240px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform block"
         >
           {/* Background image */}
           <img
@@ -188,7 +198,7 @@ export default function HomeQuickAccess() {
               <p className="text-white/80 max-w-[280px]">{t.articleDesc}</p>
             </div>
 
-            <span className="w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full cursor-pointer font-medium">
+            <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.articleBtn}
             </span>
           </div>

@@ -135,7 +135,8 @@ export async function POST(req) {
            GENERATE EMBEDDING USING ENGLISH VERSION
         ------------------------------------------------------- */
     const embedding = await generateEmbedding(question_en);
-    if (!embedding) {
+
+    if (!Array.isArray(embedding) || embedding.length !== 768) {
       return NextResponse.json({ success: false, reason: "embedding-failed" });
     }
 

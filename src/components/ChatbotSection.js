@@ -88,35 +88,31 @@ const BotResponseCard = ({
   // INITIAL SEARCH — show suggested questions
   if (result?.mode === "suggestions") {
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="w-full bg-white p-4 sm:p-5 rounded-2xl border border-gray-200 shadow-sm">
         {/* Header */}
-        <div className="px-4 pt-4 pb-3">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-600">
-              <Search className="w-4 h-4" />
+        <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600">
+            <Search className="w-5 h-5" />
+          </div>
+
+          <div>
+            <div className="text-sm font-semibold text-gray-800">
+              {selectedLang === "kn"
+                ? "ಸಂಭಾವ್ಯ ಪ್ರಶ್ನೆಗಳು"
+                : "Possible matches"}
             </div>
 
-            <div>
-              <h3 className="text-sm font-semibold text-gray-800">
-                {selectedLang === "kn"
-                  ? "ಸಂಬಂಧಿಸಿದ ಪ್ರಶ್ನೆಗಳು"
-                  : "Possible matches"}
-              </h3>
-
-              <p className="text-xs text-gray-500 mt-0.5">
-                {selectedLang === "kn"
-                  ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಇದೆಯೇ?"
-                  : "We found questions that may match what you mean."}
-              </p>
+            <div className="text-xs text-gray-500 mt-0.5">
+              {selectedLang === "kn"
+                ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಹೊಂದಿಕೆಯಾಗಬಹುದಾದ ಪ್ರಶ್ನೆಗಳು"
+                : "We found questions that may match what you mean."}
             </div>
           </div>
         </div>
 
-        {/* Suggestions */}
-        <div className="px-3 pb-3 space-y-2">
+        {/* Suggested questions */}
+        <div className="space-y-2">
           {result.suggestions.map((r) => {
-            const isExpanded = expandedSuggestionId === r.id;
-
             const badge =
               r.score >= 0.85
                 ? "Strong match"
@@ -124,147 +120,117 @@ const BotResponseCard = ({
                   ? "Very close"
                   : "Close match";
 
-            const badgeClass =
-              r.score >= 0.85
-                ? "bg-blue-50 text-blue-700"
-                : r.score >= 0.65
-                  ? "bg-indigo-50 text-indigo-700"
-                  : "bg-gray-100 text-gray-600";
+            const isExpanded = expandedSuggestionId === r.id;
 
             return (
               <div
                 key={r.id}
                 className="
-          rounded-xl
-          border border-gray-100
-          bg-white
-          overflow-hidden
-          transition-all
-          duration-200
-          hover:border-blue-200
-          hover:shadow-sm
-        "
+                w-full
+                rounded-xl
+                border border-gray-100
+                bg-white
+                overflow-hidden
+                transition
+              "
               >
                 {/* Question */}
                 <button
+                  type="button"
                   onClick={() =>
                     setExpandedSuggestionId(isExpanded ? null : r.id)
                   }
                   className="
-            group
-            w-full
-            text-left
-            p-3
-            transition-all
-            duration-200
-            hover:bg-blue-50/30
-          "
+  w-full
+  text-left
+  p-3
+  rounded-xl
+  border border-gray-100
+  bg-white
+  hover:border-blue-200
+  hover:bg-blue-50/30
+  transition
+"
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-3">
-                        <p className="text-sm leading-relaxed text-gray-700">
-                          {r.question}
-                        </p>
-
-                        <span
-                          className={`
-                    shrink-0
-                    text-[10px]
-                    font-semibold
-                    px-2
-                    py-1
-                    rounded-full
-                    ${badgeClass}
-                  `}
-                        >
-                          {badge}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div
+                  {/* Badge */}
+                  <div className="mb-2">
+                    <span
                       className={`
-                shrink-0
-                flex items-center justify-center
-                w-7 h-7
-                rounded-full
-                bg-gray-50
-                text-gray-400
-                transition-transform
-                duration-200
-                group-hover:bg-blue-100
-                group-hover:text-blue-600
-                ${isExpanded ? "rotate-90 bg-blue-100 text-blue-600" : ""}
-              `}
+                      inline-flex
+                      items-center
+                      px-2.5
+                      py-1
+                      rounded-full
+                      text-[10px]
+                      font-semibold
+                      ${
+                        r.score >= 0.85
+                          ? "bg-blue-50 text-blue-600"
+                          : r.score >= 0.65
+                            ? "bg-indigo-50 text-indigo-600"
+                            : "bg-gray-100 text-gray-600"
+                      }
+                    `}
+                    >
+                      {selectedLang === "kn"
+                        ? r.score >= 0.85
+                          ? "ಬಲವಾದ ಹೊಂದಾಣಿಕೆ"
+                          : r.score >= 0.65
+                            ? "ತುಂಬಾ ಹತ್ತಿರ"
+                            : "ಹತ್ತಿರದ ಹೊಂದಾಣಿಕೆ"
+                        : badge}
+                    </span>
+                  </div>
+
+                  {/* Question */}
+                  <div className="text-sm leading-relaxed text-gray-700">
+                    {r.question}
+                  </div>
+
+                  {/* Arrow */}
+                  <div className="flex justify-end mt-2">
+                    <span
+                      className={`
+                      flex items-center justify-center
+                      w-8 h-8
+                      rounded-full
+                      bg-gray-50
+                      text-gray-400
+                      transition-transform
+                      ${isExpanded ? "rotate-90" : ""}
+                    `}
                     >
                       →
-                    </div>
+                    </span>
                   </div>
                 </button>
 
                 {/* Expanded answer */}
                 {isExpanded && (
-                  <div className="px-3 pb-3">
-                    <div className="border-t border-gray-100 pt-3">
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                          {r.answer}
-                        </div>
+                  <div className="px-4 pb-4">
+                    <div className="pt-3 border-t border-gray-100">
+                      <div className="text-sm leading-relaxed text-gray-700 bg-gray-50 rounded-lg p-3 whitespace-pre-line">
+                        {r.answer}
                       </div>
 
-                      <div className="mt-3 text-xs text-gray-500">
-                        <span className="font-medium text-gray-600">
-                          {selectedLang === "kn"
-                            ? "ಉತ್ತರದ ಮೂಲ"
-                            : "Answer source"}
-                          :
-                        </span>{" "}
-                        {r.imamName ||
-                          (r.samputa || r.sanchike
-                            ? `Samputa ${r.samputa || ""}${
-                                r.sanchike ? ` · Sanchike ${r.sanchike}` : ""
-                              }`
-                            : r.sourceTitle ||
-                              (selectedLang === "kn"
-                                ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
-                                : "From the Archives of AlAnsar Weekly (1991–2016)"))}
-                      </div>
-
-                      <div className="flex justify-end gap-2 mt-3">
+                      <div className="mt-3 flex justify-center gap-2">
                         <button
+                          type="button"
                           onClick={() => onShare(r.id)}
-                          className="
-                    flex items-center gap-1
-                    px-3 py-1.5
-                    rounded-md
-                    bg-gray-700
-                    hover:bg-gray-800
-                    text-white
-                    text-xs
-                  "
+                          className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-xs"
                         >
-                          <Share2 className="w-3 h-3" />
                           Share
                         </button>
 
-                        <a
-                          href={`/qna/${r.id}?lang=${selectedLang}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="
-                    flex items-center gap-1
-                    px-3 py-1.5
-                    rounded-md
-                    bg-gray-700
-                    hover:bg-gray-800
-                    text-white
-                    text-xs
-                  "
+                        <button
+                          type="button"
+                          onClick={() => {
+                            window.location.href = `/qna/${r.id}?lang=${selectedLang}`;
+                          }}
+                          className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-xs"
                         >
-                          <ExternalLink className="w-3 h-3" />
                           Open
-                        </a>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -273,34 +239,35 @@ const BotResponseCard = ({
             );
           })}
         </div>
-        {/* Actions */}
-        <div className="mx-3 border-t border-gray-100" />
 
-        <div className="px-4 py-4 text-center">
-          <p className="text-xs text-gray-500 mb-3">
+        {/* Fallback */}
+        <div className="mt-5 pt-4 border-t border-gray-100 text-center">
+          <div className="text-xs text-gray-500 mb-3">
             {selectedLang === "kn"
-              ? "ನಿಮಗೆ ಬೇಕಾದ ಪ್ರಶ್ನೆ ಸಿಗಲಿಲ್ಲವೇ?"
+              ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಇಲ್ಲವೇ?"
               : "Didn't find the question you were looking for?"}
-          </p>
+          </div>
 
           <div className="flex justify-center gap-2">
             <button
+              type="button"
               onClick={onRephrase}
               className="
-              px-3.5 py-1.5
+              px-3.5
+              py-1.5
               rounded-lg
               bg-gray-100
               hover:bg-gray-200
               text-gray-700
               text-xs
               font-medium
-              transition
             "
             >
               {selectedLang === "kn" ? "ಮರುಹೊಂದಿಸಿ" : "Rephrase"}
             </button>
 
             <button
+              type="button"
               onClick={() =>
                 window.dispatchEvent(
                   new CustomEvent("trigger-ask-question", {
@@ -309,15 +276,14 @@ const BotResponseCard = ({
                 )
               }
               className="
-              px-3.5 py-1.5
+              px-3.5
+              py-1.5
               rounded-lg
               bg-blue-600
               hover:bg-blue-700
               text-white
               text-xs
               font-medium
-              transition
-              shadow-sm
             "
             >
               {selectedLang === "kn" ? "ಪ್ರಶ್ನೆ ಸಲ್ಲಿಸಿ" : "Submit Question"}
@@ -658,8 +624,8 @@ const MessageBubble = ({
   }
 
   return (
-    <div className="flex justify-start mb-6">
-      <div className="max-w-[75%]">
+    <div className="flex justify-start mb-6 w-full">
+      <div className="w-full">
         <BotResponseCard
           result={message.result}
           selectedLang={selectedLang}

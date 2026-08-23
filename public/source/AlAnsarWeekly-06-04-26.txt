@@ -3738,3 +3738,185 @@ Final production polish and robustness pass
 
 Important: Do not start coding immediately. For the first task, inspect the existing search → results → Q&A/chat → submission implementation first. Then make targeted changes rather than repeatedly modifying code that already exists.
 
+#####
+
+AlAnsarUpgrade — Project Checkpoint
+
+2026-08-23
+
+This checkpoint records the work completed immediately before beginning the subscription investigation.
+
+1. Q&A Chatbot / Search — DONE FOR NOW
+
+The Q&A search flow was revised and is considered complete for the current scope.
+
+Search behavior
+
+Search supports semantic/meaning-based matching rather than relying only on exact keywords.
+
+When the initial search finds several plausible matches, it returns a suggestions response instead of immediately opening an answer.
+
+Suggestions are ranked by confidence score.
+
+Suggestions show the question, match-strength badge, expandable answer, basic source information, Share, and Open actions.
+
+Clicking a suggested question allows the user to inspect the answer without needing another search request.
+
+Source display
+
+Suggestion data carries:
+
+imamName
+
+samputa
+
+sanchike
+
+sourceTitle
+
+Source display priority:
+
+Imam name
+
+Samputa / Sanchike
+
+Source title
+
+Generic AlAnsar Weekly archive source line when the fields are empty
+
+The archive fallback currently communicates that the answer comes from the AlAnsar Weekly archives (1991–2016).
+
+No-match flow
+
+When no reliable answer is found:
+
+The user sees a clear "No confident answer found" message.
+
+The user can rephrase the question.
+
+The user can submit the question directly through the existing Submit Question flow.
+
+The Submit Question option is intentionally obvious when no answer is found.
+
+Asking tips
+
+The question-submission/no-match UI was adjusted to provide guidance on how to ask questions.
+
+Performance
+
+The search logs showed EXACT_DB around 5–9 seconds, while embedding and similarity processing were much faster.
+
+The exact DB timer includes loadEmbeddingsIfNeeded(), so it is not a pure database-query measurement. Current search performance was considered acceptable and is explicitly deferred for now.
+
+The Node DEP0169 url.parse() message is a deprecation warning and was not treated as the cause of the search issue.
+
+2. Pioneers / Legacy Page — DONE
+
+The Kannada content on the static Pioneers/Legacy page was replaced using the exact text supplied by the Ustaad.
+
+Important constraint:
+
+Do NOT shorten, summarize, rewrite, correct, compress, or otherwise alter Ustaad-provided Kannada text.
+
+Only replace the existing Kannada content with the supplied text.
+
+The following content was updated:
+
+Tajul Ulama: Shaykhuna Assayyid Abdurrahman Al Bukhari
+
+Tajul Fuqaha: Bekal Ustad
+
+Tajul Umara: Ibrahim Bava Haji
+
+Unni Haji: Al Ansar's backbone
+
+Names, titles, dates, and supplied Kannada wording were checked against the original text from the Ustaad.
+
+3. Articles Page — DONE
+
+The Articles page previously displayed English category values even when Kannada was selected.
+
+The category configuration was changed to objects containing:
+
+value — the database/category value used for filtering
+
+label — the displayed language value
+
+Kannada labels now display as:
+
+ಎಲ್ಲಾ
+
+ಹದೀಸ್
+
+ಫಿಖ್ಹ್
+
+ಇಸ್ಲಾಮಿ ಇತಿಹಾಸ
+
+ಸ್ಮರಣೀಯರು
+
+ವಿಶ್ಲೇಷಣೆಗಳು
+
+ವಿಸ್ಮಯ ಜಗತ್ತು
+
+ಖುರ್ಆನ್ ವ್ಯಾಖ್ಯಾನ
+
+Filtering still uses the original database category values.
+
+4. Q&A Submissions / Approval Table — DONE
+
+Target file:
+src/app/admin/qna/qna-submissions/page.jsx
+
+Long questions in the submissions table were changed so that:
+
+Questions remain compact/truncated initially.
+
+Clicking a question expands it and displays the complete question.
+
+Clicking it again collapses it.
+
+Existing Approve, Reject, Promote, and Delete actions remain unchanged.
+
+Kannada instruction:
+"ಪೂರ್ಣ ಪ್ರಶ್ನೆಯನ್ನು ಓದಲು, ದಯವಿಟ್ಟು ಅದರ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ. ಅದು ವಿಸ್ತರಿಸಿ ಪೂರ್ಣ ಪ್ರಶ್ನೆಯನ್ನು ತೋರಿಸುತ್ತದೆ."
+
+5. Main Manage QnA Table — LEFT AS-IS
+
+Target file:
+src/components/ManageQnA.js
+
+The main Manage QnA table also truncates long questions, but its entire row already opens the QnA Editor modal.
+
+Because the modal provides the complete question, answer, Kannada/English content, editor notes, source fields, and editing controls, adding another expandable question interaction was considered redundant.
+
+No expandable-question change was made to the main Manage QnA table. Existing row-to-editor behavior remains intact.
+
+6. Current Status
+
+Completed:
+
+Q&A chatbot/search UX and source display
+
+Q&A no-match / submission flow
+
+Q&A suggestion expansion
+
+Pioneers/Legacy Kannada content replacement
+
+Articles Kannada category labels
+
+Q&A submission-table expandable questions
+
+Kannada instruction for expandable questions
+
+Deferred:
+
+Q&A search performance optimization
+
+Investigation of the DEP0169 url.parse() warning
+
+7. NEXT TASK
+
+Begin investigation of the subscription system / subscription-related functionality.
+
+Do not assume the implementation or cause beforehand. First inspect the current subscription-related code, flow, data model, and observed behavior, then identify the actual issue before making changes.

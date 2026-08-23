@@ -58,6 +58,31 @@ const BotResponseCard = ({
   const best = result?.bestMatch;
   const isSystem = result?.isSystem;
   const [expandedSuggestionId, setExpandedSuggestionId] = useState(null);
+
+  const answerRefs = useRef({});
+  const [expandableSuggestions, setExpandableSuggestions] = useState({});
+
+  useEffect(() => {
+    if (!result?.suggestions) return;
+
+    const expandable = {};
+
+    requestAnimationFrame(() => {
+      result.suggestions.forEach((r) => {
+        const el = answerRefs.current[r.id];
+
+        if (!el) {
+          expandable[r.id] = false;
+          return;
+        }
+
+        expandable[r.id] = el.scrollHeight > el.clientHeight;
+      });
+
+      setExpandableSuggestions(expandable);
+    });
+  }, [result?.suggestions, selectedLang]);
+
   console.log("BOT RESULT:", result);
 
   // 🔧 HANDLE EXPLORE MODE (keyword search)
@@ -102,7 +127,7 @@ const BotResponseCard = ({
                 : "Possible matches"}
             </div>
 
-            <div className="text-xs text-gray-500 mt-0.5">
+            <div className="text-xs text-gray-500 font-bold mt-0.5">
               {selectedLang === "kn"
                 ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಹೊಂದಿಕೆಯಾಗಬಹುದಾದ ಪ್ರಶ್ನೆಗಳು"
                 : "We found questions that may match what you mean."}
@@ -121,6 +146,7 @@ const BotResponseCard = ({
                   : "Close match";
 
             const isExpanded = expandedSuggestionId === r.id;
+            const canExpand = expandableSuggestions[r.id];
 
             return (
               <div
@@ -137,9 +163,11 @@ const BotResponseCard = ({
                 {/* Question */}
                 <button
                   type="button"
-                  onClick={() =>
-                    setExpandedSuggestionId(isExpanded ? null : r.id)
-                  }
+                  onClick={() => {
+                    if (!canExpand) return;
+
+                    setExpandedSuggestionId(isExpanded ? null : r.id);
+                  }}
                   className="
   w-full
   text-left
@@ -186,30 +214,46 @@ const BotResponseCard = ({
                   <div className="text-sm leading-relaxed text-gray-700">
                     {r.question}
                   </div>
+                  {/* Answer preview */}
+                  {!isExpanded && (
+                    <div
+                      ref={(el) => {
+                        answerRefs.current[r.id] = el;
+                      }}
+                      className="mt-2 text-sm leading-relaxed text-blue-600 line-clamp-2"
+                    >
+                      {r.answer}
+                    </div>
+                  )}
 
                   {/* Arrow */}
-                  <div className="flex justify-end mt-2">
-                    <span
-                      className={`
-                      flex items-center justify-center
-                      w-8 h-8
-                      rounded-full
-                      bg-gray-50
-                      text-gray-400
-                      transition-transform
-                      ${isExpanded ? "rotate-90" : ""}
-                    `}
-                    >
-                      →
-                    </span>
-                  </div>
+                  {canExpand && (
+                    <div className="flex justify-end mt-2">
+                      <span
+                        className={`
+        flex items-center justify-center
+        w-8 h-8
+        rounded-full
+        bg-gray-50
+        text-gray-400
+        transition-transform
+        ${isExpanded ? "rotate-90" : ""}
+      `}
+                      >
+                        →
+                      </span>
+                    </div>
+                  )}
                 </button>
 
                 {/* Expanded answer */}
                 {isExpanded && (
                   <div className="px-4 pb-4">
                     <div className="pt-3 border-t border-gray-100">
-                      <div className="text-sm leading-relaxed text-gray-700 bg-gray-50 rounded-lg p-3 whitespace-pre-line">
+                      <div
+                        className="text-sm leading-relaxed text-blue-200 bg-gray-50 rounded-lg p-3 whitespace-pre-line"
+                        style={{ color: "#2563eb" }}
+                      >
                         {r.answer}
                       </div>
 
@@ -225,7 +269,9 @@ const BotResponseCard = ({
                         <button
                           type="button"
                           onClick={() => {
-                            window.location.href = `/qna/${r.id}?lang=${selectedLang}`;
+                            if (!canExpand) return;
+
+                            setExpandedSuggestionId(isExpanded ? null : r.id);
                           }}
                           className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-xs"
                         >
@@ -242,7 +288,7 @@ const BotResponseCard = ({
 
         {/* Fallback */}
         <div className="mt-5 pt-4 border-t border-gray-100 text-center">
-          <div className="text-xs text-gray-500 mb-3">
+          <div className="text-xs text-gray-500 font-bold mb-3">
             {selectedLang === "kn"
               ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಇಲ್ಲವೇ?"
               : "Didn't find the question you were looking for?"}
@@ -253,14 +299,14 @@ const BotResponseCard = ({
               type="button"
               onClick={onRephrase}
               className="
-              px-3.5
-              py-1.5
+              px-5
+              py-2.5
               rounded-lg
               bg-gray-100
               hover:bg-gray-200
               text-gray-700
               text-xs
-              font-medium
+              font-semibold
             "
             >
               {selectedLang === "kn" ? "ಮರುಹೊಂದಿಸಿ" : "Rephrase"}
@@ -276,14 +322,14 @@ const BotResponseCard = ({
                 )
               }
               className="
-              px-3.5
-              py-1.5
+              px-5
+              py-2.5
               rounded-lg
               bg-blue-600
               hover:bg-blue-700
               text-white
               text-xs
-              font-medium
+              font-semibold
             "
             >
               {selectedLang === "kn" ? "ಪ್ರಶ್ನೆ ಸಲ್ಲಿಸಿ" : "Submit Question"}
@@ -496,7 +542,7 @@ const BotResponseCard = ({
         <Zap className="w-4 h-4 mr-2 mt-0.5" />
         {best.question}
       </div>
-      <div className="text-gray-700 leading-relaxed mb-4 p-3 bg-gray-50 rounded-lg whitespace-pre-line">
+      <div className="text-blue-700 leading-relaxed mb-4 p-3 bg-gray-50 rounded-lg whitespace-pre-line">
         {best.answer}
       </div>
       <div className="border-t border-gray-100 pt-2 mb-3 text-xs text-gray-500">
@@ -988,11 +1034,11 @@ const ChatbotSection = () => {
       </header>
       <div
         className={`
-    w-full max-w-2xl mx-auto
+    w-full max-w-3xl mx-auto
     bg-white border border-gray-200
-    overflow-hidden
+    overflow-hidden border-2 border-gray-400
     transition-all duration-500
-    ${expanded ? "rounded-lg" : "rounded-full"}
+    ${expanded ? "rounded-lg" : "rounded-2xl"}
   `}
       >
         {/* Search bar */}
@@ -1011,12 +1057,13 @@ const ChatbotSection = () => {
             className="
       w-full
       px-6
-      py-4
+      py-5
       flex
       items-center
       justify-between
       text-left
       bg-white
+      border-gray-400
     "
           >
             <span className="text-gray-500">
@@ -1085,13 +1132,13 @@ const ChatbotSection = () => {
                     ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                     : "Type your question..."
                 }
-                className="flex-grow px-4 py-3 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300"
+                className="flex-grow px-5 py-4 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300 text-base"
               />
 
               <button
                 disabled={isLoading || !userInput.trim()}
                 onClick={() => handleSend()}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full disabled:opacity-40"
+                className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full disabled:opacity-40"
               >
                 <Send className="w-5 h-5" />
               </button>

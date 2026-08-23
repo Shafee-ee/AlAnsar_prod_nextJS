@@ -7,6 +7,7 @@ export default function QnaSubmissionsPage() {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState("pending");
+  const [expandedId, setExpandedId] = useState(null);
 
   const router = useRouter();
 
@@ -107,8 +108,16 @@ export default function QnaSubmissionsPage() {
             className="grid grid-cols-4 items-center px-4 py-3 border-t text-sm"
           >
             {/* Question */}
-            <div className="truncate pr-4">{item.question_original}</div>
-
+            <div
+              onClick={() =>
+                setExpandedId((prev) => (prev === item.id ? null : item.id))
+              }
+              className={`pr-4 cursor-pointer ${
+                expandedId === item.id ? "" : "truncate"
+              }`}
+            >
+              {item.question_original}
+            </div>
             {/* Submitted Date */}
 
             <div>

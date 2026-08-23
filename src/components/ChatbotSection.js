@@ -57,6 +57,8 @@ const BotResponseCard = ({
 }) => {
   const best = result?.bestMatch;
   const isSystem = result?.isSystem;
+  const [expandedSuggestionId, setExpandedSuggestionId] = useState(null);
+  console.log("BOT RESULT:", result);
 
   // 🔧 HANDLE EXPLORE MODE (keyword search)
   if (result?.mode === "explore" && Array.isArray(result.results)) {
@@ -71,13 +73,256 @@ const BotResponseCard = ({
           {result.results.map((r, i) => (
             <button
               key={i}
-              onClick={() => onRelatedClick(r.question)}
+              onClick={() => onRelatedClick(r.question, r.id)}
               className="w-full text-left text-gray-700 text-xs p-2 rounded-md hover:bg-gray-100"
             >
               <MessageCircle className="w-3 h-3 inline mr-1" />
               {r.question}
             </button>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // INITIAL SEARCH — show suggested questions
+  if (result?.mode === "suggestions") {
+    return (
+      <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        {/* Header */}
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-blue-50 text-blue-600">
+              <Search className="w-4 h-4" />
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-gray-800">
+                {selectedLang === "kn"
+                  ? "ಸಂಬಂಧಿಸಿದ ಪ್ರಶ್ನೆಗಳು"
+                  : "Possible matches"}
+              </h3>
+
+              <p className="text-xs text-gray-500 mt-0.5">
+                {selectedLang === "kn"
+                  ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಇದೆಯೇ?"
+                  : "We found questions that may match what you mean."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Suggestions */}
+        <div className="px-3 pb-3 space-y-2">
+          {result.suggestions.map((r) => {
+            const isExpanded = expandedSuggestionId === r.id;
+
+            const badge =
+              r.score >= 0.85
+                ? "Strong match"
+                : r.score >= 0.65
+                  ? "Very close"
+                  : "Close match";
+
+            const badgeClass =
+              r.score >= 0.85
+                ? "bg-blue-50 text-blue-700"
+                : r.score >= 0.65
+                  ? "bg-indigo-50 text-indigo-700"
+                  : "bg-gray-100 text-gray-600";
+
+            return (
+              <div
+                key={r.id}
+                className="
+          rounded-xl
+          border border-gray-100
+          bg-white
+          overflow-hidden
+          transition-all
+          duration-200
+          hover:border-blue-200
+          hover:shadow-sm
+        "
+              >
+                {/* Question */}
+                <button
+                  onClick={() =>
+                    setExpandedSuggestionId(isExpanded ? null : r.id)
+                  }
+                  className="
+            group
+            w-full
+            text-left
+            p-3
+            transition-all
+            duration-200
+            hover:bg-blue-50/30
+          "
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm leading-relaxed text-gray-700">
+                          {r.question}
+                        </p>
+
+                        <span
+                          className={`
+                    shrink-0
+                    text-[10px]
+                    font-semibold
+                    px-2
+                    py-1
+                    rounded-full
+                    ${badgeClass}
+                  `}
+                        >
+                          {badge}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`
+                shrink-0
+                flex items-center justify-center
+                w-7 h-7
+                rounded-full
+                bg-gray-50
+                text-gray-400
+                transition-transform
+                duration-200
+                group-hover:bg-blue-100
+                group-hover:text-blue-600
+                ${isExpanded ? "rotate-90 bg-blue-100 text-blue-600" : ""}
+              `}
+                    >
+                      →
+                    </div>
+                  </div>
+                </button>
+
+                {/* Expanded answer */}
+                {isExpanded && (
+                  <div className="px-3 pb-3">
+                    <div className="border-t border-gray-100 pt-3">
+                      <div className="p-3 bg-gray-50 rounded-lg">
+                        <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                          {r.answer}
+                        </div>
+                      </div>
+
+                      <div className="mt-3 text-xs text-gray-500">
+                        <span className="font-medium text-gray-600">
+                          {selectedLang === "kn"
+                            ? "ಉತ್ತರದ ಮೂಲ"
+                            : "Answer source"}
+                          :
+                        </span>{" "}
+                        {r.imamName ||
+                          (r.samputa || r.sanchike
+                            ? `Samputa ${r.samputa || ""}${
+                                r.sanchike ? ` · Sanchike ${r.sanchike}` : ""
+                              }`
+                            : r.sourceTitle ||
+                              (selectedLang === "kn"
+                                ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
+                                : "From the Archives of AlAnsar Weekly (1991–2016)"))}
+                      </div>
+
+                      <div className="flex justify-end gap-2 mt-3">
+                        <button
+                          onClick={() => onShare(r.id)}
+                          className="
+                    flex items-center gap-1
+                    px-3 py-1.5
+                    rounded-md
+                    bg-gray-700
+                    hover:bg-gray-800
+                    text-white
+                    text-xs
+                  "
+                        >
+                          <Share2 className="w-3 h-3" />
+                          Share
+                        </button>
+
+                        <a
+                          href={`/qna/${r.id}?lang=${selectedLang}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="
+                    flex items-center gap-1
+                    px-3 py-1.5
+                    rounded-md
+                    bg-gray-700
+                    hover:bg-gray-800
+                    text-white
+                    text-xs
+                  "
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Open
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {/* Actions */}
+        <div className="mx-3 border-t border-gray-100" />
+
+        <div className="px-4 py-4 text-center">
+          <p className="text-xs text-gray-500 mb-3">
+            {selectedLang === "kn"
+              ? "ನಿಮಗೆ ಬೇಕಾದ ಪ್ರಶ್ನೆ ಸಿಗಲಿಲ್ಲವೇ?"
+              : "Didn't find the question you were looking for?"}
+          </p>
+
+          <div className="flex justify-center gap-2">
+            <button
+              onClick={onRephrase}
+              className="
+              px-3.5 py-1.5
+              rounded-lg
+              bg-gray-100
+              hover:bg-gray-200
+              text-gray-700
+              text-xs
+              font-medium
+              transition
+            "
+            >
+              {selectedLang === "kn" ? "ಮರುಹೊಂದಿಸಿ" : "Rephrase"}
+            </button>
+
+            <button
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("trigger-ask-question", {
+                    detail: { question: query },
+                  }),
+                )
+              }
+              className="
+              px-3.5 py-1.5
+              rounded-lg
+              bg-blue-600
+              hover:bg-blue-700
+              text-white
+              text-xs
+              font-medium
+              transition
+              shadow-sm
+            "
+            >
+              {selectedLang === "kn" ? "ಪ್ರಶ್ನೆ ಸಲ್ಲಿಸಿ" : "Submit Question"}
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -113,39 +358,159 @@ const BotResponseCard = ({
 
   if (result?.noMatch) {
     return (
-      <div className="bg-gray-50 text-gray-700 p-4 rounded-xl border">
-        <p className="font-semibold mb-2">No confident answer found</p>
+      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+        {/* Header */}
+        <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-600">
+            <Search className="w-5 h-5" />
+          </div>
 
-        <p className="text-sm mb-4">
-          We couldn’t find a reliable answer for <b>"{query}"</b>.
-        </p>
+          <div>
+            <p className="font-semibold text-gray-800">
+              {selectedLang === "kn"
+                ? "ವಿಶ್ವಾಸಾರ್ಹ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ"
+                : "No confident match found"}
+            </p>
 
-        <div className="flex gap-3">
-          <button
-            onClick={() => onRephrase(query)}
-            className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm"
-          >
-            Rephrase query
-          </button>
+            <p className="text-xs text-gray-500 mt-1">
+              {selectedLang === "kn"
+                ? "ನಮ್ಮ ಪ್ರಶ್ನೋತ್ತರ ಸಂಗ್ರಹದಲ್ಲಿ ಸಾಕಷ್ಟು ಹತ್ತಿರವಾದ ಉತ್ತರ ಸಿಗಲಿಲ್ಲ."
+                : "We couldn’t find a sufficiently close answer in our Q&A archive."}
+            </p>
+          </div>
+        </div>
 
-          <button
-            onClick={() =>
-              window.dispatchEvent(
-                new CustomEvent("trigger-ask-question", {
-                  detail: { question: query },
-                }),
-              )
-            }
-            className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 text-sm"
-          >
-            Submit Question
-          </button>
+        {/* Tips */}
+        <div className="py-4">
+          <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-gray-700">
+            <Search className="w-4 h-4 text-blue-600" />
+            {selectedLang === "kn" ? "ಪ್ರಶ್ನೆ ಕೇಳುವ ಸಲಹೆಗಳು" : "Tips to try"}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                ✎
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-gray-700">
+                  {selectedLang === "kn"
+                    ? "ಪ್ರಶ್ನೆಯನ್ನು ಮರುಹೊಂದಿಸಿ"
+                    : "Rephrase your question"}
+                </p>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedLang === "kn"
+                    ? "ಬೇರೆ ಪದಗಳನ್ನು ಅಥವಾ ಸರಳವಾದ ರೀತಿಯಲ್ಲಿ ಪ್ರಯತ್ನಿಸಿ."
+                    : "Try using different words or a simpler phrasing."}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100" />
+
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                ⊙
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-gray-700">
+                  {selectedLang === "kn"
+                    ? "ಹೆಚ್ಚು ನಿರ್ದಿಷ್ಟವಾಗಿರಿ"
+                    : "Be more specific"}
+                </p>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedLang === "kn"
+                    ? "ಉತ್ತಮ ಫಲಿತಾಂಶಕ್ಕಾಗಿ ಹೆಚ್ಚಿನ ಸಂದರ್ಭ ಅಥವಾ ವಿವರಗಳನ್ನು ಸೇರಿಸಿ."
+                    : "Add more context or details to get better results."}
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-100" />
+
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                💬
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-gray-700">
+                  {selectedLang === "kn"
+                    ? "ಕಾಗುಣಿತ ಮತ್ತು ಭಾಷೆಯನ್ನು ಪರಿಶೀಲಿಸಿ"
+                    : "Check spelling & language"}
+                </p>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  {selectedLang === "kn"
+                    ? "ಕಾಗುಣಿತವನ್ನು ಸರಿಪಡಿಸಿ ಅಥವಾ ಇನ್ನೊಂದು ಭಾಷೆಯಲ್ಲಿ ಪ್ರಯತ್ನಿಸಿ."
+                    : "Correct spelling or try asking in another language."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Submit information */}
+        <div className="border border-dashed border-blue-200 bg-blue-50/30 rounded-lg px-3 py-2.5 text-xs text-gray-600">
+          {selectedLang === "kn" ? (
+            <>
+              ನೀವು ಬಯಸಿದರೆ{" "}
+              <span className="font-medium text-blue-600">
+                ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ನಮ್ಮ ತಂಡಕ್ಕೆ ಸಲ್ಲಿಸಬಹುದು.
+              </span>
+            </>
+          ) : (
+            <>
+              You can also{" "}
+              <span className="font-medium text-blue-600">
+                submit your question
+              </span>{" "}
+              to our team.
+            </>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="pt-5 text-center">
+          <p className="text-xs text-gray-500 mb-3">
+            {selectedLang === "kn"
+              ? "ಇನ್ನೂ ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರ ಸಿಗಲಿಲ್ಲವೇ?"
+              : "Still can’t find what you’re looking for?"}
+          </p>
+
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={() => onRephrase(query)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium transition"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              {selectedLang === "kn" ? "ಮರುಹೊಂದಿಸಿ" : "Rephrase"}
+            </button>
+
+            <button
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("trigger-ask-question", {
+                    detail: { question: query },
+                  }),
+                )
+              }
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition"
+            >
+              <Send className="w-3.5 h-3.5" />
+              {selectedLang === "kn" ? "ಪ್ರಶ್ನೆ ಸಲ್ಲಿಸಿ" : "Submit Question"}
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
-  const score = best.score ?? 0;
+  const score = best?.score ?? 0;
   const isHigh = score >= CONFIDENCE.HIGH;
   const isClose = score >= CONFIDENCE.LOW && score < CONFIDENCE.HIGH;
 
@@ -466,7 +831,7 @@ const ChatbotSection = () => {
     }
   }
 
-  const handleSend = async (textOverride = null) => {
+  const handleSend = async (textOverride = null, selectedId = null) => {
     if (isLoading) return;
 
     const queryText = (textOverride ?? userInput).trim();
@@ -520,7 +885,11 @@ const ChatbotSection = () => {
       const res = await fetch("/api/qa-search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: queryText, lang: selectedLang }),
+        body: JSON.stringify({
+          query: queryText,
+          lang: selectedLang,
+          selectedId,
+        }),
       });
 
       //console remove
@@ -542,8 +911,7 @@ const ChatbotSection = () => {
         return;
       }
 
-      console.log("Best match ID:", data.bestMatch?.id);
-
+      console.log("QA SEARCH RESPONSE:", data);
       // mark best match as seen
 
       const nextSeen = new Set(seenQuestions);
@@ -568,47 +936,54 @@ const ChatbotSection = () => {
         {
           type: "bot",
           result:
-            data.mode === "explore"
+            data.mode === "suggestions"
               ? {
-                  mode: "explore",
-                  results: data.results || [],
+                  mode: "suggestions",
+                  suggestions: data.suggestions || [],
                 }
-              : {
-                  bestMatch: data.bestMatch
-                    ? {
-                        id: data.bestMatch.id,
-                        question: data.bestMatch.question,
-                        answer: data.bestMatch.answer,
-                        score: data.bestMatch.score ?? 0,
+              : data.mode === "explore"
+                ? {
+                    mode: "explore",
+                    results: data.results || [],
+                  }
+                : {
+                    bestMatch: data.bestMatch
+                      ? {
+                          id: data.bestMatch.id,
+                          question: data.bestMatch.question,
+                          answer: data.bestMatch.answer,
+                          score: data.bestMatch.score ?? 0,
 
-                        editorNote:
-                          selectedLang === "kn"
-                            ? data.bestMatch.editorNote_kn
-                            : data.bestMatch.editorNote_en,
+                          editorNote:
+                            selectedLang === "kn"
+                              ? data.bestMatch.editorNote_kn
+                              : data.bestMatch.editorNote_en,
 
-                        imamName: data.bestMatch.imam_name,
+                          imamName: data.bestMatch.imam_name,
 
-                        samputa: data.bestMatch.samputa,
+                          samputa: data.bestMatch.samputa,
 
-                        sanchike: data.bestMatch.sanchike,
+                          sanchike: data.bestMatch.sanchike,
 
-                        sourceTitle:
-                          data.bestMatch.source_title ||
-                          "Al Ansar Knowledge Base",
-                      }
-                    : null,
-                  relatedQuestions: relatedFiltered,
-                },
+                          sourceTitle:
+                            data.bestMatch.source_title ||
+                            "Al Ansar Knowledge Base",
+                        }
+                      : null,
+                    relatedQuestions: relatedFiltered,
+                  },
 
           query: queryText,
         },
       ]);
-    } catch {
+    } catch (err) {
+      console.error("QA SEARCH ERROR:", err);
+
       setMessages((prev) => [
         ...prev,
         {
           type: "bot",
-          result: { bestMatch: null },
+          result: { noMatch: true },
           query: queryText,
         },
       ]);

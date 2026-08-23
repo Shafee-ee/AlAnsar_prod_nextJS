@@ -12,14 +12,29 @@ export default function AtticlesPage() {
   const router = useRouter();
 
   const categories = [
-    "All",
-    "Hadith",
-    "Fiqh",
-    "Islamic History",
-    "Smaniyaru",
-    "Vishleshanagalu",
-    "Vismaya Jagattu",
-    "Quranic vyakhanagalu",
+    { value: "All", label: lang === "kn" ? "ಎಲ್ಲಾ" : "All" },
+    { value: "Hadith", label: lang === "kn" ? "ಹದೀಸ್" : "Hadith" },
+    { value: "Fiqh", label: lang === "kn" ? "ಫಿಖ್ಹ್" : "Fiqh" },
+    {
+      value: "Islamic History",
+      label: lang === "kn" ? "ಇಸ್ಲಾಮಿ ಇತಿಹಾಸ" : "Islamic History",
+    },
+    {
+      value: "Smaniyaru",
+      label: lang === "kn" ? "ಸ್ಮರಣೀಯರು" : "Smaniyaru",
+    },
+    {
+      value: "Vishleshanagalu",
+      label: lang === "kn" ? "ವಿಶ್ಲೇಷಣೆಗಳು" : "Vishleshanagalu",
+    },
+    {
+      value: "Vismaya Jagattu",
+      label: lang === "kn" ? "ವಿಸ್ಮಯ ಜಗತ್ತು" : "Vismaya Jagattu",
+    },
+    {
+      value: "Quranic vyakhanagalu",
+      label: lang === "kn" ? "ಖುರ್ಆನ್ ವ್ಯಾಖ್ಯಾನ" : "Quranic vyakhanagalu",
+    },
   ];
 
   async function loadArticles() {
@@ -75,15 +90,15 @@ export default function AtticlesPage() {
       <div className="flex gap-2 flex-wrap mb-8">
         {categories.map((category) => (
           <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
+            key={category.value}
+            onClick={() => setSelectedCategory(category.value)}
             className={`px-4 py-1 rounded-full inline-block mb-2 cursor-pointer active:scale-95 transition-transform ${
               selectedCategory === category
                 ? "bg-blue-600 text-white"
                 : "bg-blue-100 text-gray-900"
             }`}
           >
-            {category}
+            {category.label}
           </button>
         ))}
       </div>

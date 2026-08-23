@@ -33,7 +33,7 @@ async function loadEmbeddingsIfNeeded() {
   // Reload embeddings.
   const snap = await adminDB
     .collection("qna_items")
-    .select("embedding", "question_en", "question_kn")
+    .select("embedding", "question_en", "question_kn", "answer_en", "answer_kn")
     .get();
 
   cachedItems = snap.docs.map((d) => ({
@@ -123,8 +123,7 @@ function tokenOverlapScore(question = "", query = "") {
 }
 export async function POST(req) {
   console.time("TOTAL");
-  const { query, lang = "en", excludeId } = await req.json();
-
+  const { query, lang = "en", excludeId, mode, selectedId } = await req.json();
   if (!query?.trim()) {
     console.timeEnd("TOTAL");
     return NextResponse.json({ success: false });
@@ -177,7 +176,7 @@ export async function POST(req) {
 
   console.timeEnd("EXACT_DB");
 
-  if (exactMatchItem) {
+  if (exactMatchItem && selectedId) {
     const fullDoc = await adminDB
       .collection("qna_items")
       .doc(exactMatchItem.id)
@@ -248,6 +247,51 @@ export async function POST(req) {
   console.timeEnd("SIMILARITY");
 
   scored.sort((a, b) => b.rankScore - a.rankScore);
+
+  // Initial search: return suggestions instead of opening an answer.
+  // The full Q&A is retrieved now so expanding a suggestion
+  // does not require another QA search.
+
+  if (!selectedId) {
+    const suggestions = await Promise.all(
+      scored
+        .filter((item) => item.question_en && item.confidenceScore >= 0.5)
+        .slice(0, 5)
+        .map(async (item, index) => {
+          const doc = await adminDB.collection("qna_items").doc(item.id).get();
+
+          const data = doc.data();
+
+          return {
+            id: item.id,
+            question: lang === "kn" ? data.question_kn : data.question_en,
+            answer: lang === "kn" ? data.answer_kn : data.answer_en,
+            score: item.confidenceScore,
+            rank: index,
+
+            imamName: data.imam_name || "",
+            samputa: data.samputa || "",
+            sanchike: data.sanchike || "",
+            sourceTitle: data.source_title || "",
+          };
+        }),
+    );
+
+    if (suggestions.length === 0) {
+      console.timeEnd("TOTAL");
+
+      return NextResponse.json({
+        success: true,
+        noMatch: true,
+      });
+    }
+
+    return NextResponse.json({
+      success: true,
+      mode: "suggestions",
+      suggestions,
+    });
+  }
 
   console.log(
     "TOP SEARCH RESULTS:",

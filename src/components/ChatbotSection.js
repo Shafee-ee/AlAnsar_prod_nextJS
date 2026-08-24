@@ -1088,13 +1088,23 @@ const ChatbotSection = () => {
             className={`
     px-4 py-6 overflow-y-auto flex flex-col border-t border-gray-100
     transition-all duration-700 ease-in-out
-    ${expanded ? "h-[75vh]" : "h-0"}
+    ${expanded ? "h-[60vh]" : "h-0"}
   `}
           >
             {messages.length === 0 && !isLoading ? (
               <div className="flex flex-1 items-center justify-center text-center">
-                <div className="max-w-md text-[17px] text-gray-500 italic leading-relaxed">
-                  {headings[selectedLang].disclaimer}
+                <div className="max-w-sm px-6">
+                  <div className="text-lg font-medium text-gray-700">
+                    {selectedLang === "kn"
+                      ? "ನಿಮ್ಮ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ"
+                      : "Ask your Islamic question"}
+                  </div>
+
+                  <div className="mt-2 text-sm text-gray-400">
+                    {selectedLang === "kn"
+                      ? "ಕೆಳಗಿನ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ."
+                      : "Type your question in the box below."}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -1119,7 +1129,8 @@ const ChatbotSection = () => {
             )}
           </div>
 
-          <div className="p-3 border-t border-gray-200 bg-white">
+          <div className="px-4 pt-3 pb-4 border-t border-gray-200 bg-white">
+            {/* Question input */}
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -1132,7 +1143,17 @@ const ChatbotSection = () => {
                     ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                     : "Type your question..."
                 }
-                className="flex-grow px-5 py-4 rounded-full text-gray-700 border border-gray-300 focus:ring-2 focus:ring-gray-300 text-base"
+                className="
+        flex-grow
+        px-5 py-4
+        rounded-full
+        text-gray-700
+        border-2 border-gray-400
+        focus:outline-none
+        focus:ring-2
+        focus:ring-gray-300
+        text-base
+      "
               />
 
               <button
@@ -1142,6 +1163,22 @@ const ChatbotSection = () => {
               >
                 <Send className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Bottom bezel / disclaimer */}
+            <div className="mt-2 pt-2 border-t border-gray-100 text-center">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <BookOpen className="w-3 h-3 text-gray-400" />
+                <span className="text-[10px] font-medium text-gray-500">
+                  {selectedLang === "kn"
+                    ? "ಉತ್ತರಗಳ ಮೂಲ"
+                    : "About these answers"}
+                </span>
+              </div>
+
+              <p className="text-[10px] leading-relaxed text-gray-600 font-semibold max-w-md mx-auto">
+                {headings[selectedLang].disclaimer}
+              </p>
             </div>
           </div>
         </div>

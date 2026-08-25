@@ -148,57 +148,77 @@ const BotResponseCard = ({
             const isExpanded = expandedSuggestionId === r.id;
             const canExpand = expandableSuggestions[r.id];
 
+            const imamName = r.imam_name || r.imamName;
+            const samputa = r.samputa;
+            const sanchike = r.sanchike;
+            const sourceTitle = r.source_title || r.sourceTitle;
+
+            let answerSource =
+              selectedLang === "kn"
+                ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
+                : "From the Archives of AlAnsar Weekly (1991–2016)";
+
+            if (imamName) {
+              answerSource = imamName;
+            } else if (samputa || sanchike) {
+              answerSource =
+                selectedLang === "kn"
+                  ? `${samputa ? `ಸಂಪುಟ ${samputa}` : ""}${
+                      samputa && sanchike ? " " : ""
+                    }${sanchike ? `ಸಂಚಿಕೆ ${sanchike}` : ""}`
+                  : `${samputa ? `Samputa ${samputa}` : ""}${
+                      samputa && sanchike ? " " : ""
+                    }${sanchike ? `Sanchike ${sanchike}` : ""}`;
+            } else if (sourceTitle) {
+              answerSource = sourceTitle;
+            }
+
             return (
               <div
                 key={r.id}
                 className="
-                w-full
-                rounded-xl
-                border border-gray-100
-                bg-white
-                overflow-hidden
-                transition
-              "
+    w-full
+    h-full
+    flex flex-col
+    rounded-xl
+    border border-gray-100
+    bg-white
+    p-4
+    transition
+  "
               >
-                {/* Question */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!canExpand) return;
-
-                    setExpandedSuggestionId(isExpanded ? null : r.id);
-                  }}
+                {/* Result card */}
+                <div
                   className="
-  w-full
-  text-left
-  p-3
-  rounded-xl
-  border border-gray-100
-  bg-white
-  hover:border-blue-200
-  hover:bg-blue-50/30
-  transition
-"
+    w-full
+    p-3
+    rounded-xl
+    border border-gray-100
+    bg-white
+    hover:border-blue-200
+    hover:bg-blue-50/30
+    transition
+  "
                 >
                   {/* Badge */}
                   <div className="mb-2">
                     <span
                       className={`
-                      inline-flex
-                      items-center
-                      px-2.5
-                      py-1
-                      rounded-full
-                      text-[10px]
-                      font-semibold
-                      ${
-                        r.score >= 0.85
-                          ? "bg-blue-50 text-blue-600"
-                          : r.score >= 0.65
-                            ? "bg-indigo-50 text-indigo-600"
-                            : "bg-gray-100 text-gray-600"
-                      }
-                    `}
+        inline-flex
+        items-center
+        px-2.5
+        py-1
+        rounded-full
+        text-[10px]
+        font-semibold
+        ${
+          r.score >= 0.85
+            ? "bg-green-50 text-green-600"
+            : r.score >= 0.65
+              ? "bg-blue-50 text-blue-600"
+              : "bg-yellow-50 text-yellow-700"
+        }
+      `}
                     >
                       {selectedLang === "kn"
                         ? r.score >= 0.85
@@ -214,73 +234,44 @@ const BotResponseCard = ({
                   <div className="text-sm leading-relaxed text-gray-700">
                     {r.question}
                   </div>
+
                   {/* Answer preview */}
-                  {!isExpanded && (
-                    <div
-                      ref={(el) => {
-                        answerRefs.current[r.id] = el;
-                      }}
-                      className="mt-2 text-sm leading-relaxed text-blue-600 line-clamp-2"
-                    >
-                      {r.answer}
-                    </div>
-                  )}
-
-                  {/* Arrow */}
-                  {canExpand && (
-                    <div className="flex justify-end mt-2">
-                      <span
-                        className={`
-        flex items-center justify-center
-        w-8 h-8
-        rounded-full
-        bg-gray-50
-        text-gray-400
-        transition-transform
-        ${isExpanded ? "rotate-90" : ""}
-      `}
-                      >
-                        →
-                      </span>
-                    </div>
-                  )}
-                </button>
-
-                {/* Expanded answer */}
-                {isExpanded && (
-                  <div className="px-4 pb-4">
-                    <div className="pt-3 border-t border-gray-100">
-                      <div
-                        className="text-sm leading-relaxed text-blue-200 bg-gray-50 rounded-lg p-3 whitespace-pre-line"
-                        style={{ color: "#2563eb" }}
-                      >
-                        {r.answer}
-                      </div>
-
-                      <div className="mt-3 flex justify-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => onShare(r.id)}
-                          className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-xs"
-                        >
-                          Share
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if (!canExpand) return;
-
-                            setExpandedSuggestionId(isExpanded ? null : r.id);
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-gray-700 text-white text-xs"
-                        >
-                          Open
-                        </button>
-                      </div>
-                    </div>
+                  <div
+                    ref={(el) => {
+                      answerRefs.current[r.id] = el;
+                    }}
+                    className="mt-2 text-sm leading-relaxed text-blue-600 line-clamp-2"
+                  >
+                    {r.answer}
                   </div>
-                )}
+
+                  {/* Source */}
+                  <div className="mt-3 text-xs text-gray-400">
+                    {answerSource}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4">
+                    <a
+                      href={`/qna/${r.id}?lang=${selectedLang}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      Open
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => onShare(r.id)}
+                      className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-blue-600"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      Share
+                    </button>
+                  </div>
+                </div>
               </div>
             );
           })}
@@ -343,17 +334,15 @@ const BotResponseCard = ({
   const editorNote =
     best?.editorNote || best?.editorNote_en || best?.editorNote_kn || "";
 
-  const imamName = best?.imamName;
-  const samputa = best?.samputa;
-  const sanchike = best?.sanchike;
-  const sourceTitle = best?.sourceTitle;
-
-  const sourceLabel = selectedLang === "kn" ? "ಉತ್ತರದ ಮೂಲ" : "Answer source";
+  const imamName = r.imam_name || r.imamName;
+  const samputa = r.samputa;
+  const sanchike = r.sanchike;
+  const sourceTitle = r.source_title || r.sourceTitle;
 
   let answerSource =
     selectedLang === "kn"
       ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
-      : "From the Archives of AlAnsar Weekly  (1991–2016)";
+      : "From the Archives of AlAnsar Weekly (1991–2016)";
 
   if (imamName) {
     answerSource = imamName;
@@ -366,6 +355,8 @@ const BotResponseCard = ({
         : `${samputa ? `Samputa ${samputa}` : ""}${
             samputa && sanchike ? " " : ""
           }${sanchike ? `Sanchike ${sanchike}` : ""}`;
+  } else if (sourceTitle) {
+    answerSource = sourceTitle;
   }
 
   if (result?.noMatch) {
@@ -548,7 +539,7 @@ const BotResponseCard = ({
       <div className="border-t border-gray-100 pt-2 mb-3 text-xs text-gray-500">
         <span className="font-medium text-gray-600">
           {selectedLang === "kn" ? "ಉತ್ತರದ ಮೂಲ" : "Answer source"}:
-        </span>{" "}
+        </span>
         {answerSource}
       </div>
       {editorNote && (
@@ -559,6 +550,7 @@ const BotResponseCard = ({
           <div className="whitespace-pre-line">{editorNote}</div>
         </div>
       )}
+
       <div className="flex justify-center mb-3 text-xs">
         <div className="flex justify-center gap-3 mb-3 text-xs">
           <button
@@ -579,6 +571,7 @@ const BotResponseCard = ({
           </a>
         </div>
       </div>
+
       <div className="flex flex-col items-center gap-2 mb-3 text-xs">
         {!isSystem && isHigh && (
           <div className="text-gray-500">
@@ -593,31 +586,25 @@ const BotResponseCard = ({
             Not the question you wanted to ask ?
           </div>
         )}
+        <div className="flex items-center gap-3 pt-3 mt-3 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={() => onShare(r.id)}
+            className="flex items-center gap-1.5 text-xs font-medium text-gray-600 hover:text-blue-600 transition"
+          >
+            <Share2 className="w-3.5 h-3.5" />
+            Share
+          </button>
 
-        <div className="flex gap-3">
-          {!isSystem && (
-            <button
-              onClick={onRephrase}
-              className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300 text-gray-700"
-            >
-              Rephrase query
-            </button>
-          )}
-
-          {!isSystem && (
-            <button
-              onClick={() =>
-                window.dispatchEvent(
-                  new CustomEvent("trigger-ask-question", {
-                    detail: { question: query },
-                  }),
-                )
-              }
-              className="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-            >
-              Submit Question
-            </button>
-          )}
+          <a
+            href={`/qna/${r.id}?lang=${selectedLang}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 transition"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            Open Q&A
+          </a>
         </div>
       </div>
       {result.relatedQuestions?.length > 0 && (
@@ -648,54 +635,15 @@ const BotResponseCard = ({
 /* ---------------------------------------------------------
    MESSAGE BUBBLE
 --------------------------------------------------------- */
-const MessageBubble = ({
-  message,
-  onRelatedClick,
-  onShare,
-  selectedLang,
-  onRephrase,
-}) => {
-  if (message.type === "user") {
-    return (
-      <div className="flex justify-end mb-5">
-        <div
-          className="bg-blue-600 text-white px-4 py-2.5 
-                                rounded-[16px_16px_4px_16px]
-                                max-w-[70%] text-sm "
-        >
-          {message.text}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex justify-start mb-6 w-full">
-      <div className="w-full">
-        <BotResponseCard
-          result={message.result}
-          selectedLang={selectedLang}
-          query={message.query}
-          onRelatedClick={onRelatedClick}
-          onShare={onShare}
-          onRephrase={() => onRephrase(message.query)}
-        />
-      </div>
-    </div>
-  );
-};
 
 /* ---------------------------------------------------------
    MAIN CHATBOT
 --------------------------------------------------------- */
 const ChatbotSection = () => {
-  const [messages, setMessages] = useState([]);
+  const [searchResult, setSearchResult] = useState(null);
   const [userInput, setUserInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [seenQuestions, setSeenQuestions] = useState(new Set());
-  const chatRef = useRef(null);
   const inputRef = useRef(null);
-  const [expanded, setExpanded] = useState(false);
 
   //toaster notification
   const [toast, setToast] = useState(null);
@@ -735,86 +683,6 @@ const ChatbotSection = () => {
     });
   }
 
-  //chatbox expand useEffect
-  useEffect(() => {
-    const expandChat = () => {
-      setExpanded(true);
-    };
-
-    window.addEventListener("expand-chatbot", expandChat);
-
-    return () => {
-      window.removeEventListener("expand-chatbot", expandChat);
-    };
-  }, []);
-
-  //chat history
-  useEffect(() => {
-    const saved = localStorage.getItem("chat_history");
-
-    if (!saved) return;
-
-    try {
-      const parsed = JSON.parse(saved);
-
-      const TWO_HOURS = 2 * 60 * 60 * 1000;
-
-      // ✅ NEW FORMAT (object with timestamp)
-      if (parsed?.messages && parsed?.timestamp) {
-        if (Date.now() - parsed.timestamp > TWO_HOURS) {
-          localStorage.removeItem("chat_history");
-          return;
-        }
-
-        setMessages(parsed.messages);
-        return;
-      }
-
-      // ✅ OLD FORMAT (array) — fallback support
-      if (Array.isArray(parsed)) {
-        setMessages(parsed.slice(-20)); // also cap it
-      }
-    } catch {
-      localStorage.removeItem("chat_history");
-    }
-  }, []);
-
-  useEffect(() => {
-    chatRef.current?.scrollTo({
-      top: chatRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  }, [messages, isLoading]);
-
-  useEffect(() => {
-    if (!expanded) return;
-
-    setTimeout(() => {
-      chatRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 250);
-  }, [expanded]);
-
-  //chat history
-  useEffect(() => {
-    if (messages.length === 0) {
-      localStorage.removeItem("chat_history");
-    } else {
-      const MAX_MESSAGES = 30;
-      const trimmedMessages = messages.slice(-MAX_MESSAGES);
-
-      localStorage.setItem(
-        "chat_history",
-        JSON.stringify({
-          messages: trimmedMessages,
-          timestamp: Date.now(),
-        }),
-      );
-    }
-  }, [messages]);
-
   //qna Share
   async function shareQA(id) {
     const shareUrl = `${window.location.origin}/qna/${id}?lang=${selectedLang}`;
@@ -849,7 +717,11 @@ const ChatbotSection = () => {
     const queryText = (textOverride ?? userInput).trim();
     if (!queryText) return;
 
-    if (!textOverride) setUserInput("");
+    setSearchResult(null);
+
+    if (!textOverride) {
+      setUserInput("");
+    }
 
     const normalized = queryText.toLowerCase();
 
@@ -864,39 +736,30 @@ const ChatbotSection = () => {
     ];
 
     if (greetings.some((g) => normalized.startsWith(g))) {
-      setMessages((prev) => [
-        ...prev,
-        { type: "user", text: queryText },
-        {
-          type: "bot",
-          query: queryText,
-          result: {
-            isSystem: true,
-            bestMatch: {
-              question:
-                selectedLang === "kn"
-                  ? "ಈ ಚಾಟ್‌ಬಾಟ್ ಬಗ್ಗೆ"
-                  : "About this chatbot",
-              answer:
-                selectedLang === "kn"
-                  ? "ನಾನು AlAnsarWeekly ಪ್ರಕಟಿಸಿದ ದೃಢೀಕೃತ ಪ್ರಶ್ನೋತ್ತರಗಳ ಆಧಾರದ ಮೇಲೆ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ ನೀಡುತ್ತೇನೆ.\n\nಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿರುವ ಕೆಲವು ಉತ್ತರಗಳು AlAnsar Weeklyಯ ಕೇಳಿ ನೋಡಿ ವಿಭಾಗದಲ್ಲಿ ಹಿಂದೆಯೇ ಕೇಳಲಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದವಾಗಿರುತ್ತವೆ."
-                  : "I provide answers to Islamic questions based on AlAnsarWeekly’s verified Q&A archive.\n\nSome answers in English are translations of questions previously asked in the Keli Nodi section of AlAnsar Weekly.",
-              score: 1,
-            },
-            relatedQuestions: [],
-          },
+      setSearchResult({
+        mode: "system",
+        query: queryText,
+        bestMatch: {
+          question:
+            selectedLang === "kn" ? "ಈ ಚಾಟ್‌ಬಾಟ್ ಬಗ್ಗೆ" : "About this chatbot",
+          answer:
+            selectedLang === "kn"
+              ? "ನಾನು AlAnsarWeekly ಪ್ರಕಟಿಸಿದ ದೃಢೀಕೃತ ಪ್ರಶ್ನೋತ್ತರಗಳ ಆಧಾರದ ಮೇಲೆ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ ನೀಡುತ್ತೇನೆ.\n\nಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿರುವ ಕೆಲವು ಉತ್ತರಗಳು AlAnsar Weeklyಯ ಕೇಳಿ ನೋಡಿ ವಿಭಾಗದಲ್ಲಿ ಹಿಂದೆಯೇ ಕೇಳಲಾದ ಪ್ರಶ್ನೆಗಳ ಅನುವಾದವಾಗಿರುತ್ತವೆ."
+              : "I provide answers to Islamic questions based on AlAnsarWeekly’s verified Q&A archive.\n\nSome answers in English are translations of questions previously asked in the Keli Nodi section of AlAnsar Weekly.",
         },
-      ]);
+      });
+
       return;
     }
 
-    setMessages((prev) => [...prev, { type: "user", text: queryText }]);
     setIsLoading(true);
 
     try {
       const res = await fetch("/api/qa-search", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           query: queryText,
           lang: selectedLang,
@@ -904,101 +767,75 @@ const ChatbotSection = () => {
         }),
       });
 
-      //console remove
       const data = await res.json();
 
       if (data.noMatch) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            type: "bot",
-            result: {
-              noMatch: true,
-            },
-            query: queryText,
-          },
-        ]);
+        setSearchResult({
+          mode: "noMatch",
+          query: queryText,
+          suggestions: [],
+        });
 
         setIsLoading(false);
         return;
       }
 
       console.log("QA SEARCH RESPONSE:", data);
-      // mark best match as seen
 
-      const nextSeen = new Set(seenQuestions);
+      if (data.mode === "suggestions") {
+        setSearchResult({
+          mode: "suggestions",
+          query: queryText,
+          suggestions: (data.suggestions || []).slice(0, 5),
+        });
 
-      if (data.bestMatch?.question) {
-        nextSeen.add(data.bestMatch.question);
-        setSeenQuestions(nextSeen);
+        setIsLoading(false);
+        return;
       }
 
-      const relatedFiltered = (data.related || [])
-        .filter((r) => {
-          if (!r.question) return false;
-          if (r.score != null && r.score < CONFIDENCE.LOW) return false;
-          if (nextSeen.has(r.question)) return false;
-          return true;
-        })
-        .slice(0, 3)
-        .map((r) => ({ displayText: r.question }));
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "bot",
-          result:
-            data.mode === "suggestions"
-              ? {
-                  mode: "suggestions",
-                  suggestions: data.suggestions || [],
-                }
-              : data.mode === "explore"
-                ? {
-                    mode: "explore",
-                    results: data.results || [],
-                  }
-                : {
-                    bestMatch: data.bestMatch
-                      ? {
-                          id: data.bestMatch.id,
-                          question: data.bestMatch.question,
-                          answer: data.bestMatch.answer,
-                          score: data.bestMatch.score ?? 0,
-
-                          editorNote:
-                            selectedLang === "kn"
-                              ? data.bestMatch.editorNote_kn
-                              : data.bestMatch.editorNote_en,
-
-                          imamName: data.bestMatch.imam_name,
-
-                          samputa: data.bestMatch.samputa,
-
-                          sanchike: data.bestMatch.sanchike,
-
-                          sourceTitle:
-                            data.bestMatch.source_title ||
-                            "Al Ansar Knowledge Base",
-                        }
-                      : null,
-                    relatedQuestions: relatedFiltered,
-                  },
-
+      if (data.mode === "explore") {
+        setSearchResult({
+          mode: "explore",
           query: queryText,
-        },
-      ]);
+          results: data.results || [],
+        });
+
+        setIsLoading(false);
+        return;
+      }
+
+      setSearchResult({
+        mode: "answer",
+        query: queryText,
+        bestMatch: data.bestMatch
+          ? {
+              id: data.bestMatch.id,
+              question: data.bestMatch.question,
+              answer: data.bestMatch.answer,
+              score: data.bestMatch.score ?? 0,
+
+              editorNote:
+                selectedLang === "kn"
+                  ? data.bestMatch.editorNote_kn
+                  : data.bestMatch.editorNote_en,
+
+              imamName: data.bestMatch.imam_name,
+              samputa: data.bestMatch.samputa,
+              sanchike: data.bestMatch.sanchike,
+
+              sourceTitle:
+                data.bestMatch.source_title || "Al Ansar Knowledge Base",
+            }
+          : null,
+      });
     } catch (err) {
       console.error("QA SEARCH ERROR:", err);
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: "bot",
-          result: { noMatch: true },
-          query: queryText,
-        },
-      ]);
+      setSearchResult({
+        mode: "noMatch",
+        query: queryText,
+        suggestions: [],
+      });
     }
 
     setIsLoading(false);
@@ -1032,156 +869,288 @@ const ChatbotSection = () => {
           </p>
         </div>
       </header>
-      <div
-        className={`
-    w-full max-w-3xl mx-auto
-    bg-white border border-gray-200
-    overflow-hidden border-2 border-gray-400
-    transition-all duration-500
-    ${expanded ? "rounded-lg" : "rounded-2xl"}
-  `}
-      >
-        {/* Search bar */}
-        {!expanded && (
-          <button
-            onClick={() => {
-              setExpanded(true);
 
-              setTimeout(() => {
-                document.getElementById("chatbot-section")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }, 300);
-            }}
+      {/* Search */}
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="flex items-center gap-2">
+          <input
+            ref={inputRef}
+            disabled={isLoading}
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            placeholder={
+              selectedLang === "kn"
+                ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
+                : "Ask your Islamic question..."
+            }
             className="
-      w-full
-      px-6
-      py-5
-      flex
-      items-center
-      justify-between
-      text-left
-      bg-white
-      border-gray-400
-    "
-          >
-            <span className="text-gray-500">
-              {selectedLang === "kn"
-                ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ..."
-                : "Ask your Islamic question..."}
-            </span>
-
-            <Search className="w-5 h-5 text-gray-400" />
-          </button>
-        )}
-        {/* Chat UI */}
-        <div
-          className={`
-    overflow-hidden
-    transition-all duration-700 ease-in-out
-    ${expanded ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}
-  `}
-        >
-          <div
-            ref={chatRef}
-            className={`
-    px-4 py-6 overflow-y-auto flex flex-col border-t border-gray-100
-    transition-all duration-700 ease-in-out
-    ${expanded ? "h-[60vh]" : "h-0"}
-  `}
-          >
-            {messages.length === 0 && !isLoading ? (
-              <div className="flex flex-1 items-center justify-center text-center">
-                <div className="max-w-sm px-6">
-                  <div className="text-lg font-medium text-gray-700">
-                    {selectedLang === "kn"
-                      ? "ನಿಮ್ಮ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ"
-                      : "Ask your Islamic question"}
-                  </div>
-
-                  <div className="mt-2 text-sm text-gray-400">
-                    {selectedLang === "kn"
-                      ? "ಕೆಳಗಿನ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಟೈಪ್ ಮಾಡಿ."
-                      : "Type your question in the box below."}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                {messages.map((m, i) => (
-                  <MessageBubble
-                    key={i}
-                    message={m}
-                    selectedLang={selectedLang}
-                    onRelatedClick={handleSend}
-                    onShare={shareQA}
-                    onRephrase={handleRephrase}
-                  />
-                ))}
-
-                {isLoading && (
-                  <div className="flex justify-start mb-4">
-                    <TypingDots />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className="px-4 pt-3 pb-4 border-t border-gray-200 bg-white">
-            {/* Question input */}
-            <div className="flex items-center gap-2">
-              <input
-                ref={inputRef}
-                disabled={isLoading}
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder={
-                  selectedLang === "kn"
-                    ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
-                    : "Type your question..."
-                }
-                className="
         flex-grow
         px-5 py-4
         rounded-full
         text-gray-700
-        border-2 border-gray-400
+        bg-white
+        border border-gray-300
         focus:outline-none
         focus:ring-2
-        focus:ring-gray-300
+        focus:ring-blue-100
+        focus:border-blue-400
         text-base
       "
-              />
+          />
 
-              <button
-                disabled={isLoading || !userInput.trim()}
-                onClick={() => handleSend()}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full disabled:opacity-40"
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </div>
+          <button
+            disabled={isLoading || !userInput.trim()}
+            onClick={() => handleSend()}
+            className="
+        bg-blue-600
+        hover:bg-blue-700
+        text-white
+        p-4
+        rounded-full
+        disabled:opacity-40
+        transition
+      "
+          >
+            <Send className="w-5 h-5" />
+          </button>
+        </div>
 
-            {/* Bottom bezel / disclaimer */}
-            <div className="mt-2 pt-2 border-t border-gray-100 text-center">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <BookOpen className="w-3 h-3 text-gray-400" />
-                <span className="text-[10px] font-medium text-gray-500">
-                  {selectedLang === "kn"
-                    ? "ಉತ್ತರಗಳ ಮೂಲ"
-                    : "About these answers"}
-                </span>
-              </div>
+        {/* Source bezel */}
+        <div className="mt-3 pt-3 border-t border-gray-200 text-center">
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <BookOpen className="w-3 h-3 text-gray-400" />
 
-              <p className="text-[10px] leading-relaxed text-gray-600 font-semibold max-w-md mx-auto">
-                {headings[selectedLang].disclaimer}
+            <span className="text-[10px] font-medium text-gray-500">
+              {selectedLang === "kn" ? "ಉತ್ತರಗಳ ಮೂಲ" : "About these answers"}
+            </span>
+          </div>
+
+          <p className="text-[10px] leading-relaxed text-gray-500 max-w-xl mx-auto">
+            {headings[selectedLang].disclaimer}
+          </p>
+        </div>
+
+        {/* Search results */}
+
+        {isLoading ? (
+          <div className="py-10 flex justify-center">
+            <TypingDots />
+          </div>
+        ) : searchResult ? (
+          <div className="w-full max-w-5xl mx-auto">
+            {/* Results */}
+            {searchResult.mode !== "noMatch" && (
+              <>
+                <div className="mb-4">
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    {selectedLang === "kn"
+                      ? "ನಿಮ್ಮ ಹುಡುಕಾಟದ ಆಧಾರದ ಮೇಲಿನ ಪ್ರಶ್ನೆಗಳು"
+                      : "Questions based on your search"}
+                  </h2>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    {selectedLang === "kn"
+                      ? "ಉತ್ತರವನ್ನು ಓದಲು ಒಂದು ಪ್ರಶ್ನೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ."
+                      : "Select a question to read the full answer."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {(searchResult.mode === "suggestions"
+                    ? searchResult.suggestions
+                    : searchResult.mode === "answer" && searchResult.bestMatch
+                      ? [searchResult.bestMatch]
+                      : searchResult.mode === "explore"
+                        ? searchResult.results
+                        : []
+                  )
+                    .slice(0, 5)
+                    .map((r) => {
+                      const badge =
+                        r.score >= CONFIDENCE.HIGH
+                          ? {
+                              label:
+                                selectedLang === "kn"
+                                  ? "ಬಲವಾದ ಹೊಂದಾಣಿಕೆ"
+                                  : "Strong match",
+                              className:
+                                "bg-green-50 text-green-700 border-green-100",
+                            }
+                          : r.score >= 0.65
+                            ? {
+                                label:
+                                  selectedLang === "kn"
+                                    ? "ತುಂಬಾ ಹತ್ತಿರ"
+                                    : "Very close",
+                                className:
+                                  "bg-blue-50 text-blue-700 border-blue-100",
+                              }
+                            : {
+                                label:
+                                  selectedLang === "kn"
+                                    ? "ಹತ್ತಿರದ ಹೊಂದಾಣಿಕೆ"
+                                    : "Close match",
+                                className:
+                                  "bg-yellow-50 text-yellow-700 border-yellow-100",
+                              };
+
+                      const answer = r.answer || "";
+                      const truncatedAnswer =
+                        answer.length > 180
+                          ? `${answer.slice(0, 180).trim()}...`
+                          : answer;
+
+                      const imamName = r.imamName || r.imam_name;
+                      const samputa = r.samputa;
+                      const sanchike = r.sanchike;
+                      const sourceTitle = r.sourceTitle || r.source_title;
+
+                      let attribution =
+                        selectedLang === "kn"
+                          ? "ಅಲ್ಅನ್ಸಾರ್ ವಾರಪತ್ರಿಕೆಯಿಂದ ಸಂಗ್ರಹವಾದ ಮಾಹಿತಿ (1991–2016)"
+                          : "From the Archives of AlAnsar Weekly (1991–2016)";
+
+                      if (imamName) {
+                        attribution = imamName;
+                      } else if (samputa || sanchike) {
+                        attribution =
+                          selectedLang === "kn"
+                            ? `${samputa ? `ಸಂಪುಟ ${samputa}` : ""}${
+                                samputa && sanchike ? " " : ""
+                              }${sanchike ? `ಸಂಚಿಕೆ ${sanchike}` : ""}`
+                            : `${samputa ? `Samputa ${samputa}` : ""}${
+                                samputa && sanchike ? " " : ""
+                              }${sanchike ? `Sanchike ${sanchike}` : ""}`;
+                      } else if (sourceTitle) {
+                        attribution = sourceTitle;
+                      }
+
+                      return (
+                        <article
+                          key={r.id}
+                          className="
+                    group
+                    bg-white
+                    border border-gray-200
+                    rounded-xl
+                    p-4
+                    hover:border-blue-200
+                    hover:shadow-sm
+                    transition
+                    flex
+                    flex-col
+                  "
+                        >
+                          <span
+                            className={`
+                      self-start
+                      px-2.5 py-1
+                      rounded-full
+                      border
+                      text-[10px]
+                      font-semibold
+                      ${badge.className}
+                    `}
+                          >
+                            {badge.label}
+                          </span>
+
+                          <h3 className="mt-3 text-sm font-semibold text-gray-900 leading-snug">
+                            {r.question}
+                          </h3>
+
+                          {truncatedAnswer && (
+                            <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                              {truncatedAnswer}
+                            </p>
+                          )}
+
+                          {attribution && (
+                            <div className="mt-3 text-[10px] text-gray-400">
+                              {attribution}
+                            </div>
+                          )}
+
+                          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-4">
+                            <a
+                              href={`/qna/${r.id}?lang=${selectedLang}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              Open
+                            </a>
+
+                            <button
+                              type="button"
+                              onClick={() => shareQA(r.id)}
+                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 hover:text-blue-600"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                              Share
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                </div>
+              </>
+            )}
+
+            {/* Always show fallback after a search */}
+            <div className="mt-5 border border-gray-200 rounded-xl px-4 py-4 text-center">
+              <p className="text-xs font-medium text-gray-600 mb-3">
+                {selectedLang === "kn"
+                  ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಸಿಗಲಿಲ್ಲವೇ?"
+                  : "Didn't find the question you're looking for?"}
               </p>
+
+              <div className="flex justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleRephrase(searchResult.query)}
+                  className="
+            px-4 py-2
+            rounded-lg
+            bg-gray-100
+            hover:bg-gray-200
+            text-gray-700
+            text-xs
+            font-semibold
+          "
+                >
+                  {selectedLang === "kn" ? "ಮರುಹೊಂದಿಸಿ" : "Rephrase"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    window.dispatchEvent(
+                      new CustomEvent("trigger-ask-question", {
+                        detail: { question: searchResult.query },
+                      }),
+                    )
+                  }
+                  className="
+            px-4 py-2
+            rounded-lg
+            bg-blue-600
+            hover:bg-blue-700
+            text-white
+            text-xs
+            font-semibold
+          "
+                >
+                  {selectedLang === "kn"
+                    ? "ಪ್ರಶ್ನೆ ಸಲ್ಲಿಸಿ"
+                    : "Submit Question"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );

@@ -1102,9 +1102,13 @@ const ChatbotSection = () => {
             {/* Always show fallback after a search */}
             <div className="mt-5 border border-gray-200 rounded-xl px-4 py-4 text-center">
               <p className="text-xs font-medium text-gray-600 mb-3">
-                {selectedLang === "kn"
-                  ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಸಿಗಲಿಲ್ಲವೇ?"
-                  : "Didn't find the question you're looking for?"}
+                {searchResult.mode === "noMatch"
+                  ? selectedLang === "kn"
+                    ? "ಯಾವುದೇ ಪ್ರಶ್ನೆಗಳು ಕಂಡುಬಂದಿಲ್ಲ"
+                    : "No questions found"
+                  : selectedLang === "kn"
+                    ? "ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪ್ರಶ್ನೆ ಸಿಗಲಿಲ್ಲವೇ?"
+                    : "Didn't find the question you're looking for?"}
               </p>
 
               <div className="flex justify-center gap-2">

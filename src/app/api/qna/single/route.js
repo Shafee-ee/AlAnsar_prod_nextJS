@@ -208,6 +208,7 @@ export async function POST(req) {
           await submissionRef.update({
             promoted_qna_id: newQnaId,
             email_sent: true,
+            status: "answered",
           });
         }
       } catch (err) {

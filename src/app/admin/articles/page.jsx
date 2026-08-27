@@ -146,6 +146,8 @@ function ManageArticles() {
             <th className="p-3">Status</th>
             <th className="p-3">Featured</th>
             <th className="p-3">Created</th>
+            <th className="p-3">Updated</th>
+            <th className="p-3">Updated</th>
             <th className="p-3">Actions</th>
           </tr>
         </thead>
@@ -176,7 +178,13 @@ function ManageArticles() {
                 <td className="p-3">{a.isFeatured ? "⭐ Yes" : "—"}</td>
                 <td className="p-3">
                   {a.createdAt?._seconds
-                    ? new Date(a.createdAt._seconds * 1000).toLocaleDateString()
+                    ? new Date(a.createdAt._seconds * 1000).toLocaleString()
+                    : "-"}
+                </td>
+
+                <td className="p-3">
+                  {a.updatedAt?._seconds
+                    ? new Date(a.updatedAt._seconds * 1000).toLocaleString()
                     : "-"}
                 </td>
 

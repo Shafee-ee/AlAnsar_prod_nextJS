@@ -62,7 +62,7 @@ export default function NewArticlePage() {
             className="w-full p-2 border rounded"
           >
             <option value="">Select Category</option>
-            <option value="Smaniyaru">Smaniyaru</option>
+            <option value="Smariniyaru">Smaniyaru</option>
             <option value="Islamic History">Islamic history</option>
             <option value="Hadith">Hadith </option>
             <option value="Fiqh">Fiqh</option>

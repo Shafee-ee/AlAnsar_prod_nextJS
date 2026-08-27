@@ -182,6 +182,7 @@ export async function POST(req) {
       ustaad_answered_from: email.from || "",
       ustaad_email_id: emailId,
       ustaad_email_subject: subject,
+      status: "answered_received",
     });
 
     /*

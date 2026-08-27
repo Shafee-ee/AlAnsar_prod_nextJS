@@ -77,7 +77,7 @@ export default function QnaSubmissionsPage() {
       <h1 className="text-xl font-semibold mb-4">Manage Submissions</h1>
 
       <div className="flex gap-3 mb-4">
-        {["pending", "approved", "rejected"].map((status) => (
+        {["pending", "approved", "rejected", "answered"].map((status) => (
           <button
             key={status}
             onClick={() => setActiveStatus(status)}
@@ -107,7 +107,7 @@ export default function QnaSubmissionsPage() {
             key={item.id}
             className="grid grid-cols-4 items-center px-4 py-3 border-t text-sm"
           >
-            {/* Question */}
+            {/* Question + Answer */}
             <div
               onClick={() =>
                 setExpandedId((prev) => (prev === item.id ? null : item.id))
@@ -116,8 +116,16 @@ export default function QnaSubmissionsPage() {
                 expandedId === item.id ? "" : "truncate"
               }`}
             >
-              {item.question_original}
+              <div>{item.question_original}</div>
+
+              {activeStatus === "answered" && (
+                <div className="mt-2 text-gray-600">
+                  <span className="font-medium">Answer:</span>{" "}
+                  {item.ustaad_answer || "-"}
+                </div>
+              )}
             </div>
+
             {/* Submitted Date */}
 
             <div>
@@ -127,17 +135,20 @@ export default function QnaSubmissionsPage() {
             </div>
 
             {/* Status */}
+            {/* Status */}
             <div>
               <span
                 className={`px-2 py-1 rounded text-xs font-medium ${
                   item.status === "pending"
                     ? "bg-yellow-100 text-yellow-700"
-                    : item.status === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
+                    : item.ustaad_answer
+                      ? "bg-blue-100 text-blue-700"
+                      : item.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
                 }`}
               >
-                {item.status.toUpperCase()}
+                {item.ustaad_answer ? "RESPONDED" : item.status.toUpperCase()}
               </span>
             </div>
 

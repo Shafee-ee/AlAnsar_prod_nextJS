@@ -23,7 +23,7 @@ export default function AtticlesPage() {
     },
     {
       value: "Smariniyaru",
-      label: lang === "kn" ? "ಸ್ಮರಣೀಯರು" : "Notable Personalities",
+      label: lang === "kn" ? "ಸ್ಮರಣೀಯರು" : "Eminent Personalities",
     },
     {
       value: "Vishleshanagalu",

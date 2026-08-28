@@ -31,7 +31,7 @@ export default function QnaSubmissionsPage() {
     if (!confirm("Delete this submission?")) return;
 
     try {
-      await fetch("/api/qna/delete-submission", {
+      await fetch("/api/qna/delete-submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

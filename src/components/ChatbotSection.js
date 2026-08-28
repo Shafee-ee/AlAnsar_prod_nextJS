@@ -917,7 +917,7 @@ const ChatbotSection = () => {
         </div>
 
         {/* Source bezel */}
-        <div className="mt-3 pt-3 border-t border-gray-200 text-center">
+        <div className="mt-3 pt-3 pb-2 border-b border-gray-200 text-center">
           <div className="flex items-center justify-center gap-1.5 mb-1">
             <BookOpen className="w-3 h-3 text-gray-400" />
 
@@ -942,7 +942,7 @@ const ChatbotSection = () => {
             {/* Results */}
             {searchResult.mode !== "noMatch" && (
               <>
-                <div className="mb-4">
+                <div className="mb-4 mt-2 ">
                   <h2 className="text-sm font-semibold text-gray-900">
                     {selectedLang === "kn"
                       ? "ನಿಮ್ಮ ಹುಡುಕಾಟದ ಆಧಾರದ ಮೇಲಿನ ಪ್ರಶ್ನೆಗಳು"

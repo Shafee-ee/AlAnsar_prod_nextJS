@@ -170,12 +170,21 @@ export async function POST(req) {
      * 5. SAVE USTAAD'S REPLY
      * ---------------------------------------------------------
      */
+
     const rawReply = email.text || email.html || "";
 
-    const replyText = rawReply
+    let replyText = rawReply
       .replace(/\r\n/g, "\n")
       .split(/\s+On .*?wrote:/is)[0]
       .trim();
+
+    const signatureStart = replyText.search(
+      /\n\s*Thanks,\s*\nIqbal Ahmed Mueenuddin\s*\nManaging Director/i,
+    );
+
+    if (signatureStart !== -1) {
+      replyText = replyText.slice(0, signatureStart).trim();
+    }
     await submissionRef.update({
       ustaad_answer: replyText,
       ustaad_answered_at: new Date(),

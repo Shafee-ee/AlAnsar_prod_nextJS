@@ -77,19 +77,27 @@ export default function QnaSubmissionsPage() {
       <h1 className="text-xl font-semibold mb-4">Manage Submissions</h1>
 
       <div className="flex gap-3 mb-4">
-        {["pending", "approved", "rejected", "answered"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setActiveStatus(status)}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              activeStatus === status
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            {status.toUpperCase()}
-          </button>
-        ))}
+        {["pending", "approved", "answered_received", "rejected"].map(
+          (status) => (
+            <button
+              key={status}
+              onClick={() => setActiveStatus(status)}
+              className={`px-4 py-2 rounded-md text-sm font-medium ${
+                activeStatus === status
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-700"
+              }`}
+            >
+              {status === "pending"
+                ? "PENDING"
+                : status === "approved"
+                  ? "ANSWER PENDING"
+                  : status === "answered_received"
+                    ? "ANSWER RECEIVED"
+                    : "REJECTED"}
+            </button>
+          ),
+        )}
       </div>
 
       <div className="border border-gray-300">
@@ -118,7 +126,7 @@ export default function QnaSubmissionsPage() {
             >
               <div>{item.question_original}</div>
 
-              {activeStatus === "answered" && (
+              {activeStatus === "answered_received" && (
                 <div className="mt-2 text-gray-600">
                   <span className="font-medium">Answer:</span>{" "}
                   {item.ustaad_answer || "-"}
@@ -141,14 +149,20 @@ export default function QnaSubmissionsPage() {
                 className={`px-2 py-1 rounded text-xs font-medium ${
                   item.status === "pending"
                     ? "bg-yellow-100 text-yellow-700"
-                    : item.ustaad_answer
+                    : item.status === "approved"
                       ? "bg-blue-100 text-blue-700"
-                      : item.status === "approved"
+                      : item.status === "answered_received"
                         ? "bg-green-100 text-green-700"
                         : "bg-red-100 text-red-700"
                 }`}
               >
-                {item.ustaad_answer ? "RESPONDED" : item.status.toUpperCase()}
+                {item.status === "pending"
+                  ? "PENDING"
+                  : item.status === "approved"
+                    ? "ANSWER PENDING"
+                    : item.status === "answered_received"
+                      ? "ANSWER RECEIVED"
+                      : "REJECTED"}
               </span>
             </div>
 
@@ -172,7 +186,7 @@ export default function QnaSubmissionsPage() {
                 </>
               )}
 
-              {item.status === "approved" && !item.promoted_qna_id && (
+              {item.status === "answered_received" && !item.promoted_qna_id && (
                 <button
                   onClick={() => handlePromote(item)}
                   className="px-2 py-1 bg-blue-600 text-white text-xs rounded"

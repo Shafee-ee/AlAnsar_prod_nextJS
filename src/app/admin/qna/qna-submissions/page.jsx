@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function QnaSubmissionsPage() {
   const [submissions, setSubmissions] = useState([]);
+  const [promotedSubmissions, setPromotedSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeStatus, setActiveStatus] = useState("pending");
   const [expandedId, setExpandedId] = useState(null);
@@ -13,34 +14,63 @@ export default function QnaSubmissionsPage() {
 
   useEffect(() => {
     setLoading(true);
-    fetchSubmissions(activeStatus);
+
+    Promise.all([
+      fetchSubmissions(activeStatus),
+      fetchPromotedSubmissions(),
+    ]).finally(() => {
+      setLoading(false);
+    });
   }, [activeStatus]);
 
   const fetchSubmissions = async (status) => {
     try {
       const res = await fetch(`/api/qna/submissions-list?status=${status}`);
 
+      if (!res.ok) {
+        throw new Error("Failed to fetch submissions");
+      }
+
       const data = await res.json();
 
       setSubmissions(data.submissions || []);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
+  const fetchPromotedSubmissions = async () => {
+    try {
+      const res = await fetch("/api/qna/submissions-list?status=promoted");
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch promoted submissions");
+      }
+
+      const data = await res.json();
+
+      setPromotedSubmissions(data.submissions || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const deleteSubmission = async (id) => {
     if (!confirm("Delete this submission?")) return;
 
     try {
-      await fetch("/api/qna/delete-submissions", {
+      const res = await fetch("/api/qna/delete-submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
       });
 
+      if (!res.ok) {
+        throw new Error("Failed to delete submission");
+      }
+
       setSubmissions((prev) => prev.filter((item) => item.id !== id));
+
+      setPromotedSubmissions((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       console.error(err);
     }
@@ -238,14 +268,43 @@ export default function QnaSubmissionsPage() {
           <h2 className="text-lg font-semibold mb-3">Promoted Questions</h2>
 
           <div className="border border-gray-300">
-            <div className="grid grid-cols-2 bg-gray-200 px-4 py-3 text-sm font-semibold">
+            <div className="grid grid-cols-3 bg-gray-200 px-4 py-3 text-sm font-semibold">
               <div>Question (EN)</div>
               <div>Promoted on</div>
+              <div className="text-center">Actions</div>
             </div>
 
-            <div className="px-4 py-6 text-center text-sm text-gray-500">
-              Promoted questions will appear here.
-            </div>
+            {promotedSubmissions.length === 0 ? (
+              <div className="px-4 py-6 text-center text-sm text-gray-500">
+                No promoted questions yet.
+              </div>
+            ) : (
+              promotedSubmissions.map((item) => (
+                <div
+                  key={item.id}
+                  className="grid grid-cols-3 items-center px-4 py-3 border-t text-sm"
+                >
+                  <div>{item.question_original}</div>
+
+                  <div>
+                    {item.createdAt?._seconds
+                      ? new Date(
+                          item.createdAt._seconds * 1000,
+                        ).toLocaleDateString()
+                      : "-"}
+                  </div>
+
+                  <div className="text-center">
+                    <button
+                      onClick={() => deleteSubmission(item.id)}
+                      className="text-red-600 hover:text-red-800 text-lg"
+                    >
+                      🗑
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       )}

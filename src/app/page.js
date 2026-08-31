@@ -86,7 +86,17 @@ export default function Home() {
             <AskQuestionBox
               initialQuestion={prefillQuestion}
               forceOpen={true}
-              onClose={() => setShowAskBox(false)}
+              onClose={() => {
+                setShowAskBox(false);
+                setPrefillQuestion("");
+
+                requestAnimationFrame(() => {
+                  document.getElementById("chatbot-section")?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                });
+              }}
             />
           )}
         </div>

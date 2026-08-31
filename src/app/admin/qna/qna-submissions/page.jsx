@@ -107,10 +107,10 @@ export default function QnaSubmissionsPage() {
   };
 
   const getStatusLabel = (status) => {
-    if (status === "pending") return "PENDING";
-    if (status === "approved") return "ANSWER PENDING";
-    if (status === "answered_received") return "ANSWERED";
-    if (status === "rejected") return "REJECTED";
+    if (status === "pending") return "pending";
+    if (status === "approved") return "No answer";
+    if (status === "answered_received") return "Answer received";
+    if (status === "rejected") return "Rejected";
 
     return status?.toUpperCase() || "-";
   };
@@ -162,10 +162,11 @@ export default function QnaSubmissionsPage() {
 
       {/* Main table */}
       <div className="border border-gray-300">
-        <div className="grid grid-cols-4 bg-gray-200 px-4 py-3 text-sm font-semibold">
+        <div className="grid grid-cols-5 bg-gray-200 px-4 py-3 text-sm font-semibold">
           <div>Question (EN)</div>
           <div>Submitted on</div>
           <div>Status</div>
+          <div>Contact</div>
           <div className="text-center">Actions</div>
         </div>
 
@@ -177,7 +178,7 @@ export default function QnaSubmissionsPage() {
           submissions.map((item) => (
             <div
               key={item.id}
-              className="grid grid-cols-4 items-center px-4 py-3 border-t text-sm"
+              className="grid grid-cols-5 items-center px-4 py-3 border-t text-sm"
             >
               {/* Question + Answer */}
               <div
@@ -217,6 +218,22 @@ export default function QnaSubmissionsPage() {
                 >
                   {getStatusLabel(item.status)}
                 </span>
+              </div>
+
+              {/* Contact */}
+              <div>
+                {item.email && item.phone ? (
+                  <div>
+                    <div>{item.phone}</div>
+                    <div>{item.email}</div>
+                  </div>
+                ) : item.phone ? (
+                  item.phone
+                ) : item.email ? (
+                  item.email
+                ) : (
+                  "Anonymous"
+                )}
               </div>
 
               {/* Actions */}

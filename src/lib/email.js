@@ -3,8 +3,8 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
-  "muyeen@technopulse.in",
-  "gmmkamil@gmail.com",
+  // "muyeen@technopulse.in",
+  // "gmmkamil@gmail.com",
   "shafeeazeemag@gmail.com",
 ];
 

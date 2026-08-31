@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function AskQuestionBox({
   initialQuestion = "",
@@ -11,17 +11,28 @@ export default function AskQuestionBox({
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [phone, setPhone] = useState("");
+  const qnaInputRef = useRef(null);
+
+  const emailIsValid =
+    email.trim() === "" || /^\S+@\S+\.\S+$/.test(email.trim());
+
+  const phoneIsValid = phone.trim() === "" || /^\d{10}$/.test(phone.trim());
+
+  const hasContact = email.trim() !== "" || phone.trim() !== "";
 
   const isFormValid =
     question.trim().length >= 10 &&
     (isAnonymous ||
-      (name.trim().length >= 2 && /^\S+@\S+\.\S+$/.test(email.trim())));
+      (name.trim().length >= 2 && hasContact && emailIsValid && phoneIsValid));
 
   const reset = () => {
     setMode("collapsed");
     setQuestion("");
     setEmail("");
+    setPhone("");
     setName("");
+    setIsAnonymous(false);
   };
 
   useEffect(() => {
@@ -45,8 +56,9 @@ export default function AskQuestionBox({
         body: JSON.stringify({
           question: question.trim(),
           isAnonymous: isAnonymousChoice,
-          email: isAnonymousChoice ? null : email,
-          name: isAnonymousChoice ? null : name,
+          email: isAnonymousChoice ? null : email.trim(),
+          phone: isAnonymousChoice ? null : phone.trim(),
+          name: isAnonymousChoice ? null : name.trim(),
         }),
       });
 
@@ -57,10 +69,10 @@ export default function AskQuestionBox({
         setLoading(false);
         return;
       }
-
       setMode("success");
       setQuestion("");
       setEmail("");
+      setPhone("");
       setName("");
       setIsAnonymous(false);
     } catch (err) {
@@ -90,7 +102,7 @@ export default function AskQuestionBox({
         )}
 
         {mode === "input" && (
-          <div className="space-y-4">
+          <div ref={qnaInputRef} className="space-y-4">
             <textarea
               placeholder="Type your question... to submit"
               value={question}
@@ -129,6 +141,35 @@ export default function AskQuestionBox({
               }`}
             />
 
+            <input
+              type="tel"
+              placeholder="Your phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              disabled={isAnonymous}
+              className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+              }`}
+            />
+
+            {!isAnonymous && !hasContact && (
+              <p className="text-sm text-red-600">
+                Please provide either an email address or phone number.
+              </p>
+            )}
+
+            {!isAnonymous && email.trim() !== "" && !emailIsValid && (
+              <p className="text-sm text-red-600">
+                Please enter a valid email address.
+              </p>
+            )}
+
+            {!isAnonymous && phone.trim() !== "" && !phoneIsValid && (
+              <p className="text-sm text-red-600">
+                Please enter a valid 10-digit phone number.
+              </p>
+            )}
+
             <div className="flex gap-3 justify-end">
               <button
                 onClick={reset}
@@ -159,28 +200,27 @@ export default function AskQuestionBox({
                 Your question has been sent to our scholars for review. If
                 approved, it will be answered and published.
               </p>
-
-              {!isAnonymous && email && (
+              {!isAnonymous && (email || phone) && (
                 <p className="text-sm text-gray-500">
-                  You will be notified at{" "}
-                  <span className="font-medium">{email}</span>
+                  You will be contacted at{" "}
+                  <span className="font-medium">{email || phone}</span>
                 </p>
               )}
 
               <button
-                onClick={reset}
+                onClick={() => {
+                  setQuestion("");
+                  setEmail("");
+                  setPhone("");
+                  setName("");
+                  setIsAnonymous(false);
+                  onClose?.();
+                }}
                 className="mt-4 px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
               >
                 Ask another question
               </button>
             </div>
-
-            {/* <button
-                            onClick={reset}
-                            className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition"
-                        >
-                            Ask another question
-                        </button> */}
           </div>
         )}
       </div>

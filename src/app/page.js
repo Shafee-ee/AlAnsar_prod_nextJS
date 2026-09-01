@@ -9,8 +9,8 @@ import ChatbotSection from "@/components/ChatbotSection";
 import { useLanguage } from "@/context/LanguageContext";
 import AskQuestionBox from "@/components/AskQuestionBox";
 import HomeQuickAccess from "@/components/HomeQuickAccess";
-import FeaturedArticles from "@/components/FeaturedArticles";
-import LatestArticles from "@/components/LatestArticles";
+// import FeaturedArticles from "@/components/FeaturedArticles";
+// import LatestArticles from "@/components/LatestArticles";
 
 //banner QnA count
 export default function Home() {
@@ -79,8 +79,8 @@ export default function Home() {
           <ChatbotSection />
         </Suspense>
 
-        <FeaturedArticles />
-        <LatestArticles />
+        {/* <FeaturedArticles />
+        <LatestArticles /> */}
         <div ref={askRef} className="ask-wrapper">
           {showAskBox && (
             <AskQuestionBox

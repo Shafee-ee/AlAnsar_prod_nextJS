@@ -26,7 +26,7 @@ function LegacyHeader({ lang }) {
   return (
     <div className="text-center space-y-6">
       <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900">
-        {isKannada ? "ನಮ್ಮ ಪರಂಪರೆ" : "Our Legacy"}
+        {isKannada ? "ನಮ್ಮ ಹಿರಿಯರು" : "Our Elders"}
       </h1>
       <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed text-lg">
         {isKannada
@@ -189,8 +189,6 @@ function EnglishContent() {
 function KannadaContent() {
   return (
     <>
-      <h1>ನಮ್ಮ ಹಿರಿಯರು</h1>
-
       <p>
         ಅಲ್ ಅನ್ಸಾರ್ ಪತ್ರಿಕೆಯು ಮಹಾನ್ ವಿದ್ವಾಂಸರೂ ದೂರದೃಷ್ಟಿಯ ನಾಯಕರೂ ಆದ ಧರ್ಮ
         ಸೇವಕರಿಂದ ರೂಪಿಸಲಾದ ದೃಢವಾದ ಅಡಿಪಾಯದ ಮೇಲೆ ನಿಂತಿದೆ. ಅವರು ಅಹ್ಲುಸ್ಸುನ್ನತ್‌ನ

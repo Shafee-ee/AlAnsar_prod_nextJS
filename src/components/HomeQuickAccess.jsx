@@ -75,7 +75,7 @@ export default function HomeQuickAccess() {
     articleTitle: lang === "en" ? "Articles" : "ಬರಹಗಳು",
 
     articleContent1:
-      lang === "en" ? "Quran Translations " : "ಮಿರ್‌ಆನ್ ವ್ಯಾಖ್ಯಾನ",
+      lang === "en" ? "Quran Translations " : "ಖುರ್ ಆನ್ ವ್ಯಾಖ್ಯಾನ",
     articleContent2: lang === "en" ? "Hadith " : "ಹದೀಸ್ ದರ್ಪಣ",
 
     articleContent3: lang === "en" ? "Fiqh " : "ಕರ್ಮ ಶಾಸ್ತ್ರ",
@@ -220,7 +220,7 @@ export default function HomeQuickAccess() {
               <h2 className="mt-1 text-3xl font-bold leading-tight">
                 {t.articleTitle}
               </h2>
-              <div className="grid grid-cols-2 gap-y-1 mt-1 text-xs leading-6 text-white/90">
+              <div className="grid grid-cols-2 gap-y-1 mt-1 text-sm leading-6 text-white/90">
                 <span className="whitespace-nowrap">• {t.articleContent1}</span>
                 <span className="whitespace-nowrap">• {t.articleContent5}</span>
 

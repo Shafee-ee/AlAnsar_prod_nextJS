@@ -14,25 +14,32 @@ export default function AtticlesPage() {
   const router = useRouter();
 
   const categories = [
-    { value: "All", label: lang === "kn" ? "ಎಲ್ಲಾ" : "All" },
-    { value: "Hadith", label: lang === "kn" ? "ಹದೀಸ್" : "Hadith" },
-    { value: "Fiqh", label: lang === "kn" ? "ಫಿಖ್ಹ್" : "Fiqh" },
+    { value: "All", label: lang === "kn" ? "ಬರಹಗಳು" : "All" },
+
+    { value: "Hadith", label: lang === "kn" ? "ಹದೀಸ್ ದರ್ಪಣ" : "Hadith" },
+
+    { value: "Fiqh", label: lang === "kn" ? "ಕರ್ಮ ಶಾಸ್ತ್ರಿ" : "Fiqh" },
+
     {
       value: "Islamic History",
-      label: lang === "kn" ? "ಇಸ್ಲಾಮಿ ಇತಿಹಾಸ" : "Islamic History",
+      label: lang === "kn" ? "ಇತಿಹಾಸ" : "Islamic History",
     },
+
     {
       value: "Smariniyaru",
-      label: lang === "kn" ? "ಸ್ಮರಣೀಯರು" : "Eminent Personalities",
+      label: lang === "kn" ? "ಸರಣಿ" : "Eminent Personalities",
     },
+
     {
       value: "Vishleshanagalu",
-      label: lang === "kn" ? "ವಿಶ್ಲೇಷಣೆಗಳು" : "Analysis",
+      label: lang === "kn" ? "ವಿಶ್ವಕೋಶ" : "Analysis",
     },
+
     {
       value: "Vismaya Jagattu",
-      label: lang === "kn" ? "ವಿಸ್ಮಯ ಜಗತ್ತು" : "Wonders of the World",
+      label: lang === "kn" ? "ವಿಸ್ಮಯ" : "Wonders of the World",
     },
+
     {
       value: "Quranic vyakhanagalu",
       label: lang === "kn" ? "ಖುರ್ಆನ್ ವ್ಯಾಖ್ಯಾನ" : "Quran Translation",

@@ -3920,3 +3920,118 @@ Investigation of the DEP0169 url.parse() warning
 Begin investigation of the subscription system / subscription-related functionality.
 
 Do not assume the implementation or cause beforehand. First inspect the current subscription-related code, flow, data model, and observed behavior, then identify the actual issue before making changes.
+
+#####
+AlAnsarWeekly Q&A Flow — Chatbot → Submission → Chatbot
+Completed
+
+The Q&A submission flow on the homepage has been fixed and tested successfully.
+
+Intended user flow
+User enters a question into the Q&A chatbot.
+User searches/gets suggestions.
+If they cannot find a confident match, they can click "Submit your question".
+The chatbot dispatches the trigger-ask-question event with the question.
+The homepage opens the AskQuestionBox.
+The page smoothly scrolls down to the submission form.
+The question from the chatbot is prefilled into the submission form.
+User provides their name and either email or phone, or chooses anonymous submission.
+User submits the question.
+After successful submission, the user sees the confirmation screen.
+Clicking "Ask another question" should return the user to the chatbot rather than allowing them to bypass the search/check process.
+This prevents users from repeatedly submitting questions that may already exist in the Q&A database.
+Validation added
+
+AskQuestionBox now validates:
+
+Question must be at least 10 characters.
+Non-anonymous users must provide a name of at least 2 characters.
+At least one contact method is required:
+Email, or
+Phone number.
+Email format is validated.
+Phone number must contain exactly 10 digits.
+Anonymous users do not need name/contact information.
+Submit button remains disabled until the form is valid.
+
+The form also displays appropriate feedback when contact information is missing or invalid.
+
+Important implementation detail
+
+AskQuestionBox uses:
+
+useRef
+
+to hold a reference to the submission form area.
+
+The homepage (src/app/page.js) has:
+
+const askRef = useRef(null);
+
+and listens for:
+
+window.addEventListener("trigger-ask-question", handler);
+
+When the chatbot triggers the event, the homepage:
+
+setPrefillQuestion(e.detail.question);
+setShowAskBox(true);
+
+and then smoothly scrolls to the submission section using:
+
+askRef.current?.scrollIntoView({
+  behavior: "smooth",
+});
+Bug that was encountered
+
+The first implementation of "Ask another question" attempted to directly reopen AskQuestionBox.
+
+That caused an undesirable flow:
+
+Submitted question
+       ↓
+Ask another question
+       ↓
+AskQuestionBox opens directly
+
+This allowed the user to bypass the chatbot's search.
+
+The desired flow is:
+
+Chatbot input
+     ↓
+Search existing Q&A
+     ↓
+No confident match
+     ↓
+Submit your question
+     ↓
+AskQuestionBox
+     ↓
+Submit
+     ↓
+Question submitted
+     ↓
+Ask another question
+     ↓
+Chatbot input
+     ↓
+Search again
+     ↓
+Only submit if necessary
+Current status
+
+The homepage flow was tested after the changes and is currently working correctly.
+
+The key requirement is:
+
+All new questions should pass through the chatbot/search flow before reaching the submission form.
+
+This avoids duplicate or already-existing questions being submitted unnecessarily.
+
+Files involved
+src/app/page.js
+src/components/AskQuestionBox.jsx
+src/components/ChatbotSection.jsx
+
+The chatbot component is large, but it was read as part of solving this flow. The current behavior should be preserved while moving on to other work.

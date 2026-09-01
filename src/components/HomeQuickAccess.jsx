@@ -43,27 +43,49 @@ export default function HomeQuickAccess() {
   }, []);
 
   const t = {
-    qnaTitle: lang === "en" ? "Questions Answered" : "ಉತ್ತರಿಸಲಾದ ಪ್ರಶ್ನೆಗಳು",
+    qnaTitle: lang === "en" ? "Questions Answered" : "ಪ್ರಶ್ನೋತ್ತರಗಳು",
+
     qnaDesc:
       lang === "en"
         ? "Ask a question or explore 35 years of scholarship."
-        : "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ ಅಥವಾ 35 ವರ್ಷಗಳ ಪಾಂಡಿತ್ಯವನ್ನು ಅನ್ವೇಷಿಸಿ.",
+        : "ಪ್ರಶ್ನೆ ಕೇಳಿ – ಸಂಶಯ ನಿವಾರಿಸಿ\n›ಪ್ಪ್ರಕಟಿತ ಪ್ರಶ್ನೋತ್ತರಗಳಿಂದ",
+
+    qnaDesc2:
+      lang === "en"
+        ? "› Increase your knowledge"
+        : "›ನಿಮ್ಮ ಅರಿವನ್ನು ಹೆಚ್ಚಿಸಿಕೊಳ್ಳಿ",
 
     qnaBtn: lang === "en" ? "Keli Nodi →" : "ಕೇಳಿ ನೋಡಿ →",
 
-    digiBadge: lang === "en" ? "Latest Edition" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆ",
-    digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತ್ತೀಚಿನ ಡಿಜಿಪೇಪರ್",
+    digiBadge: lang === "en" ? "Latest Edition" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆಗಳು",
+
+    digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತಿಹಾಸ ಸಂಚಿಕೆಗಳು ",
+
     digiDesc:
-      lang === "en" ? "Weekly Islamic Publication" : "ವಾರದ ಇಸ್ಲಾಮಿಕ್ ಪ್ರಕಟಣೆ",
+      lang === "en" ? "Weekly Islamic Publication" : "ಪ್ರತಿವಾರದ ಪತ್ರಿಕೆ",
+
+    digiDesc2: lang === "en" ? "DigiPaper" : "ಡಿಜಿ ಪೇಪರ್ ",
+
+    digiDesc3: lang === "en" ? "Weekly Publications" : "ಪ್ರತಿವಾರದ ಪತ್ರಿಕೆ ",
 
     digiBtn: lang === "en" ? "Read Now →" : "ಈಗ ಓದಿ →",
 
     articleBadge: lang === "en" ? "Featured Content" : "ವಿಶೇಷ ವಿಷಯ",
-    articleTitle: lang === "en" ? "Articles" : "ಲೇಖನಗಳು",
-    articleDesc:
-      lang === "en"
-        ? "Guidance, reflections and contemporary Islamic topics."
-        : "ಮಾರ್ಗದರ್ಶನ, ಚಿಂತನೆಗಳು ಮತ್ತು ಸಮಕಾಲೀನ ಇಸ್ಲಾಮಿಕ್ ವಿಷಯಗಳು.",
+
+    articleTitle: lang === "en" ? "Articles" : "ಬರಹಗಳು",
+
+    articleContent1:
+      lang === "en" ? "Quran Translations " : "ಮಿರ್‌ಆನ್ ವ್ಯಾಖ್ಯಾನ",
+    articleContent2: lang === "en" ? "Hadith " : "ಹದೀಸ್ ದರ್ಪಣ",
+
+    articleContent3: lang === "en" ? "Fiqh " : "ಕರ್ಮ ಶಾಸ್ತ್ರ",
+
+    articleContent4: lang === "en" ? "Islamic History " : "ಇತಿಹಾಸ",
+
+    articleContent5: lang === "en" ? "Eminent Personality " : "ಸ್ಮರಣೆ",
+
+    articleContent6: lang === "en" ? "Analysis" : "ವಿಶ್ಲೇಷಣ",
+    articleContent7: lang === "en" ? "Wonderful World " : "ವಿಸ್ಮಯ",
 
     articleBtn: lang === "en" ? "Explore →" : "ಅನ್ವೇಷಿಸಿ →",
   };
@@ -122,8 +144,12 @@ export default function HomeQuickAccess() {
                 {total !== null ? `${total}+` : "..."}
               </div>
               <div className="text-lg font-semibold mt-1">{t.qnaTitle}</div>
-              <p className="mt-1 max-w-[210px] text-sm font-medium text-white/80">
+              <p className="mt-1 max-w-[210px] text-[16px] font-medium text-white/80">
                 {t.qnaDesc}
+              </p>
+
+              <p className="mt-1 max-w-[210px] text-[16px] font-medium text-white/80">
+                {t.qnaDesc2}
               </p>
             </div>
             <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
@@ -147,7 +173,7 @@ export default function HomeQuickAccess() {
           <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/20 to-transparent" />
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
-              <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs">
+              <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-1xl">
                 {t.digiBadge}
               </span>
 
@@ -155,10 +181,11 @@ export default function HomeQuickAccess() {
                 {t.digiTitle}
               </h2>
 
-              <p className="mt-2 text-white/80">{t.digiDesc}</p>
+              <p className="mt-2  text-1xl text-white/80">•{t.digiDesc2}</p>
+              <p className=" ml-6 text-1xl text-white/80">› {t.digiDesc3}</p>
             </div>
 
-            <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
+            <span className="absolute right-6 bottom-4 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.digiBtn}
             </span>
           </div>
@@ -172,7 +199,7 @@ export default function HomeQuickAccess() {
           <img
             src="/articles-image.png"
             alt="Featured articles"
-            className="absolute -right-6 -bottom-6 h-[280px] w-auto object-contain pointer-events-none"
+            className="absolute -right-6 -bottom-4 h-[280px] w-auto object-contain pointer-events-none"
           />
 
           {/* Blue tint overlay */}
@@ -187,18 +214,27 @@ export default function HomeQuickAccess() {
           {/* Content */}
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div>
-              <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-xs">
+              <span className="inline-block  px-2 py-1 rounded-full bg-white/20 text-1xl">
                 {t.articleBadge}
               </span>
-
-              <h2 className="mt-4 text-3xl font-bold leading-tight">
+              <h2 className="mt-1 text-3xl font-bold leading-tight">
                 {t.articleTitle}
               </h2>
+              <div className="grid grid-cols-2 gap-y-1 mt-1 text-xs leading-6 text-white/90">
+                <span className="whitespace-nowrap">• {t.articleContent1}</span>
+                <span className="whitespace-nowrap">• {t.articleContent5}</span>
 
-              <p className="text-white/80 max-w-[280px]">{t.articleDesc}</p>
+                <span className="whitespace-nowrap">• {t.articleContent2}</span>
+                <span className="whitespace-nowrap">• {t.articleContent6}</span>
+
+                <span className="whitespace-nowrap">• {t.articleContent3}</span>
+                <span className="whitespace-nowrap">• {t.articleContent7}</span>
+
+                <span className="whitespace-nowrap">• {t.articleContent4}</span>
+              </div>
             </div>
 
-            <span className="absolute right-6 bottom-6 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
+            <span className="absolute right-6 bottom-4 w-fit px-5 py-2 bg-white text-[#1d3f9a] rounded-full font-medium">
               {t.articleBtn}
             </span>
           </div>

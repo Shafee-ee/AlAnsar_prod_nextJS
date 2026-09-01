@@ -192,7 +192,7 @@ export default function HomeQuickAccess() {
         </Link>
         {/* Articles */}
         <Link
-          href={`/article?lang=${lang}`}
+          href={`/soon-to-be-published?lang=${lang}`}
           className="snap-center lg:min-w-0 min-w-[85%] h-[240px] rounded-[28px] overflow-hidden relative shadow-xl cursor-pointer active:scale-[0.98] transition-transform block"
         >
           {/* Background image */}

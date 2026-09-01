@@ -138,7 +138,7 @@ const Navbar = () => {
             </Link>
 
             <Link
-              href={`/article?lang=${lang}`}
+              href={`/soon-to-be-published?lang=${lang}`}
               className="text-white/80 hover:text-white text-sm font-medium transition"
             >
               {t.articles}
@@ -247,7 +247,7 @@ const Navbar = () => {
           </Link>
 
           <Link
-            href={`/article?lang=${lang}`}
+            href={`/soon-to-be-published?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >

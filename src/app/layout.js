@@ -24,9 +24,9 @@ export const metadata = {
     siteName: "ALANSARWEEKLY",
     images: [
       {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
+        url: "/site-share-icon.png",
+        width: 512,
+        height: 512,
         alt: "ALANSARWEEKLY",
       },
     ],

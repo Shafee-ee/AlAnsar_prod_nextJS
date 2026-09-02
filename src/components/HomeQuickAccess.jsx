@@ -59,7 +59,7 @@ export default function HomeQuickAccess() {
 
     digiBadge: lang === "en" ? "Latest Edition" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆಗಳು",
 
-    digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತಿಹಾಸ ಸಂಚಿಕೆಗಳು ",
+    digiTitle: lang === "en" ? "Latest DigiPaper" : "ಇತ್ತೀಚಿನ ಸಂಚಿಕೆಗಳು ",
 
     digiDesc:
       lang === "en" ? "Weekly Islamic Publication" : "ಪ್ರತಿವಾರದ ಪತ್ರಿಕೆ",

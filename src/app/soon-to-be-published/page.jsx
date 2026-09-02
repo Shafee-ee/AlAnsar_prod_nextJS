@@ -12,7 +12,7 @@ export default function SoonToBePublished() {
         src={
           lang === "en"
             ? "/soon-to-be-published.png"
-            : "/soon-to-be-published-kn.png"
+            : "/soon-to-be-published.png"
         }
         alt="Articles coming soon"
         width={1280}

@@ -12,7 +12,7 @@ export async function POST(req) {
 
     const now = Date.now();
     const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-    const MAX_SUBMISSIONS = 3;
+    const MAX_SUBMISSIONS = 20;
 
     if (rateDoc.exists) {
       const data = rateDoc.data();

@@ -11,7 +11,7 @@ export default function ManageQnA() {
   const [loading, setLoading] = useState(false);
   const [filtered, setFiltered] = useState([]);
   const [badIds, setBadIds] = useState(new Set());
-
+  const [badEmbeddingIds, setBadEmbeddingIds] = useState(new Set());
   // filters
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -99,8 +99,16 @@ export default function ManageQnA() {
     const res = await fetch("/api/qna/audit");
     const data = await res.json();
 
-    const bad = new Set((data.brokenItems || []).map((i) => i.id));
+    const bad = new Set(
+      (data.items || []).filter((i) => i.content?.broken).map((i) => i.id),
+    );
+
+    const badEmbeddings = new Set(
+      (data.items || []).filter((i) => !i.embedding?.valid).map((i) => i.id),
+    );
+
     setBadIds(bad);
+    setBadEmbeddingIds(badEmbeddings);
   }
 
   /* -----------------------------
@@ -126,10 +134,20 @@ export default function ManageQnA() {
         (i.question_en || "").toLowerCase().includes(term),
       );
     }
-    if (qualityFilter !== "all") {
-      data = data.filter((i) =>
-        qualityFilter === "bad" ? badIds.has(i.id) : !badIds.has(i.id),
-      );
+    if (qualityFilter === "content-good") {
+      data = data.filter((i) => !badIds.has(i.id));
+    }
+
+    if (qualityFilter === "content-bad") {
+      data = data.filter((i) => badIds.has(i.id));
+    }
+
+    if (qualityFilter === "embedding-good") {
+      data = data.filter((i) => !badEmbeddingIds.has(i.id));
+    }
+
+    if (qualityFilter === "embedding-bad") {
+      data = data.filter((i) => badEmbeddingIds.has(i.id));
     }
 
     data.sort((a, b) => {
@@ -139,8 +157,15 @@ export default function ManageQnA() {
     });
 
     setFiltered(data);
-  }, [search, sortBy, qualityFilter, items, allItems, badIds]);
-  /* -----------------------------
+  }, [
+    search,
+    sortBy,
+    qualityFilter,
+    items,
+    allItems,
+    badIds,
+    badEmbeddingIds,
+  ]); /* -----------------------------
        ACTIONS
     ----------------------------- */
   async function handleDelete(id) {
@@ -282,8 +307,10 @@ export default function ManageQnA() {
           className="p-2 border rounded text-xs"
         >
           <option value="all">All</option>
-          <option value="good">Good</option>
-          <option value="bad">Bad</option>
+          <option value="content-good">Content Good</option>
+          <option value="content-bad">Content Bad</option>
+          <option value="embedding-good">Embedding Good</option>
+          <option value="embedding-bad">Embedding Bad</option>
         </select>
 
         <select
@@ -312,7 +339,8 @@ export default function ManageQnA() {
           <thead>
             <tr className="bg-gray-200">
               <th className="p-2 text-left">Question (EN)</th>
-              <th className="p-2">Quality</th>
+              <th className="p-2">Content</th>
+              <th className="p-2">Embedding</th>
               <th className="p-2">Lang</th>
               <th className="p-2">Created</th>
               <th className="p-2">Active</th>
@@ -322,7 +350,8 @@ export default function ManageQnA() {
 
           <tbody>
             {filtered.map((item) => {
-              const isBad = badIds.has(item.id);
+              const isBadContent = badIds.has(item.id);
+              const isBadEmbedding = badEmbeddingIds.has(item.id);
               const lang =
                 item.question_en && item.question_kn
                   ? "EN+KN"
@@ -350,12 +379,24 @@ export default function ManageQnA() {
                   <td className="p-2 text-center">
                     <span
                       className={`px-2 py-0.5 rounded text-xs font-semibold ${
-                        isBad
+                        isBadContent
                           ? "bg-red-100 text-red-700"
                           : "bg-green-100 text-green-700"
                       }`}
                     >
-                      {isBad ? "BAD" : "GOOD"}
+                      {isBadContent ? "BAD" : "GOOD"}
+                    </span>
+                  </td>
+
+                  <td className="p-2 text-center">
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                        isBadEmbedding
+                          ? "bg-red-100 text-red-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {isBadEmbedding ? "BAD" : "GOOD"}
                     </span>
                   </td>
 

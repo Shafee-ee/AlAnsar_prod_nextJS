@@ -45,15 +45,15 @@ export default function HomeQuickAccess() {
   const t = {
     qnaTitle: lang === "en" ? "Questions Answered" : "ಪ್ರಶ್ನೋತ್ತರಗಳು",
 
-    qnaDesc:
+    qnaDesc1:
       lang === "en"
-        ? "Ask a question or explore 35 years of scholarship."
-        : "ಪ್ರಶ್ನೆ ಕೇಳಿ – ಸಂಶಯ ನಿವಾರಿಸಿ\n›ಪ್ಪ್ರಕಟಿತ ಪ್ರಶ್ನೋತ್ತರಗಳಿಂದ",
+        ? "› Ask a question or explore 35 years of scholarship."
+        : "› ಪ್ರಶ್ನೆ ಕೇಳಿ ಅಥವಾ 35 ವರ್ಷಗಳ ಇಸ್ಲಾಮಿಕ್ ಪಾಂಡಿತ್ಯವನ್ನು ಅನ್ವೇಷಿಸಿ.\n",
 
     qnaDesc2:
       lang === "en"
-        ? "› Increase your knowledge"
-        : "›ನಿಮ್ಮ ಅರಿವನ್ನು ಹೆಚ್ಚಿಸಿಕೊಳ್ಳಿ",
+        ? "› Enhance your knowledge through the \n published Q&As."
+        : "› ಪ್ಪ್ರಕಟಿತ ಪ್ರಶ್ನೋತ್ತರಗಳಿಂದ ನಿಮ್ಮ ಅರಿವನ್ನು ಹೆಚ್ಚಿಸಿಕೊಳ್ಳಿ",
 
     qnaBtn: lang === "en" ? "Keli Nodi →" : "ಕೇಳಿ ನೋಡಿ →",
 
@@ -145,10 +145,10 @@ export default function HomeQuickAccess() {
               </div>
               <div className="text-lg font-semibold mt-1">{t.qnaTitle}</div>
               <p className="mt-1 max-w-[210px] text-[16px] font-medium text-white/80">
-                {t.qnaDesc}
+                {t.qnaDesc1}
               </p>
 
-              <p className="mt-1 max-w-[210px] text-[16px] font-medium text-white/80">
+              <p className="mt-1 whitespace-pre-line max-w-[210px] text-[16px] font-medium text-white/80">
                 {t.qnaDesc2}
               </p>
             </div>

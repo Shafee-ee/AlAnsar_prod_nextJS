@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "ALANSARWEEKLY - Your Islamic Guide",
   description: "An Islamic Q&A platform and weekly publication.",
+
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -15,17 +16,32 @@ export const metadata = {
     ],
     apple: "/apple-touch-icon.png",
   },
+
+  openGraph: {
+    title: "ALANSARWEEKLY - Your Islamic Guide",
+    description: "An Islamic Q&A platform and weekly publication.",
+    url: "https://www.alansarweekly.com",
+    siteName: "ALANSARWEEKLY",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ALANSARWEEKLY",
+      },
+    ],
+    locale: "en_IN",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-
         {/* ClientAppWrapper is a client component that includes AuthProvider, Navbar, Footer */}
         <ClientAppWrapper>{children}</ClientAppWrapper>
       </body>
     </html>
   );
 }
-

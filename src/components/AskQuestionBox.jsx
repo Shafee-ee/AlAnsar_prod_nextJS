@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import {
+  getCountries,
+  getCountryCallingCode,
+  isValidPhoneNumber,
+} from "libphonenumber-js";
 
 export default function AskQuestionBox({
   initialQuestion = "",
@@ -11,13 +16,15 @@ export default function AskQuestionBox({
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [country, setCountry] = useState("IN");
   const [phone, setPhone] = useState("");
   const qnaInputRef = useRef(null);
 
   const emailIsValid =
     email.trim() === "" || /^\S+@\S+\.\S+$/.test(email.trim());
 
-  const phoneIsValid = phone.trim() === "" || /^\d{10}$/.test(phone.trim());
+  const phoneIsValid =
+    phone.trim() === "" || isValidPhoneNumber(phone.trim(), country);
 
   const hasContact = email.trim() !== "" || phone.trim() !== "";
 
@@ -57,6 +64,7 @@ export default function AskQuestionBox({
           question: question.trim(),
           isAnonymous: isAnonymousChoice,
           email: isAnonymousChoice ? null : email.trim(),
+          countryCode: isAnonymousChoice ? null : countryCallingCode,
           phone: isAnonymousChoice ? null : phone.trim(),
           name: isAnonymousChoice ? null : name.trim(),
         }),
@@ -82,6 +90,18 @@ export default function AskQuestionBox({
       setLoading(false);
     }
   };
+
+  const countryOptions = getCountries()
+    .map((code) => ({
+      code,
+      name: new Intl.DisplayNames(["en"], { type: "region" }).of(code) || code,
+      callingCode: `+${getCountryCallingCode(code)}`,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const selectedCountry = countryOptions.find((item) => item.code === country);
+
+  const countryCallingCode = selectedCountry?.callingCode || "+91";
 
   return (
     <div className="w-full flex justify-center my-12">
@@ -141,16 +161,37 @@ export default function AskQuestionBox({
               }`}
             />
 
-            <input
-              type="tel"
-              placeholder="Your phone number"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              disabled={isAnonymous}
-              className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
-              }`}
-            />
+            <div className="flex gap-2">
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                disabled={isAnonymous}
+                className={`border border-gray-300 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                }`}
+              >
+                {countryOptions.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.name} {item.callingCode}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                type="tel"
+                inputMode="numeric"
+                placeholder="Your phone number"
+                value={phone}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, "").slice(0, 15);
+                  setPhone(value);
+                }}
+                disabled={isAnonymous}
+                className={`flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                }`}
+              />
+            </div>
 
             {!isAnonymous && !hasContact && (
               <p className="text-sm text-red-600">
@@ -166,7 +207,7 @@ export default function AskQuestionBox({
 
             {!isAnonymous && phone.trim() !== "" && !phoneIsValid && (
               <p className="text-sm text-red-600">
-                Please enter a valid 10-digit phone number.
+                Please enter a valid phone number
               </p>
             )}
 

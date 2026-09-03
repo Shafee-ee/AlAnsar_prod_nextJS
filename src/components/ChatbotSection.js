@@ -645,6 +645,15 @@ const ChatbotSection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
 
+  //chat box height
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, [userInput]);
+
   //toaster notification
   const [toast, setToast] = useState(null);
 
@@ -872,31 +881,42 @@ const ChatbotSection = () => {
 
       {/* Search */}
       <div className="w-full max-w-3xl mx-auto">
-        <div className="flex items-center gap-2">
-          <input
+        <div className="flex items-end  gap-2">
+          <textarea
             ref={inputRef}
             disabled={isLoading}
             value={userInput}
+            rows={1}
             onChange={(e) => setUserInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
             placeholder={
               selectedLang === "kn"
                 ? "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ..."
                 : "Ask your Islamic question..."
             }
             className="
-        flex-grow
-        px-5 py-4
-        rounded-full
-        text-gray-700
-        bg-white
-        border border-gray-300
-        focus:outline-none
-        focus:ring-2
-        focus:ring-blue-100
-        focus:border-blue-400
-        text-base
-      "
+    flex-grow
+    min-h-[56px]
+    max-h-[160px]
+    overflow-y-auto
+    resize-none
+    px-5 py-4
+    rounded-2xl
+    text-gray-700
+    bg-white
+    border border-gray-300
+    focus:outline-none
+    focus:ring-2
+    focus:ring-blue-100
+    focus:border-blue-400
+    text-base
+    leading-relaxed
+  "
           />
 
           <button

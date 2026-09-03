@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 
@@ -44,8 +45,7 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { question, isAnonymous, email, phone, name } = body;
-    // Basic validation
+    const { question, isAnonymous, email, countryCode, phone, name } = body;
     if (!question || question.trim().length < 10) {
       return NextResponse.json(
         { error: "Question too short" },
@@ -68,6 +68,30 @@ export async function POST(req) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
 
+    let normalizedPhone = null;
+
+    if (!isAnonymous && phone) {
+      if (!countryCode || !/^\+\d{1,4}$/.test(countryCode)) {
+        return NextResponse.json(
+          { error: "Invalid country code" },
+          { status: 400 },
+        );
+      }
+
+      const phoneNumber = parsePhoneNumberFromString(
+        `${countryCode}${phone.trim()}`,
+      );
+
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        return NextResponse.json(
+          { error: "Please enter a valid phone number" },
+          { status: 400 },
+        );
+      }
+
+      normalizedPhone = phoneNumber.number;
+    }
+
     const trimmedQuestion = question.trim();
 
     const isKannada = /[\u0C80-\u0CFF]/.test(trimmedQuestion);
@@ -78,7 +102,7 @@ export async function POST(req) {
       language,
       isAnonymous,
       email: isAnonymous ? null : email?.trim() || null,
-      phone: isAnonymous ? null : phone?.trim() || null,
+      phone: normalizedPhone,
       name: isAnonymous ? null : name.trim(),
       status: "pending",
       createdAt: FieldValue.serverTimestamp(),

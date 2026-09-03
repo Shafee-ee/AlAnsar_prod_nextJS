@@ -161,12 +161,12 @@ export default function AskQuestionBox({
               }`}
             />
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full min-w-0">
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 disabled={isAnonymous}
-                className={`border border-gray-300 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-[105px] min-w-0 max-w-[105px] shrink-0 border border-gray-300 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               >
@@ -187,12 +187,11 @@ export default function AskQuestionBox({
                   setPhone(value);
                 }}
                 disabled={isAnonymous}
-                className={`flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`flex-1 min-w-0 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
                 }`}
               />
             </div>
-
             {!isAnonymous && !hasContact && (
               <p className="text-sm text-red-600">
                 Please provide either an email address or phone number.

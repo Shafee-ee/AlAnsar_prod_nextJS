@@ -905,6 +905,7 @@ const ChatbotSection = () => {
     max-h-[160px]
     overflow-y-auto
     resize-none
+    [scrollbar-width:none]
     px-5 py-4
     rounded-2xl
     text-gray-700

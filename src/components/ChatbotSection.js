@@ -1077,18 +1077,18 @@ const ChatbotSection = () => {
                             {badge.label}
                           </span>
 
-                          <h3 className="mt-3 text-sm font-semibold text-gray-900 leading-snug">
+                          <h3 className="mt-3 text-sm font-semibold text-gray-900 leading-snug select-none">
                             {r.question}
                           </h3>
 
                           {truncatedAnswer && (
-                            <p className="mt-2 text-xs text-gray-600 leading-relaxed">
+                            <p className="mt-2 text-xs text-gray-600 leading-relaxed select-none">
                               {truncatedAnswer}
                             </p>
                           )}
 
                           {attribution && (
-                            <div className="mt-3 text-[10px] text-gray-400">
+                            <div className="mt-3 text-[10px] text-gray-400 select-none">
                               {attribution}
                             </div>
                           )}

@@ -47,8 +47,8 @@ export default function HomeQuickAccess() {
 
     qnaDesc1:
       lang === "en"
-        ? "› Ask a question or explore 35 years of scholarship."
-        : "› ಪ್ರಶ್ನೆ ಕೇಳಿ ಅಥವಾ 35 ವರ್ಷಗಳ ಇಸ್ಲಾಮಿಕ್ ಪಾಂಡಿತ್ಯವನ್ನು ಅನ್ವೇಷಿಸಿ.\n",
+        ? "› Ask a Question – Clear Your Doubts"
+        : "› ಪ್ರಶ್ನೆ ಕೇಳಿ - ಸಂಶಯ ನಿವಾರಿಸಿ\n",
 
     qnaDesc2:
       lang === "en"

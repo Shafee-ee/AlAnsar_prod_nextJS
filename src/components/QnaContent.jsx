@@ -37,7 +37,7 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
                 <h2 className="text-sm md:text-3xl font-medium max-w-3xl leading-snug">
                   {lang === "en" ? "Question:" : "ಪ್ರಶ್ನೆ:"}
                 </h2>
-                <p className="text-lg md:text-2xl font-semibold max-w-3xl leading-snug">
+                <p className="text-lg md:text-2xl font-semibold max-w-3xl leading-snug select-none">
                   {question}
                 </p>
               </div>
@@ -52,7 +52,7 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
           </div>
 
           {/* ANSWER SOURCE */}
-          <div className="mt-8 text-sm text-gray-600 border-l-4 border-green-300 pl-4 leading-relaxed">
+          <div className="mt-8 text-sm text-gray-600 border-l-4 border-green-300 pl-4 leading-relaxed select-none">
             <p className="font-semibold text-gray-800 mb-2">
               <span className="text-green-600">
                 {lang === "en" ? "Answer Source" : "ಉತ್ತರದ ಮೂಲ"}
@@ -135,13 +135,14 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
             {lang === "en" ? "Answer" : "ಉತ್ತರ"}
           </div>
 
-          <div className="mt-2 text-lg md:text-xl font-medium text-blue-700 leading-relaxed whitespace-pre-line">
+          <div className="mt-2 text-lg md:text-xl font-medium text-blue-700 leading-relaxed whitespace-pre-line select-none">
+            {" "}
             {answer}
           </div>
 
           {/* EDITOR NOTE */}
           {editorNote && (
-            <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm text-gray-700 whitespace-pre-line">
+            <div className="mt-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-sm text-gray-700 whitespace-pre-line select-none">
               <div className="font-semibold text-yellow-800 mb-1">
                 Editor’s Note
               </div>

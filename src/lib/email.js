@@ -3,23 +3,28 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
-  "muyeen@technopulse.in",
-  "gmmkamil@gmail.com",
+  // "muyeen@technopulse.in",
+  // "gmmkamil@gmail.com",
   "shafeeazeemag@gmail.com",
+  "shafeeghani@gmail.com",
 ];
 
-export async function sendEmailToImam(question, submissionId) {
+export async function sendEmailToImam({
+  questionOriginal,
+  questionEnglish,
+  questionKannada,
+  language,
+  submissionId,
+}) {
   try {
-    const adminLink = "https://alansarweekly.com/admin/qna/qna-submissions";
-
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from: "Al Ansar Weekly <editor@alansarweekly.com>",
       to: IMAM_NOTIFICATION_LIST,
       replyTo: "qna@hslaaxa.resend.app",
       subject: `New Question Approved – Al Ansar Weekly [${submissionId}]`,
       html: `
         <div style="font-family:Arial, sans-serif; max-width:600px; margin:auto; padding:20px;">
-          
+
           <h2 style="color:#1D3F9A; margin-bottom:10px;">
             New Question Approved
           </h2>
@@ -28,22 +33,61 @@ export async function sendEmailToImam(question, submissionId) {
             A new question has been approved and is ready for review.
           </p>
 
-          <div style="
-            background:#f5f7fb;
-            padding:15px;
-            border-radius:8px;
-            margin:20px 0;
-            font-size:16px;
-          ">
-            <strong>Question:</strong><br/>
-            ${question} 
-          </div>
+         ${
+           language === "kn"
+             ? `
+  <div style="
+    background:#f5f7fb;
+    padding:15px;
+    border-radius:8px;
+    margin:20px 0;
+    font-size:16px;
+  ">
+    <strong>Original Question:</strong><br/>
+    ${questionOriginal}
+  </div>
+
+  <div style="
+    background:#f5f7fb;
+    padding:15px;
+    border-radius:8px;
+    margin:20px 0;
+    font-size:16px;
+  ">
+    <strong>English Translation:</strong><br/>
+    ${questionEnglish || "Not available"}
+  </div>
+`
+             : `
+  <div style="
+    background:#f5f7fb;
+    padding:15px;
+    border-radius:8px;
+    margin:20px 0;
+    font-size:16px;
+  ">
+    <strong>Original Question:</strong><br/>
+    ${questionOriginal}
+  </div>
+
+  <div style="
+    background:#f5f7fb;
+    padding:15px;
+    border-radius:8px;
+    margin:20px 0;
+    font-size:16px;
+  ">
+    <strong>Kannada Translation:</strong><br/>
+    ${questionKannada || "Not available"}
+  </div>
+`
+         }
 
           <p style="font-size:14px; color:#555;">
             Submission ID: ${submissionId}
           </p>
 
-         
+          
 
           <p style="margin-top:30px; font-size:12px; color:#777;">
             Al Ansar Weekly
@@ -52,8 +96,11 @@ export async function sendEmailToImam(question, submissionId) {
         </div>
       `,
     });
+
+    return result;
   } catch (err) {
     console.error("Email to imam failed:", err);
+    throw err;
   }
 }
 

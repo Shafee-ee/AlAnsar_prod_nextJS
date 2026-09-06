@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
+import { geminiTranslate } from "@/lib/geminiTranslate";
 
 export async function POST(req) {
   try {
@@ -91,19 +92,56 @@ export async function POST(req) {
 
       normalizedPhone = phoneNumber.number;
     }
-
     const trimmedQuestion = question.trim();
 
     const isKannada = /[\u0C80-\u0CFF]/.test(trimmedQuestion);
     const language = isKannada ? "kn" : "en";
+
+    let questionEnglish = trimmedQuestion;
+    let questionKannada = trimmedQuestion;
+
+    if (isKannada) {
+      questionEnglish = await geminiTranslate(trimmedQuestion, "en");
+
+      if (!questionEnglish) {
+        return NextResponse.json(
+          {
+            error: "Unable to translate question to English. Please try again.",
+          },
+          { status: 500 },
+        );
+      }
+    } else {
+      questionKannada = await geminiTranslate(trimmedQuestion, "kn");
+
+      if (!questionKannada) {
+        return NextResponse.json(
+          {
+            error: "Unable to translate question to Kannada. Please try again.",
+          },
+          { status: 500 },
+        );
+      }
+    }
+
     await adminDB.collection("qna_submissions").add({
       question_original: trimmedQuestion,
-      translated_question_en: language === "en" ? trimmedQuestion : null,
+
+      // Language in which the user originally submitted the question
       language,
+
+      // Available translated versions.
+      question_en: questionEnglish,
+      question_kn: questionKannada,
+
+      // English version used by the existing workflow.
+      translated_question_en: questionEnglish,
+
       isAnonymous,
       email: isAnonymous ? null : email?.trim() || null,
       phone: normalizedPhone,
       name: isAnonymous ? null : name.trim(),
+
       status: "pending",
       createdAt: FieldValue.serverTimestamp(),
       answeredAt: null,

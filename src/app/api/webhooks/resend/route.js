@@ -164,7 +164,6 @@ export async function POST(req) {
         { status: 500 },
       );
     }
-
     /*
      * ---------------------------------------------------------
      * 5. SAVE USTAAD'S REPLY
@@ -185,15 +184,78 @@ export async function POST(req) {
     if (signatureStart !== -1) {
       replyText = replyText.slice(0, signatureStart).trim();
     }
-    await submissionRef.update({
-      ustaad_answer: replyText,
-      ustaad_answered_at: new Date(),
-      ustaad_answered_from: email.from || "",
-      ustaad_email_id: emailId,
-      ustaad_email_subject: subject,
-      status: "answered_received",
+
+    if (!replyText) {
+      console.error("Received email contains no usable reply:", emailId);
+
+      await webhookRef.set(
+        {
+          status: "failed",
+          reason: "empty_reply",
+          submissionId,
+          from: email.from || "",
+          subject,
+          failedAt: new Date(),
+        },
+        { merge: true },
+      );
+
+      return NextResponse.json({
+        received: true,
+        processed: false,
+        reason: "empty_reply",
+      });
+    }
+
+    /*
+     * Store every Ustaad response separately.
+     *
+     * emailId is used as the response document ID so the same
+     * email cannot create multiple response records.
+     */
+    const responseRef = submissionRef.collection("responses").doc(emailId);
+
+    const existingResponse = await responseRef.get();
+
+    if (existingResponse.exists) {
+      console.log("Response already stored:", emailId);
+
+      await webhookRef.set(
+        {
+          status: "processed",
+          submissionId,
+          responseId: emailId,
+          processedAt: new Date(),
+        },
+        { merge: true },
+      );
+
+      return NextResponse.json({
+        received: true,
+        alreadyProcessed: true,
+        submissionId,
+        responseId: emailId,
+      });
+    }
+
+    await responseRef.set({
+      responseId: emailId,
+      answer: replyText,
+      language: null,
+      ustaadEmail: email.from || "",
+      emailId,
+      emailSubject: subject,
+      receivedAt: new Date(),
     });
 
+    /*
+     * Keep the submission-level status only.
+     * The actual answer now lives in /responses.
+     */
+    await submissionRef.update({
+      status: "answered_received",
+      answeredAt: new Date(),
+    });
     /*
      * ---------------------------------------------------------
      * 6. MARK WEBHOOK AS SUCCESSFULLY PROCESSED

@@ -27,6 +27,9 @@ export default function SingleUpload() {
   const fromSubmission = searchParams.get("fromSubmission");
   const submissionId = searchParams.get("submissionId");
 
+  //ResponseId
+  const responseId = searchParams.get("responseId");
+
   //deleted the duplicate line
   const questionFromUrl = searchParams.get("question");
   const answerFromUrl = searchParams.get("answer");
@@ -179,6 +182,7 @@ export default function SingleUpload() {
         sanchike,
         image_urls: imageUrl ? [imageUrl] : [],
         submissionId: submissionId || null,
+        responseId: responseId || null,
       }),
     });
 

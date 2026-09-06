@@ -108,7 +108,7 @@ async function getSubmissionResponse(submissionId) {
 ------------------------------------------------------- */
 export async function POST(req) {
   try {
-    const {
+    let {
       question,
       answer,
       lang: userLang,
@@ -169,7 +169,10 @@ export async function POST(req) {
       /* -------------------------------------------------------
          Enforce review workflow on the backend
       ------------------------------------------------------- */
-      if (submission.status !== QNA_SUBMISSION_STATUS.READY_TO_PROMOTE) {
+      if (
+        submission.status !== QNA_SUBMISSION_STATUS.ANSWERED_RECEIVED &&
+        submission.status !== QNA_SUBMISSION_STATUS.READY_TO_PROMOTE
+      ) {
         return NextResponse.json(
           {
             success: false,
@@ -375,6 +378,26 @@ export async function POST(req) {
         promotedAt: new Date(),
       });
 
+      // Mark the selected response as promoted
+      if (submissionId && responseId) {
+        const responsesRef = adminDB
+          .collection("qna_submissions")
+          .doc(submissionId)
+          .collection("responses");
+
+        const responsesSnap = await responsesRef.get();
+
+        const batch = adminDB.batch();
+
+        responsesSnap.docs.forEach((doc) => {
+          batch.update(doc.ref, {
+            status: doc.id === responseId ? "promoted" : "rejected",
+          });
+        });
+
+        await batch.commit();
+      }
+
       /* -------------------------------------------------------
          Notify user.
          
@@ -385,7 +408,7 @@ export async function POST(req) {
           await sendEmailToUser({
             email: submission.email,
             question: submission.question_original || question_en,
-            answer: answer_en,
+            answer: submission.language === "kn" ? answer_kn : answer_en,
           });
 
           await submissionRef.update({

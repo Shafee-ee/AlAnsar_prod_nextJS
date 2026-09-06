@@ -20,7 +20,6 @@ export default function QnaSubmissionsPage() {
   const [activeStatus, setActiveStatus] = useState(STATUS.PENDING);
   const [expandedId, setExpandedId] = useState(null);
   const [resendingId, setResendingId] = useState(null);
-  const [selectedResponseIds, setSelectedResponseIds] = useState({});
 
   const router = useRouter();
 
@@ -126,8 +125,6 @@ export default function QnaSubmissionsPage() {
               : item,
           ),
         );
-
-        setExpandedId(id);
       } else {
         setSubmissions((prev) => prev.filter((item) => item.id !== id));
       }
@@ -164,34 +161,19 @@ export default function QnaSubmissionsPage() {
     }
   };
 
-  const handlePromote = (item) => {
-    if (item.status !== STATUS.READY_TO_PROMOTE) {
-      alert(
-        "This submission must be reviewed and marked ready before promotion.",
-      );
+  const handlePromote = (item, response) => {
+    if (
+      item.status !== STATUS.ANSWERED_RECEIVED &&
+      item.status !== STATUS.READY_TO_PROMOTE
+    ) {
+      alert("This submission does not have an answer available for promotion.");
       return;
     }
 
-    const responses = item.responses || [];
-
-    const selectedResponseId = selectedResponseIds[item.id];
-
-    if (!selectedResponseId) {
-      alert("Please select which Ustaad response you want to promote.");
+    if (!response?.answer) {
+      alert("This Ustaad response has no answer.");
       return;
     }
-
-    const selectedResponse = responses.find(
-      (response, index) =>
-        (response.id || response.responseId || index) === selectedResponseId,
-    );
-
-    if (!selectedResponse?.answer) {
-      alert("The selected Ustaad response has no answer.");
-      return;
-    }
-
-    const answer = selectedResponse.answer;
 
     const encodedQuestion = encodeURIComponent(
       item.question_en ||
@@ -200,12 +182,13 @@ export default function QnaSubmissionsPage() {
         "",
     );
 
-    const encodedAnswer = encodeURIComponent(answer);
+    const encodedAnswer = encodeURIComponent(response.answer);
 
-    const responseParam =
-      selectedResponseId === "legacy"
-        ? ""
-        : `&responseId=${encodeURIComponent(selectedResponseId)}`;
+    const responseId = response.id || response.responseId || "";
+
+    const responseParam = responseId
+      ? `&responseId=${encodeURIComponent(responseId)}`
+      : "";
 
     router.push(
       `/admin/qna?fromSubmission=true&submissionId=${item.id}${responseParam}&question=${encodedQuestion}&answer=${encodedAnswer}`,
@@ -263,51 +246,37 @@ export default function QnaSubmissionsPage() {
 
     return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
   };
-
   const renderResponses = (item) => {
     const responses = item.responses || [];
 
+    // Compatibility with older submissions.
     if (responses.length === 0 && item.ustaad_answer) {
-      const responseId = "legacy";
-      const isSelected = selectedResponseIds[item.id] === responseId;
-
       return (
         <div className="mt-3 border-t pt-3">
-          <div className="font-medium text-gray-700 mb-2">Ustaad response</div>
+          <div className="font-medium text-gray-700 mb-3">Ustaad response</div>
 
-          <label
-            className={`block rounded-md border p-3 cursor-pointer ${
-              isSelected
-                ? "border-blue-500 bg-blue-50"
-                : "border-gray-200 bg-gray-50"
-            }`}
-          >
-            <div className="flex items-start gap-3">
-              <input
-                type="radio"
-                name={`response-${item.id}`}
-                value={responseId}
-                checked={isSelected}
-                onChange={() =>
-                  setSelectedResponseIds((prev) => ({
-                    ...prev,
-                    [item.id]: responseId,
-                  }))
-                }
-                className="mt-1"
-              />
-
-              <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-gray-700 mb-1">
-                  Response 1
-                </div>
-
-                <div className="whitespace-pre-wrap text-gray-700">
-                  {item.ustaad_answer}
-                </div>
-              </div>
+          <div className="rounded-md bg-gray-50 border p-3">
+            <div className="whitespace-pre-wrap text-gray-700">
+              {item.ustaad_answer}
             </div>
-          </label>
+
+            {item.status === STATUS.ANSWERED_RECEIVED &&
+              !item.promoted_qna_id && (
+                <div className="mt-3 flex justify-end">
+                  <button
+                    onClick={() =>
+                      handlePromote(item, {
+                        id: "legacy",
+                        answer: item.ustaad_answer,
+                      })
+                    }
+                    className="px-3 py-2 bg-blue-600 text-white text-sm rounded"
+                  >
+                    Promote
+                  </button>
+                </div>
+              )}
+          </div>
         </div>
       );
     }
@@ -315,8 +284,6 @@ export default function QnaSubmissionsPage() {
     if (responses.length === 0) {
       return null;
     }
-
-    const selectedResponseId = selectedResponseIds[item.id];
 
     return (
       <div className="mt-3 border-t pt-3 space-y-3">
@@ -326,50 +293,51 @@ export default function QnaSubmissionsPage() {
 
         {responses.map((response, index) => {
           const responseId = response.id || response.responseId || index;
-          const isSelected = selectedResponseId === responseId;
 
           return (
-            <label
-              key={responseId}
-              className={`block rounded-md border p-3 cursor-pointer ${
-                isSelected
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 bg-gray-50"
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <input
-                  type="radio"
-                  name={`response-${item.id}`}
-                  value={responseId}
-                  checked={isSelected}
-                  onChange={() =>
-                    setSelectedResponseIds((prev) => ({
-                      ...prev,
-                      [item.id]: responseId,
-                    }))
-                  }
-                  className="mt-1"
-                />
-
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-gray-700 mb-1">
-                    Response {index + 1}
-                  </div>
-
-                  <div className="text-xs text-gray-500 mb-1">
-                    {response.ustaadEmail || "Ustaad"}{" "}
-                    {response.receivedAt
-                      ? `• ${formatDate(response.receivedAt)}`
-                      : ""}
-                  </div>
-
-                  <div className="whitespace-pre-wrap text-gray-700">
-                    {response.answer || "-"}
-                  </div>
-                </div>
+            <div key={responseId} className="rounded-md bg-gray-50 border p-3">
+              <div className="text-sm font-medium text-gray-700 mb-1">
+                Response {index + 1}
               </div>
-            </label>
+
+              <div className="text-xs text-gray-500 mb-2">
+                {response.ustaadEmail || "Ustaad"}{" "}
+                {response.receivedAt
+                  ? `• ${formatDate(response.receivedAt)}`
+                  : ""}
+              </div>
+
+              <div className="whitespace-pre-wrap text-gray-700">
+                {response.answer || "-"}
+              </div>
+
+              {/* Promotion outcome */}
+              {response.status === "promoted" && (
+                <div className="mt-3 text-sm font-medium text-green-700">
+                  Promoted Answer
+                </div>
+              )}
+
+              {response.status === "rejected" && (
+                <div className="mt-3 text-sm font-medium text-red-700">
+                  Rejected Answer
+                </div>
+              )}
+
+              {/* Promote button — only before promotion */}
+              {item.status === STATUS.READY_TO_PROMOTE &&
+                !item.promoted_qna_id &&
+                response.answer && (
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      onClick={() => handlePromote(item, response)}
+                      className="px-3 py-2 bg-blue-600 text-white text-sm rounded"
+                    >
+                      Promote
+                    </button>
+                  </div>
+                )}
+            </div>
           );
         })}
       </div>
@@ -424,128 +392,119 @@ export default function QnaSubmissionsPage() {
             const isExpanded = expandedId === item.id;
 
             return (
-              <div
-                key={item.id}
-                className="grid grid-cols-5 items-start px-4 py-3 border-t text-sm"
-              >
-                {/* Question + Responses */}
-                <div className="pr-4">
-                  <div
-                    onClick={() =>
-                      setExpandedId((prev) =>
-                        prev === item.id ? null : item.id,
-                      )
-                    }
-                    className={`cursor-pointer ${isExpanded ? "" : "truncate"}`}
-                  >
-                    {item.question_original || item.question_en || "-"}
-                  </div>
-                  {(isExpanded || item.status === STATUS.READY_TO_PROMOTE) &&
-                    renderResponses(item)}
-                </div>
-
-                {/* Submitted Date */}
-                <div>{formatDate(item.createdAt)}</div>
-
-                {/* Status */}
-                <div>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusClasses(
-                      item.status,
-                    )}`}
-                  >
-                    {getStatusLabel(item.status)}
-                  </span>
-                </div>
-
-                {/* Contact */}
-                <div>
-                  {item.email && item.phone ? (
-                    <div>
-                      <div>{item.phone}</div>
-                      <div>{item.email}</div>
-                    </div>
-                  ) : item.phone ? (
-                    item.phone
-                  ) : item.email ? (
-                    item.email
-                  ) : (
-                    "Anonymous"
-                  )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 justify-center flex-wrap">
-                  {item.status === STATUS.PENDING && (
-                    <>
-                      <button
-                        onClick={() => updateStatus(item.id, STATUS.APPROVED)}
-                        className="px-2 py-1 bg-green-600 text-white text-xs rounded"
-                      >
-                        Approve
-                      </button>
-
-                      <button
-                        onClick={() => updateStatus(item.id, STATUS.REJECTED)}
-                        className="px-2 py-1 bg-red-600 text-white text-xs rounded"
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-
-                  {/* Answer received → start review */}
-                  {item.status === STATUS.ANSWERED_RECEIVED && (
-                    <button
-                      onClick={() => updateStatus(item.id, STATUS.UNDER_REVIEW)}
-                      className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
-                    >
-                      Review Answer
-                    </button>
-                  )}
-
-                  {/* Under review → mark ready */}
-                  {item.status === STATUS.UNDER_REVIEW && (
-                    <button
+              <div key={item.id} className="border-t">
+                {/* Main submission row */}
+                <div className="grid grid-cols-5 items-start px-4 py-3 text-sm">
+                  {/* Question */}
+                  <div className="pr-4">
+                    <div
                       onClick={() =>
-                        updateStatus(item.id, STATUS.READY_TO_PROMOTE)
+                        setExpandedId((prev) =>
+                          prev === item.id ? null : item.id,
+                        )
                       }
-                      className="px-2 py-1 bg-green-600 text-white text-xs rounded"
+                      className={`cursor-pointer ${
+                        isExpanded ? "" : "truncate"
+                      }`}
                     >
-                      Ready to Promote
-                    </button>
-                  )}
+                      {item.question_original || item.question_en || "-"}
+                    </div>
+                  </div>
 
-                  {/* Ready → enter promotion workflow */}
-                  {item.status === STATUS.READY_TO_PROMOTE &&
-                    !item.promoted_qna_id && (
+                  {/* Submitted Date */}
+                  <div>{formatDate(item.createdAt)}</div>
+
+                  {/* Status */}
+                  <div>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${getStatusClasses(
+                        item.status,
+                      )}`}
+                    >
+                      {getStatusLabel(item.status)}
+                    </span>
+                  </div>
+
+                  {/* Contact */}
+                  <div className="min-w-0 pr-2">
+                    {item.email && item.phone ? (
+                      <div>
+                        <div className="truncate">{item.phone}</div>
+                        <div className="truncate">{item.email}</div>
+                      </div>
+                    ) : item.phone ? (
+                      <div className="truncate">{item.phone}</div>
+                    ) : item.email ? (
+                      <div className="truncate">{item.email}</div>
+                    ) : (
+                      "Anonymous"
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2 justify-center flex-wrap">
+                    {item.status === STATUS.PENDING && (
+                      <>
+                        <button
+                          onClick={() => updateStatus(item.id, STATUS.APPROVED)}
+                          className="px-2 py-1 bg-green-600 text-white text-xs rounded"
+                        >
+                          Approve
+                        </button>
+
+                        <button
+                          onClick={() => updateStatus(item.id, STATUS.REJECTED)}
+                          className="px-2 py-1 bg-red-600 text-white text-xs rounded"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+
+                    {/* Approved → resend question */}
+                    {item.status === STATUS.APPROVED && (
                       <button
-                        onClick={() => handlePromote(item)}
-                        className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
+                        onClick={() => resendImamEmail(item.id)}
+                        disabled={resendingId === item.id}
+                        className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded disabled:opacity-50"
                       >
-                        Promote
+                        {resendingId === item.id
+                          ? "Sending..."
+                          : "Resend Email"}
                       </button>
                     )}
 
-                  {/* Approved → resend question */}
-                  {item.status === STATUS.APPROVED && (
-                    <button
-                      onClick={() => resendImamEmail(item.id)}
-                      disabled={resendingId === item.id}
-                      className="px-2 py-1 bg-gray-600 text-white text-xs rounded disabled:opacity-50"
-                    >
-                      {resendingId === item.id ? "Sending..." : "Resend Email"}
-                    </button>
-                  )}
+                    {(item.status === STATUS.ANSWERED_RECEIVED ||
+                      item.status === STATUS.UNDER_REVIEW ||
+                      item.status === STATUS.READY_TO_PROMOTE ||
+                      item.status === STATUS.PROMOTED) && (
+                      <button
+                        onClick={() =>
+                          setExpandedId((prev) =>
+                            prev === item.id ? null : item.id,
+                          )
+                        }
+                        className="px-1 bg-gray-100 text-gray-700 text-xs"
+                      >
+                        {isExpanded ? "[Hide Answer]" : "[View Answer]"}
+                      </button>
+                    )}
 
-                  <button
-                    onClick={() => deleteSubmission(item.id)}
-                    className="text-red-600 hover:text-red-800 text-lg"
-                    title="Delete submission"
-                  >
-                    🗑
-                  </button>
+                    <button
+                      onClick={() => deleteSubmission(item.id)}
+                      className="text-red-600 hover:text-red-800 text-lg"
+                      title="Delete submission"
+                    >
+                      🗑
+                    </button>
+                  </div>
                 </div>
+
+                {/* Ustaad responses — full width */}
+                {/* Ustaad responses — full width */}
+                {isExpanded && (
+                  <div className="px-4 pb-4">{renderResponses(item)}</div>
+                )}
               </div>
             );
           })
@@ -569,32 +528,56 @@ export default function QnaSubmissionsPage() {
                 No promoted questions yet.
               </div>
             ) : (
-              promotedSubmissions.map((item) => (
-                <div
-                  key={item.id}
-                  className="grid grid-cols-3 items-center px-4 py-3 border-t text-sm"
-                >
-                  <div className="truncate">
-                    {item.question_original || item.question_en || "-"}
-                  </div>
+              promotedSubmissions.map((item) => {
+                const isExpanded = expandedId === item.id;
 
-                  <div>
-                    {formatDate(
-                      item.promotedAt || item.updatedAt || item.createdAt,
+                return (
+                  <div key={item.id} className="border-t">
+                    {/* Promoted submission row */}
+                    <div className="grid grid-cols-3 items-center px-4 py-3 text-sm">
+                      <div className="truncate">
+                        {item.question_original || item.question_en || "-"}
+                      </div>
+
+                      <div>
+                        {formatDate(
+                          item.promotedAt || item.updatedAt || item.createdAt,
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-center gap-3">
+                        <button
+                          onClick={() =>
+                            setExpandedId((prev) =>
+                              prev === item.id ? null : item.id,
+                            )
+                          }
+                          className="px-2 py-1  text-gray-500 text-xs "
+                        >
+                          {isExpanded ? "[Hide answer]" : "[View answer]"}
+                        </button>
+
+                        <div className="flex gap-2 justify-center flex-wrap">
+                          {/* existing status action buttons stay here */}
+
+                          <button
+                            onClick={() => deleteSubmission(item.id)}
+                            className="text-red-600 hover:text-red-800 text-lg"
+                            title="Delete submission"
+                          >
+                            🗑
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Answer */}
+                    {isExpanded && (
+                      <div className="px-4 pb-4">{renderResponses(item)}</div>
                     )}
                   </div>
-
-                  <div className="text-center">
-                    <button
-                      onClick={() => deleteSubmission(item.id)}
-                      className="text-red-600 hover:text-red-800 text-lg"
-                      title="Delete submission"
-                    >
-                      🗑
-                    </button>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

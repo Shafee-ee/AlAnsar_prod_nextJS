@@ -1,16 +1,15 @@
 "use client";
-import { convertNudiToUnicode } from "@/lib/nudiConverter";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebaseClient";
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
 
 export default function SingleUpload() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-
-  const [lang, setLang] = useState("kn");
+  const [questionEn, setQuestionEn] = useState("");
+  const [questionKn, setQuestionKn] = useState("");
+  const [answerEn, setAnswerEn] = useState("");
+  const [answerKn, setAnswerKn] = useState("");
   const [keywords, setKeywords] = useState("");
   const [loading, setLoading] = useState(false);
   const [editorNoteEn, setEditorNoteEn] = useState("");
@@ -21,6 +20,7 @@ export default function SingleUpload() {
   const [sanchike, setSanchike] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [translating, setTranslating] = useState(null);
 
   //prefill QnA from submissions
   const searchParams = useSearchParams();
@@ -34,6 +34,82 @@ export default function SingleUpload() {
   const questionFromUrl = searchParams.get("question");
   const answerFromUrl = searchParams.get("answer");
 
+  async function translateText(text, targetLang) {
+    const res = await fetch("/api/qna/single", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        action: "translate",
+        text: text.trim(),
+        targetLang,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.reason || "Translation failed");
+    }
+
+    return data.translation;
+  }
+
+  async function handleTranslateAll() {
+    const jobs = [];
+
+    // Question: fill whichever language is empty
+    if (!questionEn.trim() && questionKn.trim()) {
+      jobs.push(
+        translateText(questionKn, "en").then((translation) => {
+          setQuestionEn(translation);
+        }),
+      );
+    }
+
+    if (!questionKn.trim() && questionEn.trim()) {
+      jobs.push(
+        translateText(questionEn, "kn").then((translation) => {
+          setQuestionKn(translation);
+        }),
+      );
+    }
+
+    // Answer: fill whichever language is empty
+    if (!answerEn.trim() && answerKn.trim()) {
+      jobs.push(
+        translateText(answerKn, "en").then((translation) => {
+          setAnswerEn(translation);
+        }),
+      );
+    }
+
+    if (!answerKn.trim() && answerEn.trim()) {
+      jobs.push(
+        translateText(answerEn, "kn").then((translation) => {
+          setAnswerKn(translation);
+        }),
+      );
+    }
+
+    if (jobs.length === 0) {
+      toast("Nothing to translate");
+      return;
+    }
+
+    setTranslating("all");
+
+    try {
+      await Promise.all(jobs);
+      toast.success("Translation completed");
+    } catch (error) {
+      console.error("Translation error:", error);
+      toast.error("Translation failed");
+    } finally {
+      setTranslating(null);
+    }
+  }
   // for image upload
   async function handleImageUpload(e) {
     const file = e.target.files[0];
@@ -133,16 +209,26 @@ export default function SingleUpload() {
   }
   //prefill
   useEffect(() => {
-    if (fromSubmission === "true") {
-      if (questionFromUrl) {
-        setQuestion(decodeURIComponent(questionFromUrl));
-      }
+    if (fromSubmission !== "true") return;
 
-      if (answerFromUrl) {
-        setAnswer(decodeURIComponent(answerFromUrl));
-      }
+    if (questionFromUrl) {
+      const question = decodeURIComponent(questionFromUrl);
 
-      setLang("en");
+      if (/[\u0C80-\u0CFF]/.test(question)) {
+        setQuestionKn(question);
+      } else {
+        setQuestionEn(question);
+      }
+    }
+
+    if (answerFromUrl) {
+      const answer = decodeURIComponent(answerFromUrl);
+
+      if (/[\u0C80-\u0CFF]/.test(answer)) {
+        setAnswerKn(answer);
+      } else {
+        setAnswerEn(answer);
+      }
     }
   }, [fromSubmission, questionFromUrl, answerFromUrl]);
   // handle submit function
@@ -154,8 +240,13 @@ export default function SingleUpload() {
       return;
     }
 
-    if (!question || !answer) {
-      toast.error("Please enter both question and answer.");
+    if (
+      !questionEn.trim() ||
+      !questionKn.trim() ||
+      !answerEn.trim() ||
+      !answerKn.trim()
+    ) {
+      toast.error("Please fill all four fields before saving.");
       return;
     }
 
@@ -170,9 +261,10 @@ export default function SingleUpload() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        question,
-        answer,
-        lang,
+        question_en: questionEn,
+        question_kn: questionKn,
+        answer_en: answerEn,
+        answer_kn: answerKn,
         keywords: keywordArray,
         editor_note_en: editorNoteEn,
         editor_note_kn: editorNoteKn,
@@ -197,8 +289,10 @@ export default function SingleUpload() {
 
     if (data.success) {
       toast.success("QnA uploaded successfully!");
-      setQuestion("");
-      setAnswer("");
+      setQuestionEn("");
+      setQuestionKn("");
+      setAnswerEn("");
+      setAnswerKn("");
       setKeywords("");
       setEditorNoteEn("");
       setEditorNoteKn("");
@@ -212,45 +306,84 @@ export default function SingleUpload() {
     }
   }
 
-  //on hold for now
-  function handleFixEncoding() {
-    setQuestion((prev) => convertNudiToUnicode(prev));
-    setAnswer((prev) => convertNudiToUnicode(prev));
-  }
-
   return (
     <div className="space-y-4 relative">
       <h2 className="text-xl font-bold text-[#1D3F9A]">Add Single QnA</h2>
 
       {/* Question */}
-      <div className="space-y-2">
-        <label className="font-medium">Question</label>
-        <textarea
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 h-24 focus:ring-[#1D3F9A]"
-          placeholder="Enter question..."
-        />
+      {/* Question */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="font-medium">Question</label>
+
+          <button
+            type="button"
+            onClick={handleTranslateAll}
+            disabled={translating === "all"}
+            className="text-sm text-[#1D3F9A] font-medium hover:underline disabled:opacity-50"
+          >
+            {translating === "all" ? "Translating..." : "Translate →"}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-sm text-gray-500 mb-1">English</div>
+
+            <textarea
+              value={questionEn}
+              onChange={(e) => setQuestionEn(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              rows={4}
+              placeholder="English question..."
+            />
+          </div>
+
+          <div>
+            <div className="text-sm text-gray-500 mb-1">Kannada</div>
+
+            <textarea
+              value={questionKn}
+              onChange={(e) => setQuestionKn(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              rows={4}
+              placeholder="Kannada question..."
+            />
+          </div>
+        </div>
       </div>
 
       {/* Answer */}
-      <div className="space-y-2">
+      {/* Answer */}
+      <div className="space-y-3">
         <label className="font-medium">Answer</label>
-        <textarea
-          value={answer}
-          onChange={(e) => setAnswer(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg h-32 focus:ring-2 focus:ring-[#1D3F9A]"
-          placeholder="Enter answer..."
-        ></textarea>
-      </div>
 
-      {/* <button
-        type="button"
-        onClick={handleFixEncoding}
-        className="bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-gray-900 transition"
-      >
-        Fix Kannada Encoding
-      </button> */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <div className="text-sm text-gray-500 mb-1">English</div>
+
+            <textarea
+              value={answerEn}
+              onChange={(e) => setAnswerEn(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              rows={6}
+              placeholder="English answer..."
+            />
+          </div>
+
+          <div>
+            <div className="text-sm text-gray-500 mb-1">Kannada</div>
+
+            <textarea
+              value={answerKn}
+              onChange={(e) => setAnswerKn(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              rows={6}
+              placeholder="Kannada answer..."
+            />
+          </div>
+        </div>
+      </div>
 
       {/* Keywords */}
       <div className="space-y-2">
@@ -262,19 +395,6 @@ export default function SingleUpload() {
           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
           placeholder="e.g. prayer, wudu, fasting"
         />
-      </div>
-
-      {/* Language */}
-      <div className="space-y-2">
-        <label className="font-medium">Language</label>
-        <select
-          value={lang}
-          onChange={(e) => setLang(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
-        >
-          <option value="kn">Kannada</option>
-          <option value="en">English</option>
-        </select>
       </div>
 
       {/* Editor Note (English) */}
@@ -380,7 +500,7 @@ export default function SingleUpload() {
       </div>
 
       <button
-        disabled={loading || uploadingImage}
+        disabled={loading || uploadingImage || translating === "all"}
         onClick={handleSubmit}
         className="bg-[#1D3F9A] text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-[#132B6A] transition disabled:opacity-50"
       >

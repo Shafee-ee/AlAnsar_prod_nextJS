@@ -108,9 +108,36 @@ async function getSubmissionResponse(submissionId) {
 ------------------------------------------------------- */
 export async function POST(req) {
   try {
+    const body = await req.json();
+
+    /* -------------------------------------------------------
+       TRANSLATION REQUEST
+    ------------------------------------------------------- */
+    if (body.action === "translate") {
+      const { text, targetLang } = body;
+
+      if (!text?.trim() || !targetLang) {
+        return NextResponse.json(
+          {
+            success: false,
+            reason: "missing-translation-fields",
+          },
+          { status: 400 },
+        );
+      }
+
+      const translation = await translate(text.trim(), targetLang);
+
+      return NextResponse.json({
+        success: true,
+        translation,
+      });
+    }
     let {
-      question,
-      answer,
+      question_en = "",
+      question_kn = "",
+      answer_en = "",
+      answer_kn = "",
       lang: userLang,
       keywords = [],
       editor_note_en = "",
@@ -122,8 +149,7 @@ export async function POST(req) {
       image_urls = [],
       submissionId = null,
       responseId = null,
-    } = await req.json();
-
+    } = body;
     /* -------------------------------------------------------
        SUBMISSION-BASED PROMOTION
        
@@ -213,37 +239,68 @@ export async function POST(req) {
           { status: 409 },
         );
       }
-
       /* -------------------------------------------------------
-         For submissions, use the stored question.
-         Do not trust the browser to provide a different one.
-      ------------------------------------------------------- */
-      question =
-        submission.question_original ||
-        submission.question_en ||
-        submission.translated_question_en ||
-        question;
+   Fill only fields that are missing.
+   
+   The values already supplied by SingleUpload are preserved.
+------------------------------------------------------- */
 
-      answer = submissionResponse.answer;
+      // Question
+      if (!question_en.trim() && !question_kn.trim()) {
+        if (submission.language === "kn") {
+          question_kn =
+            submission.question_original || submission.question_kn || "";
+
+          question_en =
+            submission.translated_question_en || submission.question_en || "";
+        } else {
+          question_en =
+            submission.question_original || submission.question_en || "";
+
+          question_kn = submission.question_kn || "";
+        }
+      }
+
+      // Answer
+      if (!answer_en.trim() && !answer_kn.trim()) {
+        if (isKannada(submissionResponse.answer)) {
+          answer_kn = submissionResponse.answer;
+        } else {
+          answer_en = submissionResponse.answer;
+        }
+      }
     }
+    /* -------------------------------------------------------
+   Trim bilingual fields
+------------------------------------------------------- */
+    question_en = question_en.trim();
+    question_kn = question_kn.trim();
+    answer_en = answer_en.trim();
+    answer_kn = answer_kn.trim();
 
     /* -------------------------------------------------------
-       Validate final question + answer
-    ------------------------------------------------------- */
-    if (!question || !answer) {
+   Validate question + answer
+------------------------------------------------------- */
+    /* -------------------------------------------------------
+   Require complete bilingual Q&A
+------------------------------------------------------- */
+
+    if (!question_en || !question_kn || !answer_en || !answer_kn) {
       return NextResponse.json(
         {
           success: false,
-          reason: "missing-fields",
+          reason: "missing-bilingual-fields",
         },
         { status: 400 },
       );
     }
 
-    const q = question.trim();
-    const a = answer.trim();
-
-    if (q.length < 2 || a.length < 2) {
+    if (
+      (question_en && question_en.length < 2) ||
+      (question_kn && question_kn.length < 2) ||
+      (answer_en && answer_en.length < 2) ||
+      (answer_kn && answer_kn.length < 2)
+    ) {
       return NextResponse.json(
         {
           success: false,
@@ -252,48 +309,12 @@ export async function POST(req) {
         { status: 400 },
       );
     }
-
     /* -------------------------------------------------------
-       Determine original language
-    ------------------------------------------------------- */
-    const detectedLang = isKannada(q) ? "kn" : "en";
+   Determine original language
+------------------------------------------------------- */
+    const detectedLang = isKannada(question_kn) && !question_en ? "kn" : "en";
 
-    const finalLang = q.length < 6 ? userLang || detectedLang : detectedLang;
-
-    /* -------------------------------------------------------
-       CREATE BOTH ENGLISH + KANNADA VERSIONS
-    ------------------------------------------------------- */
-    let question_en;
-    let answer_en;
-    let question_kn;
-    let answer_kn;
-
-    if (finalLang === "en") {
-      question_en = q;
-      answer_en = a;
-
-      question_kn = await translate(q, "kn");
-      answer_kn = await translate(a, "kn");
-    } else {
-      question_kn = q;
-      answer_kn = a;
-
-      question_en = await translate(q, "en");
-      answer_en = await translate(a, "en");
-    }
-
-    /* -------------------------------------------------------
-       Final bilingual validation
-    ------------------------------------------------------- */
-    if (!question_en || !answer_en || !question_kn || !answer_kn) {
-      return NextResponse.json(
-        {
-          success: false,
-          reason: "translation-failed",
-        },
-        { status: 500 },
-      );
-    }
+    const finalLang = submission?.language || userLang || detectedLang;
 
     /* -------------------------------------------------------
        Generate embedding from English question

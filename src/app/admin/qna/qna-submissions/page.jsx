@@ -325,7 +325,8 @@ export default function QnaSubmissionsPage() {
               )}
 
               {/* Promote button — only before promotion */}
-              {item.status === STATUS.READY_TO_PROMOTE &&
+              {(item.status === STATUS.ANSWERED_RECEIVED ||
+                item.status === STATUS.READY_TO_PROMOTE) &&
                 !item.promoted_qna_id &&
                 response.answer && (
                   <div className="mt-3 flex justify-end">

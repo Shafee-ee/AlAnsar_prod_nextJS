@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
 import { sendEmailToImam } from "@/lib/email";
+import { geminiTranslate } from "@/lib/geminiTranslate";
 
 export async function POST(req) {
   try {
@@ -32,10 +33,53 @@ export async function POST(req) {
       );
     }
 
+    let questionKannada = data.question_kn;
+    let questionEnglish = data.translated_question_en;
+
+    const updates = {};
+
+    if (!questionKannada) {
+      if (data.language === "kn") {
+        questionKannada = data.question_original;
+      } else {
+        questionKannada = await geminiTranslate(data.question_original, "kn");
+      }
+
+      if (!questionKannada) {
+        return NextResponse.json(
+          { error: "Unable to generate Kannada translation" },
+          { status: 500 },
+        );
+      }
+
+      updates.question_kn = questionKannada;
+    }
+
+    if (!questionEnglish) {
+      if (data.language === "en") {
+        questionEnglish = data.question_original;
+      } else {
+        questionEnglish = await geminiTranslate(data.question_original, "en");
+      }
+
+      if (!questionEnglish) {
+        return NextResponse.json(
+          { error: "Unable to generate English translation" },
+          { status: 500 },
+        );
+      }
+
+      updates.question_en = questionEnglish;
+      updates.translated_question_en = questionEnglish;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await docRef.update(updates);
+    }
     const result = await sendEmailToImam({
       questionOriginal: data.question_original,
-      questionEnglish: data.translated_question_en,
-      questionKannada: data.question_kn,
+      questionEnglish,
+      questionKannada,
       language: data.language,
       submissionId: id,
     });

@@ -147,6 +147,8 @@ export async function POST(req) {
       samputa = null,
       sanchike = null,
       image_urls = [],
+      email = "",
+      phone = "",
       submissionId = null,
       responseId = null,
     } = body;
@@ -177,6 +179,15 @@ export async function POST(req) {
       }
 
       submission = submissionSnap.data();
+
+      // Backend is the source of truth for contact information.
+      if (!email.trim()) {
+        email = submission.email || "";
+      }
+
+      if (!phone.trim()) {
+        phone = submission.phone || "";
+      }
 
       /* -------------------------------------------------------
          Prevent duplicate promotion
@@ -273,6 +284,13 @@ export async function POST(req) {
     /* -------------------------------------------------------
    Trim bilingual fields
 ------------------------------------------------------- */
+
+    /* -------------------------------------------------------
+       Normalize contact information
+    ------------------------------------------------------- */
+    const normalizedEmail = email && email.trim() !== "" ? email.trim() : null;
+
+    const normalizedPhone = phone && phone.trim() !== "" ? phone.trim() : null;
     question_en = question_en.trim();
     question_kn = question_kn.trim();
     answer_en = answer_en.trim();
@@ -374,6 +392,14 @@ export async function POST(req) {
       sanchike: normalizedSanchike,
       image_urls: normalizedImages,
 
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      submissionId: submissionId || null,
+
+      user_notification_sent: false,
+      user_notification_sent_at: null,
+      user_notification_error: null,
+
       createdAt: new Date().toISOString(),
       updatedAt: null,
     };
@@ -400,7 +426,7 @@ export async function POST(req) {
       });
 
       // Mark the selected response as promoted
-      if (submissionId && responseId) {
+      if (responseId) {
         const responsesRef = adminDB
           .collection("qna_submissions")
           .doc(submissionId)
@@ -418,42 +444,76 @@ export async function POST(req) {
 
         await batch.commit();
       }
-
-      /* -------------------------------------------------------
-         Notify user.
-         
-         Email failure must NOT undo the promotion.
-      ------------------------------------------------------- */
-      if (submission.email && !submission.isAnonymous) {
-        try {
-          await sendEmailToUser({
-            email: submission.email,
-            question: submission.question_original || question_en,
-            answer: submission.language === "kn" ? answer_kn : answer_en,
-          });
-
-          await submissionRef.update({
-            user_notification_sent: true,
-            user_notification_sent_at: new Date(),
-          });
-        } catch (emailError) {
-          console.error(
-            "User notification failed after promotion:",
-            emailError,
-          );
-
-          await submissionRef.update({
-            user_notification_sent: false,
-            user_notification_error:
-              emailError?.message || "Unknown email error",
-          });
-        }
-      } else {
-        console.log("No user notification sent (anonymous or missing email)");
-      }
     }
 
-    console.log("Q&A promoted successfully:", newQnaId);
+    /* -------------------------------------------------------
+       Notify questioner
+
+       Works for:
+       1. Submission-based promotion
+       2. Regular Single Upload
+
+       Email failure must NOT undo Q&A creation.
+    ------------------------------------------------------- */
+    const shouldNotify =
+      normalizedEmail && !(submissionId && submission?.isAnonymous);
+
+    if (shouldNotify) {
+      try {
+        const notificationQuestion =
+          finalLang === "kn" ? question_kn : question_en;
+
+        const notificationAnswer = finalLang === "kn" ? answer_kn : answer_en;
+
+        await sendEmailToUser({
+          email: normalizedEmail,
+          question: notificationQuestion,
+          answer: notificationAnswer,
+        });
+
+        await qnaRef.update({
+          user_notification_sent: true,
+          user_notification_sent_at: new Date(),
+          user_notification_error: null,
+        });
+
+        // Keep submission notification status updated too.
+        if (submissionId && submission) {
+          await adminDB.collection("qna_submissions").doc(submissionId).update({
+            user_notification_sent: true,
+            user_notification_sent_at: new Date(),
+            user_notification_error: null,
+          });
+        }
+      } catch (emailError) {
+        console.error(
+          "User notification failed after Q&A creation:",
+          emailError,
+        );
+
+        await qnaRef.update({
+          user_notification_sent: false,
+          user_notification_error: emailError?.message || "Unknown email error",
+        });
+
+        // Keep submission notification status updated too.
+        if (submissionId && submission) {
+          await adminDB
+            .collection("qna_submissions")
+            .doc(submissionId)
+            .update({
+              user_notification_sent: false,
+              user_notification_error:
+                emailError?.message || "Unknown email error",
+            });
+        }
+      }
+    } else {
+      console.log(
+        "No user notification sent (anonymous, missing email, or no contact email)",
+      );
+    }
+    console.log("Q&A created successfully:", newQnaId);
 
     return NextResponse.json({
       success: true,

@@ -297,6 +297,19 @@ export default function SingleUpload() {
       }),
     });
 
+    if (res.status === 409) {
+      const data = await res.json();
+
+      if (data.reason === "already-promoted") {
+        toast.error("Already promoted");
+      } else {
+        toast.error("Request already processed");
+      }
+
+      setLoading(false);
+      return;
+    }
+
     if (!res.ok) {
       toast.error("Server error");
       setLoading(false);

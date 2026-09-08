@@ -21,10 +21,20 @@ export default function CalendarView({
     ].sort((a, b) => b - a);
   }, [calendars]);
 
-  const [selectedYear, setSelectedYear] = useState(
-    years[0] || new Date().getFullYear(),
-  );
+  const today = new Date();
+  const todayDay = today.getDate();
 
+  const currentCalendar = calendars.find((calendar) => {
+    if (!calendar.calendarDate) return false;
+
+    return new Date(calendar.calendarDate) <= today;
+  });
+
+  const [selectedYear, setSelectedYear] = useState(
+    currentCalendar
+      ? new Date(currentCalendar.calendarDate).getFullYear()
+      : years[0] || today.getFullYear(),
+  );
   const filteredCalendars = useMemo(() => {
     return calendars.filter((calendar) => {
       if (!calendar.calendarDate) return false;
@@ -36,7 +46,7 @@ export default function CalendarView({
   }, [calendars, selectedYear]);
 
   const [selectedId, setSelectedId] = useState(
-    initialCalendarId || calendars[0]?.id || null,
+    initialCalendarId || currentCalendar?.id || calendars[0]?.id || null,
   );
 
   const [selectedEventId, setSelectedEventId] = useState(
@@ -44,7 +54,7 @@ export default function CalendarView({
   );
 
   const [selectedDuaDay, setSelectedDuaDay] = useState(
-    initialDuaDay ? Number(initialDuaDay) : null,
+    initialDuaDay ? Number(initialDuaDay) : todayDay,
   );
   const handleShare = async () => {
     if (!selectedCalendar) return;
@@ -138,9 +148,7 @@ export default function CalendarView({
   );
 
   const selectedDua =
-    duas.find((dua) => Number(dua.day) === Number(selectedDuaDay)) ||
-    duas[0] ||
-    null;
+    duas.find((dua) => Number(dua.day) === Number(selectedDuaDay)) || null;
 
   const selectedIndex = filteredCalendars.findIndex(
     (calendar) => calendar.id === selectedCalendar?.id,

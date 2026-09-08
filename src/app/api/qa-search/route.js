@@ -232,6 +232,14 @@ export async function POST(req) {
     const itemNorm = normalize(question);
 
     const confidenceScore = cosine(queryEmbedding, item.embedding);
+
+    if (item.id === "T82sDYunkXXTW5BtXDff") {
+      console.log("TARGET SEARCH DEBUG:", {
+        embeddingText,
+        confidenceScore,
+        question: item.question_en,
+      });
+    }
     const lexicalScore = tokenOverlapScore(itemNorm, qNorm);
 
     const rankScore = confidenceScore;

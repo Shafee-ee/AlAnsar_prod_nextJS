@@ -490,14 +490,6 @@ export default function QnaSubmissionsPage() {
                         {isExpanded ? "[Hide Answer]" : "[View Answer]"}
                       </button>
                     )}
-
-                    <button
-                      onClick={() => deleteSubmission(item.id)}
-                      className="text-red-600 hover:text-red-800 text-lg"
-                      title="Delete submission"
-                    >
-                      🗑
-                    </button>
                   </div>
                 </div>
 
@@ -560,14 +552,6 @@ export default function QnaSubmissionsPage() {
 
                         <div className="flex gap-2 justify-center flex-wrap">
                           {/* existing status action buttons stay here */}
-
-                          <button
-                            onClick={() => deleteSubmission(item.id)}
-                            className="text-red-600 hover:text-red-800 text-lg"
-                            title="Delete submission"
-                          >
-                            🗑
-                          </button>
                         </div>
                       </div>
                     </div>

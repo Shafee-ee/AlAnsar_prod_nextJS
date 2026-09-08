@@ -169,7 +169,6 @@ export async function POST(req) {
      * 5. SAVE USTAAD'S REPLY
      * ---------------------------------------------------------
      */
-
     const rawReply = email.text || email.html || "";
 
     let replyText = rawReply
@@ -177,14 +176,19 @@ export async function POST(req) {
       .split(/\s+On .*?wrote:/is)[0]
       .trim();
 
+    /*
+     * Remove Ustaad's email signature.
+     *
+     * Everything from the signature onward is excluded from
+     * the answer that gets stored in Firestore.
+     */
     const signatureStart = replyText.search(
-      /\n\s*Thanks,\s*\nIqbal Ahmed Mueenuddin\s*\nManaging Director/i,
+      /\n\s*(Thanks|Thank you)[,!]?\s*\n\s*Iqbal Ahmed Mueenuddin[\s\S]*$/i,
     );
 
     if (signatureStart !== -1) {
       replyText = replyText.slice(0, signatureStart).trim();
     }
-
     if (!replyText) {
       console.error("Received email contains no usable reply:", emailId);
 

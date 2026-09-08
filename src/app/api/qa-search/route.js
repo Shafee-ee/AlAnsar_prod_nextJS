@@ -55,6 +55,16 @@ function normalize(s = "") {
     .replace(/\s+/g, " ")
     .trim();
 }
+
+function expandIslamicTerms(query = "") {
+  return query
+    .replace(/\bniyyat\b/gi, "niyyat intention")
+    .replace(/\bniyyah\b/gi, "niyyah intention")
+    .replace(/\bqala\b/gi, "qala qada missed")
+    .replace(/\bqada\b/gi, "qada missed")
+    .replace(/\bqadha\b/gi, "qadha qada missed");
+}
+
 function hasValidIntent(query = "") {
   const q = normalize(query);
 
@@ -129,8 +139,7 @@ export async function POST(req) {
     return NextResponse.json({ success: false });
   }
 
-  let embeddingText = query;
-
+  let embeddingText = expandIslamicTerms(query);
   function isKannada(text = "") {
     return /[\u0C80-\u0CFF]/.test(text);
   }
@@ -149,9 +158,11 @@ export async function POST(req) {
   }
   console.timeEnd("TRANSLATE");
 
-  const qNorm = normalize(embeddingText);
+  embeddingText = expandIslamicTerms(embeddingText);
 
-  //added just now
+  embeddingText = expandIslamicTerms(embeddingText);
+
+  const qNorm = normalize(embeddingText); //added just now
   const isKeywordQuery = qNorm.split(" ").length === 1;
   const isLongQuery = qNorm.length > 80;
 

@@ -21,6 +21,8 @@ export default function SingleUpload() {
   const [imageUrl, setImageUrl] = useState(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [translating, setTranslating] = useState(null);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   //prefill QnA from submissions
   const searchParams = useSearchParams();
@@ -55,7 +57,45 @@ export default function SingleUpload() {
 
     return data.translation;
   }
+  useEffect(() => {
+    if (fromSubmission !== "true") return;
 
+    if (questionFromUrl) {
+      const question = decodeURIComponent(questionFromUrl);
+
+      if (/[\u0C80-\u0CFF]/.test(question)) {
+        setQuestionKn(question);
+      } else {
+        setQuestionEn(question);
+      }
+    }
+
+    if (answerFromUrl) {
+      const answer = decodeURIComponent(answerFromUrl);
+
+      if (/[\u0C80-\u0CFF]/.test(answer)) {
+        setAnswerKn(answer);
+      } else {
+        setAnswerEn(answer);
+      }
+    }
+
+    if (submissionId) {
+      fetch(
+        `/api/qna/submission-contact?id=${encodeURIComponent(submissionId)}`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setEmail(data.email || "");
+            setPhone(data.phone || "");
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to load submission contact:", error);
+        });
+    }
+  }, [fromSubmission, submissionId, questionFromUrl, answerFromUrl]);
   async function handleTranslateAll() {
     const jobs = [];
 
@@ -207,30 +247,7 @@ export default function SingleUpload() {
 
     img.src = objectUrl;
   }
-  //prefill
-  useEffect(() => {
-    if (fromSubmission !== "true") return;
 
-    if (questionFromUrl) {
-      const question = decodeURIComponent(questionFromUrl);
-
-      if (/[\u0C80-\u0CFF]/.test(question)) {
-        setQuestionKn(question);
-      } else {
-        setQuestionEn(question);
-      }
-    }
-
-    if (answerFromUrl) {
-      const answer = decodeURIComponent(answerFromUrl);
-
-      if (/[\u0C80-\u0CFF]/.test(answer)) {
-        setAnswerKn(answer);
-      } else {
-        setAnswerEn(answer);
-      }
-    }
-  }, [fromSubmission, questionFromUrl, answerFromUrl]);
   // handle submit function
   async function handleSubmit(e) {
     e.preventDefault();
@@ -270,6 +287,8 @@ export default function SingleUpload() {
         editor_note_kn: editorNoteKn,
         imam_name: imamName,
         source_title: sourceTitle,
+        email,
+        phone,
         samputa,
         sanchike,
         image_urls: imageUrl ? [imageUrl] : [],
@@ -468,6 +487,35 @@ export default function SingleUpload() {
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
             placeholder="Issue"
           />
+        </div>
+      </div>
+
+      {/* Contact Information */}
+      <div className="space-y-3">
+        <label className="font-medium">Questioner Contact</label>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm text-gray-500">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              placeholder="Email address"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm text-gray-500">Phone Number</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
+              placeholder="Phone number"
+            />
+          </div>
         </div>
       </div>
 

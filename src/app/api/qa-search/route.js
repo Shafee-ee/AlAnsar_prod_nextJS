@@ -285,6 +285,12 @@ export async function POST(req) {
         }),
     );
 
+    const targetDebug = scored.find(
+      (item) => item.id === "T82sDYunkXXTW5BtXDff",
+    );
+
+    console.log("TARGET SCORE:", targetDebug?.confidenceScore);
+
     if (suggestions.length === 0) {
       console.timeEnd("TOTAL");
 
@@ -298,6 +304,20 @@ export async function POST(req) {
       success: true,
       mode: "suggestions",
       suggestions,
+      targetDebug: (() => {
+        const target = scored.find(
+          (item) => item.id === "T82sDYunkXXTW5BtXDff",
+        );
+
+        return target
+          ? {
+              id: target.id,
+              question: target.question_en,
+              confidence: target.confidenceScore,
+              lexical: target.lexicalScore,
+            }
+          : null;
+      })(),
     });
   }
 

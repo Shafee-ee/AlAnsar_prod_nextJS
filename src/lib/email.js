@@ -3,8 +3,8 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const IMAM_NOTIFICATION_LIST = [
-  // "muyeen@technopulse.in",
-  // "gmmkamil@gmail.com"
+  "muyeen@technopulse.in",
+  "gmmkamil@gmail.com",
   "shafeeghani@gmail.com",
 ];
 
@@ -14,6 +14,9 @@ export async function sendEmailToImam({
   questionKannada,
   language,
   submissionId,
+  name,
+  email,
+  phone,
 }) {
   try {
     const result = await resend.emails.send({
@@ -82,12 +85,24 @@ export async function sendEmailToImam({
 `
          }
 
-          <p style="font-size:14px; color:#555;">
-            Submission ID: ${submissionId}
-          </p>
+         
+<div style="
+  background:#f5f7fb;
+  padding:15px;
+  border-radius:8px;
+  margin:20px 0;
+  font-size:14px;
+">
+  <strong>Submitter Information:</strong><br/><br/>
+  <strong>Name:</strong> ${name || "Anonymous"}<br/>
+  <strong>Email:</strong> ${email || "Not provided"}<br/>
+  <strong>Phone:</strong> ${phone || "Not provided"}
+</div>
 
-          
-
+<p style="font-size:14px; color:#555;">
+  Submission ID: ${submissionId}
+</p>
+       
           <p style="margin-top:30px; font-size:12px; color:#777;">
             Al Ansar Weekly
           </p>

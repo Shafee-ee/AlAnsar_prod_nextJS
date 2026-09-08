@@ -56,6 +56,9 @@ export async function POST(req) {
         questionKannada: data.question_kn,
         language: data.language,
         submissionId: id,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
       });
       if (!emailResult) {
         return NextResponse.json(

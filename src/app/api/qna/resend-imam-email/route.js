@@ -82,6 +82,9 @@ export async function POST(req) {
       questionKannada,
       language: data.language,
       submissionId: id,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
     });
     if (!result) {
       return NextResponse.json(

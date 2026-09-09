@@ -728,10 +728,6 @@ const ChatbotSection = () => {
 
     setSearchResult(null);
 
-    if (!textOverride) {
-      setUserInput("");
-    }
-
     const normalized = queryText.toLowerCase();
 
     const greetings = [

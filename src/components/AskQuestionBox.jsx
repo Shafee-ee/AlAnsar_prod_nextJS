@@ -4,6 +4,7 @@ import {
   getCountryCallingCode,
   isValidPhoneNumber,
 } from "libphonenumber-js";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AskQuestionBox({
   initialQuestion = "",
@@ -27,7 +28,7 @@ export default function AskQuestionBox({
     phone.trim() === "" || isValidPhoneNumber(phone.trim(), country);
 
   const hasContact = email.trim() !== "" || phone.trim() !== "";
-
+  const { lang } = useLanguage();
   const isFormValid =
     question.trim().length >= 10 &&
     (isAnonymous ||
@@ -40,6 +41,30 @@ export default function AskQuestionBox({
     setPhone("");
     setName("");
     setIsAnonymous(false);
+  };
+
+  const AnonMessage = {
+    kn: {
+      title: "ದಯವಿಟ್ಟು ಗಮನಿಸಿ:",
+      text: "ನೀವು ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಅನಾಮಧೇಯವಾಗಿ ಸಲ್ಲಿಸಿದರೆ, ಅದರ ಉತ್ತರವನ್ನು ಇಮೇಲ್ ಅಥವಾ ವಾಟ್ಸಾಪ್ ಮೂಲಕ ನಿಮ್ಮೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳಲು ನಮಗೆ ಸಾಧ್ಯವಾಗುವುದಿಲ್ಲ.",
+    },
+    en: {
+      title: "Please note:",
+      text: "If you submit your question anonymously, we will not be able to share the answer with you via email or WhatsApp.",
+    },
+  };
+
+  const ValidationMessage = {
+    kn: {
+      contact: "ದಯವಿಟ್ಟು ಇಮೇಲ್ ವಿಳಾಸ ಅಥವಾ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ಒದಗಿಸಿ.",
+      email: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ.",
+      phone: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+    },
+    en: {
+      contact: "Please provide either an email address or phone number.",
+      email: "Please enter a valid email address.",
+      phone: "Please enter a valid phone number.",
+    },
   };
 
   useEffect(() => {
@@ -139,74 +164,89 @@ export default function AskQuestionBox({
               />
               Submit anonymously
             </label>
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              disabled={isAnonymous}
-              className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
-              }`}
-            />
+            {isAnonymous ? (
+              <div className="py-6 px-4 text-center">
+                <p className="font-medium text-gray-700 ">
+                  <span className="font-medium text-gray-600">
+                    {AnonMessage[lang].title}
+                  </span>
+                  {AnonMessage[lang].text}
+                </p>
+              </div>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={isAnonymous}
+                  className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                />
 
-            <input
-              type="email"
-              placeholder="Your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isAnonymous}
-              className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
-              }`}
-            />
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isAnonymous}
+                  className={`w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                />
 
-            <div className="flex gap-2 w-full min-w-0">
-              <select
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                disabled={isAnonymous}
-                className={`w-[105px] min-w-0 max-w-[105px] shrink-0 border border-gray-300 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
-              >
-                {countryOptions.map((item) => (
-                  <option key={item.code} value={item.code}>
-                    {item.name} {item.callingCode}
-                  </option>
-                ))}
-              </select>
+                <div className="flex gap-2 w-full min-w-0">
+                  <select
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    disabled={isAnonymous}
+                    className={`w-[105px] min-w-0 max-w-[105px] shrink-0 border border-gray-300 rounded-lg px-3 py-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {countryOptions.map((item) => (
+                      <option key={item.code} value={item.code}>
+                        {item.name} {item.callingCode}
+                      </option>
+                    ))}
+                  </select>
 
-              <input
-                type="tel"
-                inputMode="numeric"
-                placeholder="Your phone number"
-                value={phone}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "").slice(0, 15);
-                  setPhone(value);
-                }}
-                disabled={isAnonymous}
-                className={`flex-1 min-w-0 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
-                }`}
-              />
-            </div>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    placeholder="Your phone number"
+                    value={phone}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 15);
+                      setPhone(value);
+                    }}
+                    disabled={isAnonymous}
+                    className={`flex-1 min-w-0 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                      isAnonymous ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                  />
+                </div>
+              </>
+            )}
             {!isAnonymous && !hasContact && (
-              <p className="text-sm text-red-600">
-                Please provide either an email address or phone number.
+              <p className="text-sm text-blue-600">
+                {ValidationMessage[lang].contact}
               </p>
             )}
 
             {!isAnonymous && email.trim() !== "" && !emailIsValid && (
-              <p className="text-sm text-red-600">
-                Please enter a valid email address.
+              <p className="text-sm text-blue-600">
+                {ValidationMessage[lang].email}
               </p>
             )}
 
             {!isAnonymous && phone.trim() !== "" && !phoneIsValid && (
-              <p className="text-sm text-red-600">
-                Please enter a valid phone number
+              <p className="text-sm text-blue-600">
+                {ValidationMessage[lang].phone}
               </p>
             )}
 

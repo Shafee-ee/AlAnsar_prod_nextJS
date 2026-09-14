@@ -8,6 +8,7 @@ import {
   Share2,
   ExternalLink,
 } from "lucide-react";
+import BookLoader from "@/components/BookLoader";
 import { useSearchParams } from "next/navigation";
 
 import { BookOpen } from "lucide-react";
@@ -36,13 +37,13 @@ const CONFIDENCE = {
   LOW: 0.35,
 };
 
-const TypingDots = () => (
-  <div className="flex items-center gap-1 px-4 py-2 bg-white border rounded-xl shadow-sm">
-    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.2s]" />
-    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.1s]" />
-    <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
-  </div>
-);
+// const TypingDots = () => (
+//   <div className="flex items-center gap-1 px-4 py-2 bg-white border rounded-xl shadow-sm">
+//     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.2s]" />
+//     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.1s]" />
+//     <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce" />
+//   </div>
+// );
 
 /* ---------------------------------------------------------
    BOT RESPONSE CARD
@@ -951,8 +952,13 @@ const ChatbotSection = () => {
         {/* Search results */}
 
         {isLoading ? (
-          <div className="py-10 flex justify-center">
-            <TypingDots />
+          <div className="py-10 flex flex-col items-center justify-center gap-2">
+            <BookLoader />
+            <span className="text-xs text-gray-500 -mt-1">
+              {selectedLang === "kn"
+                ? "ನಮ್ಮ ಆರ್ಕೈವ್‌ನಲ್ಲಿ ಹುಡುಕಲಾಗುತ್ತಿದೆ..."
+                : "Searching our archive..."}
+            </span>
           </div>
         ) : searchResult ? (
           <div className="w-full max-w-5xl mx-auto">

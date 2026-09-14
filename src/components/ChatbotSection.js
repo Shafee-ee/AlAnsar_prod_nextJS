@@ -842,9 +842,10 @@ const ChatbotSection = () => {
         query: queryText,
         suggestions: [],
       });
+    } finally {
+      setIsLoading(false);
+      setUserInput("");
     }
-
-    setIsLoading(false);
   };
 
   return (
@@ -962,11 +963,22 @@ const ChatbotSection = () => {
           </div>
         ) : searchResult ? (
           <div className="w-full max-w-5xl mx-auto">
+            <div className="mb-6 px-4 py-3 rounded-lg bg-gray-50 border border-gray-100">
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
+                {selectedLang === "kn"
+                  ? "ನೀವು ಕೇಳಿದ ಪ್ರಶ್ನೆ"
+                  : "Asked Question"}
+              </p>
+
+              <p className="mt-1.5 text-sm font-medium text-blue-700 leading-relaxed ">
+                {searchResult.query}
+              </p>
+            </div>
             {/* Results */}
             {searchResult.mode !== "noMatch" && (
               <>
-                <div className="mb-4 mt-2 ">
-                  <h2 className="text-sm font-semibold text-gray-900">
+                <div className="mb-2 ml-4">
+                  <h2 className="text-xs font-semibold text-gray-900">
                     {selectedLang === "kn"
                       ? "ನಿಮ್ಮ ಹುಡುಕಾಟದ ಆಧಾರದ ಮೇಲಿನ ಪ್ರಶ್ನೆಗಳು"
                       : "Questions based on your search"}

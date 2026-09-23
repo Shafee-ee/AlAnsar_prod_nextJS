@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import sharp from "sharp";
-import { adminDB } from "@/lib/firebaseAdmin";
 
 export const runtime = "nodejs";
 
@@ -15,27 +14,27 @@ export async function GET(req) {
       return new NextResponse("Slug required", { status: 400 });
     }
 
-    // Get the article
-    const articleSnap = await adminDB
-      .collection("articles")
-      .where("slug", "==", slug)
-      .where("status", "==", "published")
-      .limit(1)
-      .get();
+    // Reuse the existing article lookup
+    const articleUrl =
+      `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/by-slug` +
+      `?slug=${encodeURIComponent(slug)}&lang=${encodeURIComponent(lang)}`;
 
-    if (articleSnap.empty) {
+    const articleResponse = await fetch(articleUrl, {
+      next: { revalidate: 3600 },
+    });
+
+    if (!articleResponse.ok) {
       return new NextResponse("Article not found", { status: 404 });
     }
 
-    const articleDoc = articleSnap.docs[0];
-    const article = articleDoc.data();
+    const article = await articleResponse.json();
 
-    if (!article.coverImage) {
+    if (!article.image) {
       return new NextResponse("Article image not found", { status: 404 });
     }
 
-    // Download the original image
-    const imageResponse = await fetch(article.coverImage);
+    // Download the original article image
+    const imageResponse = await fetch(article.image);
 
     if (!imageResponse.ok) {
       return new NextResponse("Failed to fetch article image", {
@@ -45,7 +44,7 @@ export async function GET(req) {
 
     const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-    // Resize and compress for social previews
+    // Resize and compress for WhatsApp / Open Graph
     const optimizedImage = await sharp(imageBuffer)
       .resize(1200, 630, {
         fit: "cover",

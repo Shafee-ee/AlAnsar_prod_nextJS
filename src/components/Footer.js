@@ -107,8 +107,18 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        <div className="pt-6 text-center text-sm text-white/50 text-xs  border-white/10 pt-4 mt-6">
-          © {new Date().getFullYear()} Al Ansar Weekly. All rights reserved.
+        {/* Bottom */}
+        <div className="text-center text-xs text-white/50 border-white/10 pt-4 mt-6">
+          <a
+            href="/privacy-policy"
+            className="text-white/70 hover:text-white hover:underline"
+          >
+            Privacy Policy
+          </a>
+
+          <p className="mt-2">
+            © {new Date().getFullYear()} Al Ansar Weekly. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

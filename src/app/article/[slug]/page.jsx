@@ -2,6 +2,55 @@ import ArticleView from "@/components/ArticleView";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleAd from "@/components/ads/ArticleAd";
 
+export async function generateMetadata({ params, searchParams }) {
+  const { slug } = await params;
+  const { lang = "kn" } = await searchParams;
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
+    { next: { revalidate: 60 } },
+  );
+
+  if (!res.ok) {
+    return {
+      title: "Article - Al Ansar Weekly",
+    };
+  }
+
+  const article = await res.json();
+
+  const articleUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/article/${article.slug}?lang=${lang}`;
+
+  return {
+    title: article.title,
+    description: article.excerpt,
+
+    openGraph: {
+      title: article.title,
+      description: article.excerpt,
+      url: articleUrl,
+      type: "article",
+      images: article.image
+        ? [
+            {
+              url: article.image,
+              width: 1200,
+              height: 630,
+              alt: article.title,
+            },
+          ]
+        : [],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: article.image ? [article.image] : [],
+    },
+  };
+}
+
 export default async function ArticlePage({ params, searchParams }) {
   const { slug } = await params;
   const { lang = "kn" } = await searchParams;

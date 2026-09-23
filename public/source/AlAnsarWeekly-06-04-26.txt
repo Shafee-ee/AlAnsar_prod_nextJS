@@ -4035,3 +4035,327 @@ src/components/AskQuestionBox.jsx
 src/components/ChatbotSection.jsx
 
 The chatbot component is large, but it was read as part of solving this flow. The current behavior should be preserved while moving on to other work.
+#####
+## Al Ansar Weekly — Chat Summary / Current Checkpoint
+**Date: 23 September 2026**
+
+### 1. Privacy Policy — DONE
+
+Meta's App Settings required a public Privacy Policy URL before the app could be submitted/published.
+
+We created:
+
+```text
+src/app/privacy-policy/page.jsx
+```
+
+The policy covers:
+- Q&A submissions
+- Optional email collection
+- Anonymous submissions
+- IP/technical information used for abuse prevention
+- How submitted questions are used
+- Firebase / Google Cloud
+- Resend
+- Gemini / Vertex AI for translation and semantic search
+- Data security and retention
+- User rights
+- Contact information
+
+We also added a footer link in:
+
+```text
+src/components/Footer.js
+```
+
+The live page is:
+
+```text
+https://alansarweekly.com/privacy-policy
+```
+
+Verified working publicly.
+
+---
+
+### 2. Meta App Settings — DONE
+
+Meta initially showed:
+
+> Currently ineligible for submission
+
+Missing:
+- Privacy Policy URL
+- Category
+- App icon
+
+We entered:
+
+**Privacy Policy URL**
+
+```text
+https://alansarweekly.com/privacy-policy
+```
+
+**Category**
+
+```text
+Education
+```
+
+The app icon was already present.
+
+After saving, the red eligibility warning disappeared.
+
+---
+
+### 3. Meta Publish Page
+
+We went to:
+
+**Meta Developer Dashboard → Publish**
+
+The page showed:
+
+**Business verification**
+- Business: Al Ansar Weekly
+- Business Portfolio ID: `1828404188243995`
+- Status: **Unverified**
+
+It also showed:
+
+> To start access verification, you need to complete business verification.
+
+The WhatsApp use case is:
+
+> Connect with customers through WhatsApp
+
+So we started Business Verification.
+
+---
+
+### 4. Business Verification
+
+Meta's Security Centre showed:
+
+**Business verification**
+- Verification use case: `App requires access to permissions on Meta for Developers`
+- Status: **Eligible for verification**
+- `Start verification` available
+
+There was also an unrelated security recommendation:
+
+> 1 user with a public email domain
+
+We did not change that.
+
+---
+
+### 5. Business Type
+
+Meta asked what type of business Al Ansar Weekly is.
+
+The client confirmed:
+
+- It is owned and operated by one individual.
+- It is not a registered partnership.
+- It is not a private company.
+- It is not a trust/institution.
+
+Therefore the appropriate business type is:
+
+**Sole proprietorship**
+
+Meta then asked:
+
+> Is your business officially registered?
+
+Options:
+
+- Registered
+- Not yet registered
+
+We have **not selected either one yet**.
+
+---
+
+### 6. Documentation Problem
+
+The client currently provided:
+
+- Bank passbook first page
+- Utility bill
+
+These can help establish the business/address details, but they don't establish the legal registration/proprietorship Meta is asking for.
+
+The client has a personal PAN, but explicitly said:
+
+> “That's my PAN not related to AlAnsar.”
+
+So we are **not treating that PAN as business-registration evidence**.
+
+The client said they will meet another person at the Al Ansar office to find out what business-registration/proprietorship documentation is available.
+
+This is where we stopped.
+
+---
+
+### 7. Important Meta/WhatsApp State From Earlier Investigation
+
+The underlying WhatsApp setup is already substantially configured.
+
+**App**
+
+```text
+AI Ansar Weekly
+App ID: 1392556126300609
+```
+
+**Business Portfolio**
+
+```text
+Al Ansar Weekly
+ID: 1828404188243995
+```
+
+**Production WABA**
+
+```text
+Al Ansar Weekly
+ID: 1035462545927881
+```
+
+WABA status:
+
+```text
+account_review_status: APPROVED
+on_behalf_of_business_info:
+  business ID: 1828404188243995
+  status: APPROVED
+  type: SELF
+```
+
+**Production phone**
+
+```text
++91 94814 55704
+Phone ID: 1245008558705087
+```
+
+Status:
+
+```text
+CONNECTED
+VERIFIED
+LIVE
+TIER_250
+```
+
+**Production WABA balance**
+
+```text
+₹499.99
+```
+
+**Approved template**
+
+```text
+test_message
+ID: 1669996227888288
+Language: en
+Status: APPROVED
+Category: MARKETING
+```
+
+**App subscribed to production WABA**
+
+```text
+POST /1035462545927881/subscribed_apps
+→ {"success":true}
+```
+
+And the app appears in the WABA's subscribed apps.
+
+**System User**
+
+```text
+Al Ansar Weekly API
+```
+
+Has access to:
+- App
+- WhatsApp account
+
+Required permissions are granted:
+- `business_management`
+- `whatsapp_business_management`
+- `whatsapp_business_messaging`
+- `public_profile`
+
+A fresh System User token was generated and verified as valid.
+
+---
+
+### 8. The Actual WhatsApp Problem
+
+Despite all of the above, sending a message through:
+
+```text
+/1245008558705087/messages
+```
+
+consistently produces:
+
+```text
+HTTP 500
+OAuthException
+code: 1
+message: An unknown error has occurred.
+```
+
+This happened with:
+
+- Plain text message
+- `hello_world` template
+- Approved `test_message` template
+- Fresh System User token
+- API v26.0
+- API v21.0
+
+The recipient number was also confirmed to be active on WhatsApp.
+
+So the message-send issue remains unresolved.
+
+---
+
+### 9. Current Hypothesis
+
+We **do not know yet** that Business Verification is the cause.
+
+However, Meta's current Publish flow explicitly says:
+
+> Access verification requires completion of business verification.
+
+Since the app currently has the other major WhatsApp components configured and the API still returns the generic error, completing Business Verification is now a concrete thing to test.
+
+The plan is:
+
+```text
+Obtain appropriate business documentation
+        ↓
+Complete Meta Business Verification
+        ↓
+Complete Access Verification if Meta requires it
+        ↓
+Retry the exact same approved WhatsApp message
+        ↓
+See whether the code 1 error changes
+```
+
+If the error remains, we continue investigating from that new state rather than repeating the previous setup work.
+
+### Current stopping point
+
+**Do not change anything in Meta right now.**
+
+Wait for the client to determine what official document exists for Al Ansar Weekly's sole proprietorship/business registration.

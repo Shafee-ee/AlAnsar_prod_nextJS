@@ -33,7 +33,7 @@ export async function generateMetadata({ params, searchParams }) {
       images: article.image
         ? [
             {
-              url: article.image,
+              url: `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/og-image?slug=${article.slug}&lang=${lang}`,
               width: 1200,
               height: 630,
               alt: article.title,
@@ -46,7 +46,11 @@ export async function generateMetadata({ params, searchParams }) {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: article.image ? [article.image] : [],
+      images: article.image
+        ? [
+            `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/og-image?slug=${article.slug}&lang=${lang}`,
+          ]
+        : [],
     },
   };
 }

@@ -468,15 +468,26 @@ export default function QnaSubmissionsPage() {
 
                     {/* Approved → resend question */}
                     {item.status === STATUS.APPROVED && (
-                      <button
-                        onClick={() => resendImamEmail(item.id)}
-                        disabled={resendingId === item.id}
-                        className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded disabled:opacity-50"
-                      >
-                        {resendingId === item.id
-                          ? "Sending..."
-                          : "Resend Email"}
-                      </button>
+                      <>
+                        <button
+                          onClick={() => resendImamEmail(item.id)}
+                          disabled={resendingId === item.id}
+                          className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded disabled:opacity-50"
+                        >
+                          {resendingId === item.id
+                            ? "Sending..."
+                            : "Resend Email"}
+                        </button>
+
+                        {!item.promoted_qna_id && (
+                          <button
+                            onClick={() => handlePromote(item)}
+                            className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
+                          >
+                            Promote
+                          </button>
+                        )}
+                      </>
                     )}
 
                     {(item.status === STATUS.ANSWERED_RECEIVED ||

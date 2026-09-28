@@ -161,17 +161,9 @@ export default function QnaSubmissionsPage() {
     }
   };
 
-  const handlePromote = (item, response) => {
-    if (
-      item.status !== STATUS.ANSWERED_RECEIVED &&
-      item.status !== STATUS.READY_TO_PROMOTE
-    ) {
-      alert("This submission does not have an answer available for promotion.");
-      return;
-    }
-
-    if (!response?.answer) {
-      alert("This Ustaad response has no answer.");
+  const handlePromote = (item, response = null) => {
+    if (item.promoted_qna_id) {
+      alert("This submission has already been promoted.");
       return;
     }
 
@@ -182,16 +174,18 @@ export default function QnaSubmissionsPage() {
         "",
     );
 
-    const encodedAnswer = encodeURIComponent(response.answer);
+    const encodedAnswer = response?.answer
+      ? `&answer=${encodeURIComponent(response.answer)}`
+      : "";
 
-    const responseId = response.id || response.responseId || "";
+    const responseId = response?.id || response?.responseId || "";
 
     const responseParam = responseId
       ? `&responseId=${encodeURIComponent(responseId)}`
       : "";
 
     router.push(
-      `/admin/qna?fromSubmission=true&submissionId=${item.id}${responseParam}&question=${encodedQuestion}&answer=${encodedAnswer}`,
+      `/admin/qna?fromSubmission=true&submissionId=${item.id}&question=${encodedQuestion}${encodedAnswer}${responseParam}`,
     );
   };
 
@@ -282,7 +276,20 @@ export default function QnaSubmissionsPage() {
     }
 
     if (responses.length === 0) {
-      return null;
+      return (
+        <div className="mt-3 border-t pt-3">
+          {!item.promoted_qna_id && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => handlePromote(item)}
+                className="px-3 py-2 bg-blue-600 text-white text-sm rounded"
+              >
+                Promote
+              </button>
+            </div>
+          )}
+        </div>
+      );
     }
 
     return (
@@ -325,19 +332,16 @@ export default function QnaSubmissionsPage() {
               )}
 
               {/* Promote button — only before promotion */}
-              {(item.status === STATUS.ANSWERED_RECEIVED ||
-                item.status === STATUS.READY_TO_PROMOTE) &&
-                !item.promoted_qna_id &&
-                response.answer && (
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={() => handlePromote(item, response)}
-                      className="px-3 py-2 bg-blue-600 text-white text-sm rounded"
-                    >
-                      Promote
-                    </button>
-                  </div>
-                )}
+              {!item.promoted_qna_id && (
+                <div className="mt-3 flex justify-end">
+                  <button
+                    onClick={() => handlePromote(item, response)}
+                    className="px-3 py-2 bg-blue-600 text-white text-sm rounded"
+                  >
+                    Promote
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}

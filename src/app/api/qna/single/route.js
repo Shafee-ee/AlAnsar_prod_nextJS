@@ -207,6 +207,7 @@ export async function POST(req) {
          Enforce review workflow on the backend
       ------------------------------------------------------- */
       if (
+        submission.status !== QNA_SUBMISSION_STATUS.APPROVED &&
         submission.status !== QNA_SUBMISSION_STATUS.ANSWERED_RECEIVED &&
         submission.status !== QNA_SUBMISSION_STATUS.READY_TO_PROMOTE
       ) {
@@ -241,15 +242,7 @@ export async function POST(req) {
                 : null,
             )
         : await getSubmissionResponse(submissionId);
-      if (!submissionResponse?.answer) {
-        return NextResponse.json(
-          {
-            success: false,
-            reason: "no-ustaad-response",
-          },
-          { status: 409 },
-        );
-      }
+
       /* -------------------------------------------------------
    Fill only fields that are missing.
    
@@ -273,7 +266,11 @@ export async function POST(req) {
       }
 
       // Answer
-      if (!answer_en.trim() && !answer_kn.trim()) {
+      if (
+        !answer_en.trim() &&
+        !answer_kn.trim() &&
+        submissionResponse?.answer
+      ) {
         if (isKannada(submissionResponse.answer)) {
           answer_kn = submissionResponse.answer;
         } else {

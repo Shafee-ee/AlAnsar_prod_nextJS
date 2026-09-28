@@ -67,16 +67,19 @@ export async function GET(req) {
 
     // 4. merge + return
     return NextResponse.json({
+      id: article.id,
       slug: article.slug,
       category: article.category,
       topics: article.topics,
       image: article.coverImage,
       isFeatured: article.isFeatured,
+      likes: article.likes || 0,
       language: translation.language,
       title: translation.title,
       excerpt: translation.excerpt,
       content: translation.content,
       author: translation.author,
+      views: article.views || 0,
     });
   } catch (err) {
     console.error("Fetch by slug failed:", err);

@@ -2,10 +2,14 @@ import ArticleView from "@/components/ArticleView";
 import RelatedArticles from "@/components/RelatedArticles";
 import ArticleAd from "@/components/ads/ArticleAd";
 
+const SITE_URL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : process.env.NEXT_PUBLIC_SITE_URL;
+
 export async function generateMetadata({ params, searchParams }) {
   const { slug } = await params;
   const { lang = "kn" } = await searchParams;
-
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
     { next: { revalidate: 60 } },
@@ -18,9 +22,8 @@ export async function generateMetadata({ params, searchParams }) {
   }
 
   const article = await res.json();
-
-  const articleUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/article/${article.slug}?lang=${lang}`;
-
+  console.log("ARTICLE PAGE RESPONSE ID:", article.id);
+  const articleUrl = `${SITE_URL}/article/${article.slug}?lang=${lang}`;
   return {
     title: article.title,
     description: article.excerpt,
@@ -58,11 +61,14 @@ export async function generateMetadata({ params, searchParams }) {
 export default async function ArticlePage({ params, searchParams }) {
   const { slug } = await params;
   const { lang = "kn" } = await searchParams;
+  console.log("SITE URL:", process.env.NEXT_PUBLIC_SITE_URL);
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_SITE_URL}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
-    { next: { revalidate: 60 } },
+    `${SITE_URL}/api/articles/by-slug?slug=${slug}&lang=${lang}`,
+    { cache: "no-store" },
   );
+
+  console.log("ARTICLE API STATUS:", res.status);
 
   if (!res.ok) {
     return <div>Article not found</div>;
@@ -76,7 +82,7 @@ export default async function ArticlePage({ params, searchParams }) {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           {/* ARTICLE */}
           <div className="lg:col-span-8">
-            <ArticleView article={article} />
+            <ArticleView article={{ ...article, id: article.id }} />
           </div>
           {/* SIDEBAR */}
           <div className="space-y-6 self-start lg:col-span-4 lg:sticky lg:top-8">

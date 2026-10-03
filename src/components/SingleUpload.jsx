@@ -1,16 +1,35 @@
 "use client";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "@/lib/firebaseClient";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useSearchParams } from "next/navigation";
+
+const QNA_KEYWORDS = [
+  "Namaz",
+  "Dua",
+  "Fasting",
+  "Hajj and Umrah",
+  "Qiyamah",
+  "Festivals",
+  "Marriage",
+  "Birth",
+  "Inheritance",
+  "Transactions",
+  "Death",
+  "Vows",
+  "Dress and Adornment",
+  "Children",
+];
 
 export default function SingleUpload() {
   const [questionEn, setQuestionEn] = useState("");
   const [questionKn, setQuestionKn] = useState("");
   const [answerEn, setAnswerEn] = useState("");
   const [answerKn, setAnswerKn] = useState("");
-  const [keywords, setKeywords] = useState("");
+  const [keywords, setKeywords] = useState([]);
+  const [showKeywordList, setShowKeywordList] = useState(false);
+  const keywordRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [editorNoteEn, setEditorNoteEn] = useState("");
   const [editorNoteKn, setEditorNoteKn] = useState("");
@@ -96,6 +115,20 @@ export default function SingleUpload() {
         });
     }
   }, [fromSubmission, submissionId, questionFromUrl, answerFromUrl]);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (keywordRef.current && !keywordRef.current.contains(event.target)) {
+        setShowKeywordList(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   async function handleTranslateAll() {
     const jobs = [];
 
@@ -248,6 +281,15 @@ export default function SingleUpload() {
     img.src = objectUrl;
   }
 
+  //keywords
+  function toggleKeyword(keyword) {
+    setKeywords((current) =>
+      current.includes(keyword)
+        ? current.filter((item) => item !== keyword)
+        : [...current, keyword],
+    );
+  }
+
   // handle submit function
   async function handleSubmit(e) {
     e.preventDefault();
@@ -269,11 +311,6 @@ export default function SingleUpload() {
 
     setLoading(true);
 
-    const keywordArray = keywords
-      .split(",")
-      .map((k) => k.trim())
-      .filter((k) => k.length > 0);
-
     const res = await fetch("/api/qna/single", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -282,7 +319,7 @@ export default function SingleUpload() {
         question_kn: questionKn,
         answer_en: answerEn,
         answer_kn: answerKn,
-        keywords: keywordArray,
+        keywords,
         editor_note_en: editorNoteEn,
         editor_note_kn: editorNoteKn,
         imam_name: imamName,
@@ -325,7 +362,7 @@ export default function SingleUpload() {
       setQuestionKn("");
       setAnswerEn("");
       setAnswerKn("");
-      setKeywords("");
+      setKeywords([]);
       setEditorNoteEn("");
       setEditorNoteKn("");
       setImamName("");
@@ -418,15 +455,69 @@ export default function SingleUpload() {
       </div>
 
       {/* Keywords */}
-      <div className="space-y-2">
-        <label className="font-medium">Keywords (comma separated)</label>
-        <input
-          type="text"
-          value={keywords}
-          onChange={(e) => setKeywords(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1D3F9A]"
-          placeholder="e.g. prayer, wudu, fasting"
-        />
+      <div ref={keywordRef} className="space-y-2">
+        <label className="font-medium">Keywords</label>
+
+        <div className="relative">
+          {/* Selected keywords / input */}
+          <button
+            type="button"
+            onClick={() => setShowKeywordList((open) => !open)}
+            className="w-full min-h-[52px] p-2 border border-gray-300 rounded-lg bg-white text-left hover:border-[#1D3F9A] transition"
+          >
+            {keywords.length === 0 ? (
+              <span className="text-gray-500 px-1">Add keywords...</span>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {keywords.map((keyword) => (
+                  <span
+                    key={keyword}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-300 text-sm text-gray-700"
+                  >
+                    {keyword}
+
+                    <span
+                      role="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleKeyword(keyword);
+                      }}
+                      className="text-gray-500 hover:text-red-600 font-medium cursor-pointer"
+                    >
+                      ×
+                    </span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </button>
+
+          {/* Keyword dropdown */}
+          {showKeywordList && (
+            <div className="absolute z-30 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg p-2">
+              <div className="flex flex-wrap gap-2">
+                {QNA_KEYWORDS.map((keyword) => {
+                  const selected = keywords.includes(keyword);
+
+                  return (
+                    <button
+                      key={keyword}
+                      type="button"
+                      onClick={() => toggleKeyword(keyword)}
+                      className={`inline-flex items-center px-3 py-2 rounded-lg border text-sm transition ${
+                        selected
+                          ? "bg-[#1D3F9A] text-white border-[#1D3F9A]"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-[#1D3F9A]"
+                      }`}
+                    >
+                      {keyword}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Editor Note (English) */}

@@ -5,8 +5,10 @@ export async function GET(req) {
 
   const lang = searchParams.get("lang") || "kn";
 
-  const snap = await adminDB.collection("qna_items").get();
-
+  const snap = await adminDB
+    .collection("qna_items")
+    .orderBy("createdAt", "asc")
+    .get();
   const items = snap.docs.map((doc) => doc.data());
 
   const content = items

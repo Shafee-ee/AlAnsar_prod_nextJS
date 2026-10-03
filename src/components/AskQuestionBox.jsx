@@ -67,6 +67,17 @@ export default function AskQuestionBox({
     },
   };
 
+  const SuccessMessage = {
+    en: {
+      title: "Question submitted",
+      text: "Your question has been submitted successfully. We will get back to you with the answer. The answer will be sent to the email address or mobile number you provided.",
+    },
+    kn: {
+      title: "ನಿಮ್ಮ ಪ್ರಶ್ನೆಯನ್ನು ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ",
+      text: "ನಾವು ಉತ್ತರದೊಂದಿಗೆ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತೇವೆ. ನೀವು ನೀಡಿರುವ ಇಮೇಲ್ ವಿಳಾಸ ಅಥವಾ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಗೆ ಉತ್ತರವನ್ನು ಕಳುಹಿಸಲಾಗುತ್ತದೆ.",
+    },
+  };
+
   useEffect(() => {
     if (forceOpen) {
       setMode("input");
@@ -273,19 +284,12 @@ export default function AskQuestionBox({
           <div className="text-center space-y-6">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-gray-900">
-                Question submitted
+                {SuccessMessage[lang].title}
               </h3>
 
               <p className="text-sm text-gray-600">
-                Your question has been sent to our scholars for review. If
-                approved, it will be answered and published.
+                {SuccessMessage[lang].text}
               </p>
-              {!isAnonymous && (email || phone) && (
-                <p className="text-sm text-gray-500">
-                  You will be contacted at{" "}
-                  <span className="font-medium">{email || phone}</span>
-                </p>
-              )}
 
               <button
                 onClick={() => {
@@ -298,7 +302,9 @@ export default function AskQuestionBox({
                 }}
                 className="mt-4 px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
               >
-                Ask another question
+                {lang === "kn"
+                  ? "ಮತ್ತೊಂದು ಪ್ರಶ್ನೆ ಕೇಳಿ"
+                  : "Ask another question"}
               </button>
             </div>
           </div>

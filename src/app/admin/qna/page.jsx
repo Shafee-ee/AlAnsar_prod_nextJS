@@ -57,7 +57,7 @@ export default function QnAUploadPanel() {
       <div className="bg-white shadow-md p-6 rounded-b-lg border">
         {activeTab === "single" && <SingleUpload />}
         {activeTab === "bulk" && <BulkUpload />}
-        {activeTab === "manage" && <ManageQnA />};
+        {activeTab === "manage" && <ManageQnA />}
       </div>
     </div>
   );

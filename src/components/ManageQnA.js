@@ -4,6 +4,23 @@ import { useState, useEffect } from "react";
 import { FiTrash2 } from "react-icons/fi";
 import toast from "react-hot-toast";
 
+const QNA_KEYWORDS = [
+  "Namaz",
+  "Dua",
+  "Fasting",
+  "Hajj and Umrah",
+  "Qiyamah",
+  "Festivals",
+  "Marriage",
+  "Birth",
+  "Inheritance",
+  "Transactions",
+  "Death",
+  "Vows",
+  "Dress and Adornment",
+  "Children",
+];
+
 export default function ManageQnA() {
   const [items, setItems] = useState([]);
   const [allItems, setAllItems] = useState([]);
@@ -235,6 +252,7 @@ export default function ManageQnA() {
           source_title: selectedItem.source_title || "",
           samputa: selectedItem.samputa ?? null,
           sanchike: selectedItem.sanchike ?? null,
+          keywords: selectedItem.keywords || [],
         },
       }),
     });
@@ -260,6 +278,7 @@ export default function ManageQnA() {
               source_title: selectedItem.source_title,
               samputa: selectedItem.samputa,
               sanchike: selectedItem.sanchike,
+              keywords: selectedItem.keywords,
             }
           : i,
       ),
@@ -544,6 +563,40 @@ export default function ManageQnA() {
             </div>
 
             <hr />
+
+            <div>
+              <h3 className="text-xs font-semibold mb-2">Keywords</h3>
+
+              <div className="flex flex-wrap gap-2">
+                {QNA_KEYWORDS.map((keyword) => {
+                  const selected = (selectedItem.keywords || []).includes(
+                    keyword,
+                  );
+
+                  return (
+                    <button
+                      key={keyword}
+                      type="button"
+                      onClick={() =>
+                        setSelectedItem((prev) => ({
+                          ...prev,
+                          keywords: selected
+                            ? (prev.keywords || []).filter((k) => k !== keyword)
+                            : [...(prev.keywords || []), keyword],
+                        }))
+                      }
+                      className={`px-3 py-1 rounded-full text-xs border ${
+                        selected
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-gray-700 border-gray-300"
+                      }`}
+                    >
+                      {keyword}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Editor's Notes */}
             <div>

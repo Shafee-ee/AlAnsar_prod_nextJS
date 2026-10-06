@@ -110,6 +110,69 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
+    //.........................
+    //Check whether the QNA question already exists both english and kannada
+    //..........................
+
+    if (body.action === "check-duplicate") {
+      const questionEn = String(body.question_en || "").trim();
+      const questionKn = String(body.question_kn || "").trim();
+
+      if (!questionEn && !questionKn) {
+        return NextResponse.json(
+          {
+            success: false,
+            reason: "missing-question",
+          },
+          { status: 400 },
+        );
+      }
+
+      const checks = [];
+      if (questionEn) {
+        checks.push(
+          adminDB
+            .collection("qna_items")
+            .where("question_en", "==", questionEn)
+            .limit(1)
+            .get(),
+        );
+      } else {
+        checks.push(null);
+      }
+
+      if (questionKn) {
+        checks.push(
+          adminDB
+            .collection("qna_items")
+            .where("question_kn", "==", questionKn)
+            .limit(1)
+            .get(),
+        );
+      } else {
+        checks.push(null);
+      }
+
+      const [englishSnap, kannadaSnap] = await Promise.all(
+        checks.map((check) => check || Promise.resolve(null)),
+      );
+
+      const matches = [];
+
+      if (englishSnap?.docs.length) {
+        matches.push("en");
+      }
+      if (kannadaSnap?.docs.length) {
+        matches.push("kn");
+      }
+
+      return NextResponse.json({
+        success: true,
+        duplicate: matches.length > 0,
+        matches,
+      });
+    }
+
     /* -------------------------------------------------------
        TRANSLATION REQUEST
     ------------------------------------------------------- */

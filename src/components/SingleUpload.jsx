@@ -43,6 +43,9 @@ export default function SingleUpload() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
+  //check duplicate
+  const [checkingDuplicate, setCheckingDuplicate] = useState(false);
+
   //prefill QnA from submissions
   const searchParams = useSearchParams();
   const fromSubmission = searchParams.get("fromSubmission");
@@ -290,6 +293,54 @@ export default function SingleUpload() {
     );
   }
 
+  async function handleCheckDuplicate() {
+    if (!questionEn.trim() && !questionKn.trim()) {
+      toast.error("Enter a question first.");
+      return;
+    }
+
+    setCheckingDuplicate(true);
+
+    try {
+      const res = await fetch("/api/qna/single", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          action: "check-duplicate",
+          question_en: questionEn,
+          question_kn: questionKn,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        toast.error("Could not check the question.");
+        return;
+      }
+
+      if (data.duplicate) {
+        if (data.matches.includes("en") && data.matches.includes("kn")) {
+          toast.error("This question already exists in English and Kannada");
+        } else if (data.matches.includes("en")) {
+          toast.error("This question already exists in English");
+        } else {
+          toast.error("This question already exists in Kannada");
+        }
+
+        return;
+      }
+
+      toast.success("No matching question found ");
+    } catch (error) {
+      console.error("Duplicate Check failed:", error);
+      toast.error("Could not check the question.");
+    } finally {
+      setCheckingDuplicate(false);
+    }
+  }
+
   // handle submit function
   async function handleSubmit(e) {
     e.preventDefault();
@@ -452,6 +503,18 @@ export default function SingleUpload() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Check duplicate question */}
+      <div className="flex justify-center">
+        <button
+          type="button"
+          onClick={handleCheckDuplicate}
+          disabled={checkingDuplicate}
+          className="px-5 py-2 border border-[#1D3F9A] text-[#1D3F9A] rounded-lg hover:bg-[#1D3F9A] hover:text-white transition disabled:opacity-50"
+        >
+          {checkingDuplicate ? "Checking..." : "Check Question"}
+        </button>
       </div>
 
       {/* Keywords */}

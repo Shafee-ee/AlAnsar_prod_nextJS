@@ -44,6 +44,10 @@ export default function AtticlesPage() {
       value: "Quranic vyakhanagalu",
       label: lang === "kn" ? "ಖುರ್ಆನ್ ವ್ಯಾಖ್ಯಾನ" : "Quran Translation",
     },
+    {
+      value: "Prophets in Quran",
+      label: lang === "kn" ? "ಪ್ರವಾದಿಗಳು" : "Prophets in Quran",
+    },
   ];
 
   async function loadArticles() {

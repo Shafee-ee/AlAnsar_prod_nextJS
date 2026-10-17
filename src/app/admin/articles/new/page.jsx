@@ -69,6 +69,7 @@ export default function NewArticlePage() {
             <option value="Vismaya Jagattu">Vismaya Jagattu</option>
             <option value="Vishleshanagalu">Vishleshanagalu</option>
             <option value="Quranic vyakhanagalu">Quranic vyakhanagalu</option>
+            <option value="Prophets in Qur'an">Prophets in Qur'an</option>
           </select>
         </div>
         {/*Featured  */}

@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 
 const QNA_KEYWORDS = [
   "Namaz",
-  "wudu",
+  "Wudu",
   "Dua",
   "Fasting",
   "Hajj and Umrah",

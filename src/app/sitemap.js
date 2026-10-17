@@ -24,7 +24,14 @@ export default async function sitemap() {
   ];
 
   //public QNA pages
+  console.log("[sitemap] Q&A query started", Date.now());
   const qnaSnapshot = await adminDB.collection("qna_items").get();
+  console.log(
+    "[sitemap] Q&A query finished",
+    Date.now(),
+    "documents:",
+    qnaSnapshot.size,
+  );
 
   for (const doc of qnaSnapshot.docs) {
     const data = doc.data();
@@ -43,41 +50,52 @@ export default async function sitemap() {
   }
 
   //published articles
+  console.time("sitemap:article query");
   const articleSnapshot = await adminDB
     .collection("articles")
     .where("status", "==", "published")
     .get();
+  console.timeEnd("sitemap:article query");
+
+  console.log(
+    "[sitemap] article loop started",
+    Date.now(),
+    "documents:",
+    articleSnapshot.size,
+  );
 
   for (const doc of articleSnapshot.docs) {
     const article = doc.data();
     if (!article.slug) continue;
 
-    const translationsSnapshot = await doc.ref.collection("translations").get();
-
-    for (const translationDoc of translationsSnapshot.docs) {
+    const translationDoc = await doc.ref
+      .collection("translations")
+      .doc("en")
+      .get();
+    if (translationDoc.exists) {
       const translation = translationDoc.data();
-      const lang = translationDoc.id;
 
-      //match the existing article route's availability behaviour
-
-      if (!translation.title || !translation.content) continue;
-
-      urls.push({
-        url: `${SITE_URL}/article/${article.slug}?lang=${lang}`,
-        lastModified: safeDate(article.updatedAt, now),
-        changeFrequency: "monthly",
-        priority: 0.8,
-      });
+      if (translation.title && translation.content) {
+        urls.push({
+          url: `${SITE_URL}/article/${article.slug}?lang=en`,
+          lastModified: safeDate(article.updatedAt, now),
+          changeFrequency: "monthly",
+          priority: 0.8,
+        });
+      }
     }
   }
 
+  console.log("[sitemap] article loop finished", Date.now());
+
   //published Digipaper issues
 
+  console.time("sitemap: digipaper query");
   const issuesSnapshot = await adminDB
     .collection("digipaper_issues")
     .where("status", "==", "published")
     .get();
-
+  console.timeEnd("sitemap: digipaper query");
   for (const doc of issuesSnapshot.docs) {
     urls.push({
       url: `${SITE_URL}/digipaper/${encodeURIComponent(doc.id)}`,

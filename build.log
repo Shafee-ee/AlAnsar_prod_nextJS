@@ -1,0 +1,153 @@
+
+> alansarweekly-app@0.1.0 build
+> next build
+
+   ▲ Next.js 15.3.6
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Compiled with warnings in 5.0s
+
+./src/components/CalendarManage.jsx
+Attempted import error: 'app' is not exported from '@/lib/firebaseClient' (imported as 'app').
+
+Import trace for requested module:
+./src/components/CalendarManage.jsx
+./src/app/admin/calendar/page.jsx
+
+./src/components/CalendarManage.jsx
+Attempted import error: 'app' is not exported from '@/lib/firebaseClient' (imported as 'app').
+
+Import trace for requested module:
+./src/components/CalendarManage.jsx
+./src/app/admin/calendar/page.jsx
+
+ ⚠ Compiled with warnings in 5.0s
+
+./src/components/CalendarManage.jsx
+Attempted import error: 'app' is not exported from '@/lib/firebaseClient' (imported as 'app').
+
+Import trace for requested module:
+./src/components/CalendarManage.jsx
+./src/app/admin/calendar/page.jsx
+
+./src/components/CalendarManage.jsx
+Attempted import error: 'app' is not exported from '@/lib/firebaseClient' (imported as 'app').
+
+Import trace for requested module:
+./src/components/CalendarManage.jsx
+./src/app/admin/calendar/page.jsx
+
+ ✓ Compiled successfully in 10.0s
+   Linting and checking validity of types ...
+ ⨯ ESLint: nextVitals is not iterable
+   Collecting page data ...
+API KEY PRESENT: true
+   Generating static pages (0/73) ...
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+   Generating static pages (18/73) 
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+[sitemap] Q&A query started 1792266535776
+   Generating static pages (36/73) 
+API KEY PRESENT: true
+   Generating static pages (54/73) 
+[sitemap] Q&A query finished 1792266546544 documents: 2154
+sitemap:article query: 392.461ms
+[sitemap] article loop started 1792266547590 documents: 322
+[sitemap] article loop finished 1792266574647
+(node:90940) Warning: No such label 'sitemap:article query' for console.timeEnd()
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ Generating static pages (73/73)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    44.5 kB         353 kB
+├ ○ /_not-found                            981 B         102 kB
+├ ƒ /about                                 175 B         107 kB
+├ ○ /admin                                 364 B         102 kB
+├ ○ /admin/ads                           1.69 kB         103 kB
+├ ○ /admin/articles                      2.01 kB         103 kB
+├ ƒ /admin/articles/[id]                 1.57 kB         108 kB
+├ ƒ /admin/articles/by-id                  292 B         101 kB
+├ ○ /admin/articles/new                  1.11 kB         102 kB
+├ ○ /admin/calendar                       3.9 kB         314 kB
+├ ○ /admin/calendar/upload               1.52 kB         312 kB
+├ ○ /admin/digipaper                     2.95 kB         287 kB
+├ ƒ /admin/digipaper/manage                292 B         101 kB
+├ ○ /admin/digipaper/upload              1.65 kB         286 kB
+├ ○ /admin/qna                           9.06 kB         294 kB
+├ ○ /admin/qna/qna-submissions           2.79 kB         104 kB
+├ ƒ /api/ads                               292 B         101 kB
+├ ƒ /api/ads/upload                        292 B         101 kB
+├ ƒ /api/articles                          292 B         101 kB
+├ ƒ /api/articles/by-id                    292 B         101 kB
+├ ƒ /api/articles/by-slug                  292 B         101 kB
+├ ƒ /api/articles/create                   292 B         101 kB
+├ ƒ /api/articles/delete                   292 B         101 kB
+├ ƒ /api/articles/like                     292 B         101 kB
+├ ƒ /api/articles/og-image                 292 B         101 kB
+├ ƒ /api/articles/related                  292 B         101 kB
+├ ƒ /api/articles/translations/create      292 B         101 kB
+├ ƒ /api/articles/translations/list        292 B         101 kB
+├ ƒ /api/articles/translations/update      292 B         101 kB
+├ ƒ /api/articles/update-featured          292 B         101 kB
+├ ƒ /api/articles/update-status            292 B         101 kB
+├ ƒ /api/articles/upload-image             292 B         101 kB
+├ ƒ /api/articles/view                     292 B         101 kB
+├ ƒ /api/calendar/delete                   292 B         101 kB
+├ ƒ /api/calendar/dua                      292 B         101 kB
+├ ƒ /api/calendar/upload                   292 B         101 kB
+├ ƒ /api/digipaper/by-slug                 292 B         101 kB
+├ ƒ /api/embed                             292 B         101 kB
+├ ƒ /api/is-admin                          292 B         101 kB
+├ ƒ /api/pdf/[slug]                        292 B         101 kB
+├ ƒ /api/qa-search                         292 B         101 kB
+├ ƒ /api/qna/audit                         292 B         101 kB
+├ ƒ /api/qna/bulk                          292 B         101 kB
+├ ƒ /api/qna/by-id                         292 B         101 kB
+├ ƒ /api/qna/csv                           292 B         101 kB
+├ ƒ /api/qna/delete                        292 B         101 kB
+├ ƒ /api/qna/delete-all                    292 B         101 kB
+├ ƒ /api/qna/delete-submissions            292 B         101 kB
+├ ƒ /api/qna/export                        292 B         101 kB
+├ ƒ /api/qna/export-html                   292 B         101 kB
+├ ƒ /api/qna/export-qna-pdf                292 B         101 kB
+├ ƒ /api/qna/fix-all                       292 B         101 kB
+├ ƒ /api/qna/fix-embedding                 292 B         101 kB
+├ ƒ /api/qna/link-submissions              292 B         101 kB
+├ ƒ /api/qna/list                          292 B         101 kB
+├ ƒ /api/qna/paginated                     292 B         101 kB
+├ ƒ /api/qna/resend-imam-email             292 B         101 kB
+├ ƒ /api/qna/single                        292 B         101 kB
+├ ƒ /api/qna/submission-contact            292 B         101 kB
+├ ƒ /api/qna/submissions-count             292 B         101 kB
+├ ƒ /api/qna/submissions-list              292 B         101 kB
+├ ƒ /api/qna/update                        292 B         101 kB
+├ ƒ /api/qna/update-submission-status      292 B         101 kB
+├ ƒ /api/qna/user-submission               292 B         101 kB
+├ ƒ /api/stats                             292 B         101 kB
+├ ƒ /api/translate                         292 B         101 kB
+├ ƒ /api/webhooks/resend                   292 B         101 kB
+├ ○ /article                             2.23 kB         103 kB
+├ ƒ /article/[slug]                      4.25 kB         105 kB
+├ ○ /BookLoader                          3.98 kB         105 kB
+├ ƒ /calendar                            3.78 kB         105 kB
+├ ƒ /digipaper                           1.09 kB         106 kB
+├ ƒ /digipaper/[slug]                      176 B         105 kB
+├ ○ /login                               1.87 kB         307 kB
+├ ○ /nudi-analyzer                       1.03 kB         102 kB
+├ ○ /privacy-policy                        292 B         101 kB
+├ ƒ /qna/[id]                             3.6 kB         105 kB
+├ ƒ /qna/[id]/opengraph-image/[lang]       292 B         101 kB
+├ ○ /sitemap.xml                           292 B         101 kB
+└ ○ /soon-to-be-published                1.05 kB         108 kB
++ First Load JS shared by all             101 kB
+  ├ chunks/1684-6eb554ea70c6d0f0.js      46.1 kB
+  ├ chunks/4bd1b696-f62c1a3f55cd2a1e.js  53.2 kB
+  └ other shared chunks (total)          1.93 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

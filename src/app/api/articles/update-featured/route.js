@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
+import { invalidateArticleCache } from "@/lib/articleCache";
 
 export async function POST(req) {
   try {
@@ -25,6 +26,7 @@ export async function POST(req) {
       updatedAt: new Date(),
     });
 
+    invalidateArticleCache();
     return NextResponse.json({
       success: true,
     });

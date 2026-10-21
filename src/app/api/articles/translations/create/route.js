@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { adminDB } from "@/lib/firebaseAdmin";
+import { invalidateArticleCache } from "@/lib/articleCache";
 
 function slugify(text) {
   return text
@@ -143,7 +144,7 @@ export async function POST(req) {
     }
 
     await articleRef.update(articleUpdate);
-
+    invalidateArticleCache();
     return NextResponse.json({
       articleId,
       language: normalizedLanguage,

@@ -107,7 +107,6 @@ const Footer = () => {
         </div>
 
         {/* Bottom */}
-        {/* Bottom */}
         <div className="text-center text-xs text-white/50 border-white/10 pt-4 mt-6">
           <a
             href="/privacy-policy"

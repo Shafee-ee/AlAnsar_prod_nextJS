@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 const QNA_KEYWORDS = [
   "Namaz",
   "Wudu",
+  "Zakat",
   "Dua",
   "Fasting",
   "Hajj and Umrah",

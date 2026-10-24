@@ -73,7 +73,15 @@ export default function QnaContent({ id, data, lang }) {
                 <h2 className="text-sm md:text-3xl font-medium max-w-3xl leading-snug">
                   {lang === "en" ? "Question:" : "ಪ್ರಶ್ನೆ:"}
                 </h2>
-                <p className="text-lg md:text-2xl font-semibold max-w-3xl leading-snug select-none">
+                <p
+                  className={`font-semibold max-w-3xl leading-snug select-none ${
+                    question.length > 250
+                      ? "text-sm md:text-lg"
+                      : question.length > 150
+                        ? "text-base md:text-xl"
+                        : "text-lg md:text-2xl"
+                  }`}
+                >
                   {question}
                 </p>
               </div>

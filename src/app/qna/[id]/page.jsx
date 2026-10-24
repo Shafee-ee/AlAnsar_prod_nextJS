@@ -113,36 +113,5 @@ export default async function QnAPage(props) {
   const data = await getQnaById(id);
   if (!data) notFound();
 
-  const currentEmbedding = data.embedding || [];
-  let relatedQuestions = [];
-
-  if (currentEmbedding.length) {
-    const allItems = await loadQnaEmbeddingsIfNeeded();
-
-    relatedQuestions = allItems
-      .map((item) => {
-        if (item.id === id) return null;
-        if (!item.embedding) return null;
-
-        return {
-          id: item.id,
-          question_en: item.question_en,
-          question_kn: item.question_kn,
-          image_urls: item.image_urls || [],
-          score: cosine(currentEmbedding, item.embedding),
-        };
-      })
-      .filter(Boolean)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 10);
-  }
-
-  return (
-    <QnaContent
-      id={id}
-      data={data}
-      relatedQuestions={relatedQuestions}
-      lang={lang}
-    />
-  );
+  return <QnaContent id={id} data={data} relatedQuestions={[]} lang={lang} />;
 }

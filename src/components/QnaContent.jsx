@@ -1,8 +1,10 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import QnaShareButton from "@/components/QnaShareButton";
 
-export default function QnaContent({ id, data, relatedQuestions, lang }) {
+export default function QnaContent({ id, data, lang }) {
+  const [relatedQuestions, setRelatedQuestions] = useState([]);
+  const [relatedLoading, setRelatedLoading] = useState(true);
   const question = lang === "en" ? data.question_en : data.question_kn;
   const answer = lang === "en" ? data.answer_en : data.answer_kn;
   const editorNote = lang === "en" ? data.editor_note_en : data.editor_note_kn;
@@ -15,6 +17,40 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
     Boolean(data.source_title) ||
     Number(data.samputa) > 0 ||
     Number(data.sanchike) > 0;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadRelatedQuestions() {
+      setRelatedLoading(true);
+
+      try {
+        const response = await fetch(`/api/qna/${id}/related`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to load related questions");
+        }
+
+        const result = await response.json();
+        setRelatedQuestions(result.results || []);
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error("Related questions error:", error);
+          setRelatedQuestions([]);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setRelatedLoading(false);
+        }
+      }
+    }
+
+    loadRelatedQuestions();
+
+    return () => controller.abort();
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16 px-4">
@@ -156,7 +192,7 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
           </div>
 
           {/* RELATED */}
-          {relatedQuestions.length > 0 && (
+          {(relatedLoading || relatedQuestions.length > 0) && (
             <div className="mt-16">
               <h3 className="text-xl text-gray-800 font-semibold mb-6">
                 {lang === "en" ? "Related Questions" : "ಸಂಬಂಧಿತ ಪ್ರಶ್ನೆಗಳು"}
@@ -164,43 +200,48 @@ export default function QnaContent({ id, data, relatedQuestions, lang }) {
 
               <div className="overflow-x-auto">
                 <div className="flex gap-6 min-w-full pb-4">
-                  {relatedQuestions.map((item) => {
-                    const qText =
-                      lang === "kn" ? item.question_kn : item.question_en;
-
-                    const cardImage =
-                      item.image_urls?.length > 0
-                        ? item.image_urls[0]
-                        : fallbackImage;
-
-                    return (
-                      <a
-                        key={item.id}
-                        href={`/qna/${item.id}?lang=${lang}`}
-                        className="min-w-[300px] max-w-[300px] aspect-[1200/680] relative rounded-xl overflow-hidden shadow hover:shadow-lg transition"
-                      >
-                        <img
-                          src={cardImage}
-                          alt={qText}
-                          className="absolute inset-0 w-full h-full object-cover"
+                  {relatedLoading
+                    ? Array.from({ length: 3 }).map((_, index) => (
+                        <div
+                          key={index}
+                          className="min-w-[300px] max-w-[300px] aspect-[1200/680] animate-pulse rounded-xl bg-gray-200"
                         />
+                      ))
+                    : relatedQuestions.map((item) => {
+                        const qText =
+                          lang === "kn" ? item.question_kn : item.question_en;
 
-                        <div className="absolute inset-0 bg-black/40" />
+                        const cardImage =
+                          item.image_urls?.length > 0
+                            ? item.image_urls[0]
+                            : fallbackImage;
 
-                        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-                          <p className="text-white font-medium text-sm line-clamp-4">
-                            {qText}
-                          </p>
-                        </div>
-                      </a>
-                    );
-                  })}
+                        return (
+                          <a
+                            key={item.id}
+                            href={`/qna/${item.id}?lang=${lang}`}
+                            className="min-w-[300px] max-w-[300px] aspect-[1200/680] relative rounded-xl overflow-hidden shadow hover:shadow-lg transition"
+                          >
+                            <img
+                              src={cardImage}
+                              alt={qText}
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+
+                            <div className="absolute inset-0 bg-black/40" />
+
+                            <div className="absolute inset-0 flex items-center justify-center text-center px-4">
+                              <p className="text-white font-medium text-sm line-clamp-4">
+                                {qText}
+                              </p>
+                            </div>
+                          </a>
+                        );
+                      })}
                 </div>
               </div>
             </div>
           )}
-
-          {/* KELI NODI CTA */}
 
           {/* KELI NODI CTA */}
           <div className="mt-10 pt-6 border-t">

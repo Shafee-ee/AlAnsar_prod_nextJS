@@ -14,12 +14,10 @@ export default function AtticlesPage() {
   const router = useRouter();
 
   const categories = [
-    { value: "All", label: lang === "kn" ? "ಬರಹಗಳು" : "All" },
-
+    { value: "All", label: lang === "kn" ? "ಒಟ್ಟು ಲೇಖನಗಳು" : "All" },
     { value: "Hadith", label: lang === "kn" ? "ಹದೀಸ್ ದರ್ಪಣ" : "Hadith" },
 
-    { value: "Fiqh", label: lang === "kn" ? "ಕರ್ಮ ಶಾಸ್ತ್ರಿ" : "Fiqh" },
-
+    { value: "Fiqh", label: lang === "kn" ? "ಕರ್ಮ ಶಾಸ್ತ್ರ" : "Fiqh" },
     {
       value: "Islamic History",
       label: lang === "kn" ? "ಇತಿಹಾಸ" : "Islamic History",
@@ -32,20 +30,40 @@ export default function AtticlesPage() {
 
     {
       value: "Vishleshanagalu",
-      label: lang === "kn" ? "ವಿಶ್ವಕೋಶ" : "Analysis",
+      label: lang === "kn" ? "ಇತರ" : "Analysis",
     },
 
     {
       value: "Vismaya Jagattu",
       label: lang === "kn" ? "ವಿಸ್ಮಯ" : "Wonders of the World",
     },
+    {
+      value: "History",
+      label: lang === "kn" ? "ಕಥೆ" : "History",
+    },
+    {
+      value: "Serial",
+      label: lang === "kn" ? "ಧಾರಾವಾಹಿ" : "Serial",
+    },
+    {
+      value: "Poem",
+      label: lang === "kn" ? "ಕವನ" : "Poem",
+    },
+    {
+      value: "Health",
+      label: lang === "kn" ? "ಆರೋಗ್ಯ" : "Health",
+    },
+    {
+      value: "Editorial",
+      label: lang === "kn" ? "ಸಂಪಾದಕೀಯ" : "Editorial",
+    },
 
     {
       value: "Quranic vyakhanagalu",
-      label: lang === "kn" ? "ಖುರ್ಆನ್ ವ್ಯಾಖ್ಯಾನ" : "Quran Translation",
+      label: lang === "kn" ? "ಖುರ್'ಆನ್" : "Quran Translation",
     },
     {
-      value: "Prophets in Quran",
+      value: "Prophets in Qur'an",
       label: lang === "kn" ? "ಪ್ರವಾದಿಗಳು" : "Prophets in Quran",
     },
   ];
@@ -70,6 +88,14 @@ export default function AtticlesPage() {
     counts[article.category] = (counts[article.category] || 0) + 1;
     return counts;
   }, {});
+  console.log(
+    "ALL ARTICLE CATEGORIES:",
+    articles.map((article) => ({
+      id: article.id,
+      category: article.category,
+      status: article.status,
+    })),
+  );
 
   const filteredArticles = articles.filter((article) => {
     const matchesCategory =

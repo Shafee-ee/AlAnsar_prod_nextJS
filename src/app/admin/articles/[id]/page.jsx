@@ -18,12 +18,7 @@ export default function ArticlePage() {
   const [author, setAuthor] = useState("");
   const [saving, setSaving] = useState(false);
   const [image, setImage] = useState("");
-
-  useEffect(() => {
-    if (article) {
-      setImage(article.coverImage || "");
-    }
-  }, [article]);
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     async function load() {
@@ -35,6 +30,13 @@ export default function ArticlePage() {
 
     if (id) load();
   }, [id]);
+
+  useEffect(() => {
+    if (article) {
+      setImage(article.coverImage || "");
+      setCategory(article.category || "");
+    }
+  }, [article]);
 
   useEffect(() => {
     if (article?.translations?.[lang]) {
@@ -52,8 +54,24 @@ export default function ArticlePage() {
       toast.error("Title and content required");
       return;
     }
-
     setSaving(true);
+    try {
+      const categoryRes = await fetch("/api/articles/update-category", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ articleId: id, category }),
+      });
+
+      const categoryData = await categoryRes.json();
+
+      if (!categoryRes.ok) {
+        throw new Error(categoryData.error || "Failed to update category");
+      }
+    } catch (err) {
+      toast.error(err.message);
+      setSaving(false);
+      return;
+    }
 
     const detectedLanguage = /[\u0C80-\u0CFF]/.test(title) ? "kn" : "en";
 
@@ -159,6 +177,30 @@ export default function ArticlePage() {
         placeholder="Author"
         className="w-full border p-2"
       />
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Category</label>
+
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full border p-2 rounded"
+        >
+          <option value="Smariniyaru">Smaniyaru</option>
+          <option value="Islamic History">Islamic history</option>
+          <option value="Hadith">Hadith</option>
+          <option value="Fiqh">Fiqh</option>
+          <option value="Vismaya Jagattu">Vismaya Jagattu</option>
+          <option value="Vishleshanagalu">Vishleshanagalu</option>
+          <option value="Quranic vyakhanagalu">Quranic vyakhanagalu</option>
+          <option value="Prophets in Qur'an">Prophets in Qur'an</option>
+          <option value="History">History</option>
+          <option value="Serial">Serial</option>
+          <option value="Poem">Poem</option>
+          <option value="Health">Health</option>
+          <option value="Editorial">Editorial</option>
+        </select>
+      </div>
 
       <div className="space-y-2">
         <label className="text-sm font-medium">Cover Image</label>

@@ -64,12 +64,17 @@ export default function NewArticlePage() {
             <option value="">Select Category</option>
             <option value="Smariniyaru">Smaniyaru</option>
             <option value="Islamic History">Islamic history</option>
-            <option value="Hadith">Hadith </option>
+            <option value="Hadith">Hadith</option>
             <option value="Fiqh">Fiqh</option>
             <option value="Vismaya Jagattu">Vismaya Jagattu</option>
             <option value="Vishleshanagalu">Vishleshanagalu</option>
             <option value="Quranic vyakhanagalu">Quranic vyakhanagalu</option>
             <option value="Prophets in Qur'an">Prophets in Qur'an</option>
+            <option value="History">History</option>
+            <option value="Serial">Serial</option>
+            <option value="Poem">Poem</option>
+            <option value="Health">Health</option>
+            <option value="Editorial">Editorial</option>
           </select>
         </div>
         {/*Featured  */}

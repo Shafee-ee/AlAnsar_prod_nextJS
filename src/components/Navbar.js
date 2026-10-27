@@ -247,7 +247,7 @@ const Navbar = () => {
           </Link>
 
           <Link
-            href={`/aticle?lang=${lang}`}
+            href={`/article?lang=${lang}`}
             onClick={() => setIsMenuOpen(false)}
             className="block text-white text-base font-medium hover:bg-white/10 rounded px-3 py-2"
           >

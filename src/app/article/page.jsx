@@ -25,17 +25,17 @@ export default function AtticlesPage() {
 
     {
       value: "Smariniyaru",
-      label: lang === "kn" ? "ಸರಣಿ" : "Eminent Personalities",
+      label: lang === "kn" ? "ಸ್ಮರಣೀಯರು" : "Eminent Personalities",
     },
 
     {
       value: "Vishleshanagalu",
-      label: lang === "kn" ? "ಇತರ" : "Analysis",
+      label: lang === "kn" ? "ವಿಶ್ಲೇಷಣೆಗಳು" : "Analysis",
     },
 
     {
       value: "Vismaya Jagattu",
-      label: lang === "kn" ? "ವಿಸ್ಮಯ" : "Wonders of the World",
+      label: lang === "kn" ? "ವಿಸ್ಮಯ ಜಗತ್ತು" : "Wonders of the World",
     },
     {
       value: "History",

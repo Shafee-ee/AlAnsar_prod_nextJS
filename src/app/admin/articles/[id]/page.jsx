@@ -194,7 +194,7 @@ export default function ArticlePage() {
           <option value="Vishleshanagalu">Vishleshanagalu</option>
           <option value="Quranic vyakhanagalu">Quranic vyakhanagalu</option>
           <option value="Prophets in Qur'an">Prophets in Qur'an</option>
-          <option value="History">History</option>
+          <option value="History">Story</option>
           <option value="Serial">Serial</option>
           <option value="Poem">Poem</option>
           <option value="Health">Health</option>

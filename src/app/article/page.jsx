@@ -39,7 +39,7 @@ export default function AtticlesPage() {
     },
     {
       value: "History",
-      label: lang === "kn" ? "ಕಥೆ" : "History",
+      label: lang === "kn" ? "ಕಥೆ" : "Story",
     },
     {
       value: "Serial",

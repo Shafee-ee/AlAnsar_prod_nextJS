@@ -199,6 +199,7 @@ export default function ArticlePage() {
           <option value="Poem">Poem</option>
           <option value="Health">Health</option>
           <option value="Editorial">Editorial</option>
+          <option value="Hajj / Umrah">Hajj / Umrah</option>
         </select>
       </div>
 

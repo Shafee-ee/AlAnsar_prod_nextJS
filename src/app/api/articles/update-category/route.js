@@ -16,6 +16,7 @@ const ALLOWED_CATEGORIES = [
   "Poem",
   "Health",
   "Editorial",
+  "Hajj / Umrah",
 ];
 
 export async function PATCH(req) {

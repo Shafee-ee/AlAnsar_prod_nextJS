@@ -59,6 +59,11 @@ export default function AtticlesPage() {
     },
 
     {
+      value: "Hajj / Umrah",
+      label: lang === "kn" ? "ಹಜ್ಜ್ / ಉಮ್ರಾ" : "Hajj / Umrah",
+    },
+
+    {
       value: "Quranic vyakhanagalu",
       label: lang === "kn" ? "ಖುರ್'ಆನ್" : "Quran Translation",
     },

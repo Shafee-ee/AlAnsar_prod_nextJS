@@ -4359,3 +4359,144 @@ If the error remains, we continue investigating from that new state rather than 
 **Do not change anything in Meta right now.**
 
 Wait for the client to determine what official document exists for Al Ansar Weekly's sole proprietorship/business registration.
+
+###############
+# Al Ansar Weekly — Work Summary
+**Date:** 29 October 2026
+
+## 1. Article Categories
+
+### Kannada label changes
+The following Kannada category labels were requested:
+
+- `ಕರ್ಮ ಶಾಸ್ತ್ರೀ` → `ಕರ್ಮ ಶಾಸ್ತ್ರ`
+- `ವಿಶ್ಲೇಷಣೆಗಳು` → `ಇತರ`
+- `ಖುರ್'ಆನ್ ವ್ಯಾಖ್ಯಾನ` → `ಖುರ್'ಆನ್`
+- `ಬರಹಗಳು` → `ಒಟ್ಟು ಲೇಖನಗಳು`
+
+Additional clarification:
+- Use `ಸ್ಮರಣೀಯರು` instead of `ಸರಣಿ` in the relevant category naming.
+- Use `ವಿಸ್ಮಯ ಜಗತ್ತು` instead of `ವಿಸ್ಮಯ`.
+
+**Note:** Verify the final labels in the public category list against these requirements. The public page code pasted during this session still showed `ವಿಶ್ಲೇಷಣೆಗಳು` for the `Vishleshanagalu` category, so that particular label needs checking.
+
+### Categories added
+
+Five categories were added:
+
+| Stored category value | Kannada label |
+|---|---|
+| `History` | ಕಥೆ |
+| `Serial` | ಧಾರಾವಾಹಿ |
+| `Poem` | ಕವನ |
+| `Health` | ಆರೋಗ್ಯ |
+| `Editorial` | ಸಂಪಾದಕೀಯ |
+
+A further category, `Hajj / Umrah`, was added with the Kannada label `ಹಜ್ಜ್ / ಉಮ್ರಾ`.
+
+### Files updated and verified
+
+The `Hajj / Umrah` category was confirmed using `grep` in these four files:
+
+- `src/app/article/page.jsx` — public category list and filtering.
+- `src/app/admin/articles/new/page.jsx` — category dropdown for new articles.
+- `src/app/admin/articles/[id]/page.jsx` — category dropdown when editing articles.
+- `src/app/api/articles/update-category/route.js` — allowed category values for category updates.
+
+The actual public articles page is `src/app/article/page.jsx`, not `src/app/articles/page.jsx`.
+
+The creation API, `src/app/api/articles/create/route.js`, only checks that a category is provided and stores the submitted value. It does not maintain an allowed-category list, so no change was needed there.
+
+## 2. Category Count Bug — Fixed
+
+### Problem
+A published test article was assigned to `Prophets in Qur'an`, but the public Articles page showed a count of zero for that category.
+
+### Investigation
+Firestore confirmed the article document had:
+
+- Document ID: `dU8rzEO1ccbMKdtJtrlo`
+- Category: `Prophets in Qur'an`
+- Status: `published`
+- Slug: `test-article`
+
+The admin category value included an apostrophe, while the public category option used `Prophets in Quran` without one.
+
+### Fix
+In `src/app/article/page.jsx`, changed the category value to:
+
+```js
+value: "Prophets in Qur'an",
+```
+
+The visible English label remains `Prophets in Quran`.
+
+### Result
+The category count changed to **1**. The article creation/editing flow and public category count were verified to work for the test article.
+
+## 3. Subscription System — Planning
+
+No subscription implementation was started in this session. The architecture and requirements were discussed, and implementation is planned next.
+
+### Architecture decision
+Keep the existing Firebase/Firestore system. A migration to PostgreSQL is not justified by the expected user volume alone.
+
+Expected scale: approximately 200–1,000 accounts over the next five years.
+
+Planned separation of responsibilities:
+
+1. **Firebase Authentication:** registration, login, logout, password reset, and user identity.
+2. **Account management:** user profile and account settings.
+3. **Subscription management:** plans, payment verification, subscription status, expiry, renewal, cancellation, and access control.
+
+Firestore will continue to hold the existing Q&A, articles, and translations. Subscription data can also be stored in Firestore, provided the data model, security rules, and payment processing are designed correctly.
+
+Firebase UID will be the stable identifier connecting the authenticated user to their account and subscription records.
+
+### Subscription plans discussed
+
+All plans are annual subscriptions for DigiPaper access.
+
+| Plan | Price | Access |
+|---|---:|---|
+| Al Ansar Weekly | ₹750/year | Al Ansar Weekly DigiPaper |
+| Moilanji Monthly | ₹250/year | Moilanji DigiPaper |
+| Combo | ₹1,000/year | Both publications |
+
+These prices were discussed previously and should be reconfirmed before launch.
+
+The subscription scope discussed so far is DigiPaper access. No decision has been made to restrict ordinary Q&A or article access to paying subscribers.
+
+### Payment approach
+The existing payment method discussed was UPI through GPay/PhonePe using a static QR code and the number `+91 73385 78560`.
+
+Two approaches remain under consideration:
+
+- Manual payment verification by an administrator.
+- Automated verification using a payment gateway or suitable merchant integration.
+
+A static QR code alone does not reliably confirm the payer, selected plan, or payment status. Paid access must only be granted after server-side verification or an authorized manual approval.
+
+### Decisions still required
+- Manual or automated payment verification.
+- Registration and login flow.
+- Firestore account and subscription schema.
+- Subscription activation and access checks.
+- Expiry and renewal reminders.
+- Failed payments, refunds, and cancellation.
+- Upgrading between individual plans and the combo plan.
+- Payment history and receipts.
+- Admin controls to activate, extend, correct, or cancel subscriptions.
+
+## 4. Next Work Session
+
+Planned implementation order:
+
+1. Build Firebase Authentication flows.
+2. Implement account management and establish the Firestore user profile structure.
+3. Design the subscription data model.
+4. Implement the three annual subscription plans.
+5. Integrate payment verification and subscription activation.
+6. Implement expiry, renewal, and admin management.
+
+**First decision before implementing subscriptions:** determine whether UPI payments will be verified manually by an administrator or automatically through a payment integration.
